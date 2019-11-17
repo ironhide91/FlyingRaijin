@@ -3,45 +3,23 @@ using FlyingRaijin.Bencode.Ast.Dictionary;
 using FlyingRaijin.Bencode.Ast.Integer;
 using FlyingRaijin.Bencode.Ast.List;
 using FlyingRaijin.Bencode.Ast.Shared;
-using FlyingRaijin.Bencode.Parser.Base;
-using FlyingRaijin.Bencode.Parser.Dictionary;
-using FlyingRaijin.Bencode.Parser.Integer;
-using FlyingRaijin.Bencode.Parser.Shared;
-using FlyingRaijin.Bencode.Parser.String;
 using System;
 
-namespace FlyingRaijin.Bencode.Parser.List
+namespace FlyingRaijin.Bencode.Parser
 {
-    public sealed class BencodeListParser : NonTerminalParserBase<BencodeListNode>
+    public static partial class DelegateParsers
     {
-        public static IParser Parser =>
-            new BencodeListParser(Pack(
-                    ListStartParser.Parser,
-                    BencodeIntegerParser.Parser,
-                    BencodeStringParser.Parser,
-                    BencodeDictionaryParser.Parser,
-                    EndParser.Parser));
-
-        private BencodeListParser(ParserDictionary dependentParsers) : base(dependentParsers)
-        {
-            Parsers = dependentParsers;
-        }
-
-        public override Production ProductionType => Production.BENCODED_LIST;
-
-        protected override ParserDictionary Parsers { get; set; }
-
-        public override void Parse(ParseContext context, NodeBase ast)
+        public static void BencodeListParser(ParseContext context, NodeBase ast)
         {
             var node = new BencodeListNode();
             ast.Children.Add(node);
 
-            Parsers[Production.LIST_START].Parse(context, node);
+            ListStartParser(context, node);
             ParseRecursiveList(context, node);
-            Parsers[Production.END].Parse(context, node);
+            EndParser(context, node);
         }
 
-        private void ParseRecursiveList(ParseContext context, NodeBase ast)
+        private static void ParseRecursiveList(ParseContext context, NodeBase ast)
         {
             context.HasTokens();
 
@@ -58,12 +36,12 @@ namespace FlyingRaijin.Bencode.Parser.List
                 if (context.LookAheadByte == IntegerStartNode.IntegerStartNonTerminalByte)
                 {
                     //- Possible Bencoded Integer
-                    Parsers[Production.BENCODED_INTEGER].Parse(context, node);
+                    BencodeIntegerParser(context, node);
                 }
                 else if (char.IsDigit(Convert.ToChar(context.LookAheadByte)))
                 {
                     //- Possible Bencoded String
-                    Parsers[Production.BENCODED_STRING].Parse(context, node);
+                    BencodeStringParser(context, node);
                 }
                 else if (context.LookAheadByte == ListStartNode.ListStartTerminalByte)
                 {
@@ -71,14 +49,14 @@ namespace FlyingRaijin.Bencode.Parser.List
                     var nestedListNode = new BencodeListNode();
                     node.Children.Add(nestedListNode);
 
-                    Parsers[Production.LIST_START].Parse(context, nestedListNode);
+                    ListStartParser(context, nestedListNode);
                     ParseRecursiveList(context, nestedListNode);
-                    Parsers[Production.END].Parse(context, nestedListNode);
+                    EndParser(context, nestedListNode);
                 }
                 else if (context.LookAheadByte == DictionaryStartNode.DictionaryStartTerminalByte)
                 {
                     //- Possible Bencoded Dictionary
-                    Parsers[Production.BENCODED_DICTIONARY].Parse(context, node);
+                    BencodeDictionaryParser(context, node);
                 }
                 else
                 {

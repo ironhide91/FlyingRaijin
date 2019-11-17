@@ -1,21 +1,11 @@
 ﻿using FlyingRaijin.Bencode.Ast.Base;
 using FlyingRaijin.Bencode.Ast.List;
-using FlyingRaijin.Bencode.Parser.Base;
 
-namespace FlyingRaijin.Bencode.Parser.List
+namespace FlyingRaijin.Bencode.Parser
 {
-    public sealed class ListStartParser : TerminalParserBase<ListStartNode>
+    public static partial class DelegateParsers
     {
-        public static ListStartParser Parser => new ListStartParser();
-
-        private ListStartParser()
-        {
-
-        }
-
-        public override Production ProductionType => Production.LIST_START;
-
-        public override void Parse(ParseContext context, NodeBase ast)
+        public static void ListStartParser(ParseContext context, NodeBase ast)
         {
             context.HasTokens();
             context.Match(ListStartNode.ListStartTerminalByte);

@@ -1,23 +1,13 @@
 ﻿using FlyingRaijin.Bencode.Ast.Base;
 using FlyingRaijin.Bencode.Ast.Shared;
-using FlyingRaijin.Bencode.Parser.Base;
 
 namespace FlyingRaijin.Bencode.Parser
 {
-    public sealed class DigitExcludingZeroParser : TerminalParserBase<DigitExcludingZeroNode>
+    public static partial class DelegateParsers
     {
-        public static DigitExcludingZeroParser Parser => new DigitExcludingZeroParser();
-
-        private DigitExcludingZeroParser()
+        public static void DigitExcludingZeroParser(ParseContext context, NodeBase ast)
         {
-
-        }
-        
-        public override Production ProductionType => Production.DIGIT_EXCULUDING_ZERO;
-
-        public override void Parse(ParseContext context, NodeBase ast)
-        {
-            context.HasTokens();            
+            context.HasTokens();
 
             var chr = context.LookAheadByte;
 

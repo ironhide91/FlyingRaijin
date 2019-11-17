@@ -4,11 +4,10 @@ using FlyingRaijin.Bencode.ClrObject;
 using FlyingRaijin.Bencode.Converter;
 using FlyingRaijin.Bencode.Parser;
 using FlyingRaijin.Bencode.Parser.Base;
-using FlyingRaijin.Bencode.Parser.Integer;
 using System;
-using System.Text;
-using System.Linq;
 using System.IO;
+using System.Linq;
+using System.Text;
 using Xunit;
 
 namespace FlyingRaijin.Bencode.Test
@@ -17,7 +16,7 @@ namespace FlyingRaijin.Bencode.Test
     {
         private static Encoding encoding = Encoding.UTF8;
 
-        private static IParser parser = BencodeIntegerParser.Parser;
+        private static Parse parser => DelegateParsers.BencodeIntegerParser;
 
         private static IClrObjectConverter<BencodeIntegerNode, BInteger> converter = BIntegerConverter.Converter;
         
@@ -38,7 +37,7 @@ namespace FlyingRaijin.Bencode.Test
             var context = Helper.CreateParseContext(bencode);
             var root = new TorrentRoot();
 
-            parser.Parse(context, root);            
+            parser(context, root);            
             var bnumber = converter.Convert(encoding, (BencodeIntegerNode)root.Children.ElementAt(0));
 
             Assert.Equal(bnumber.Value, value);
@@ -50,7 +49,7 @@ namespace FlyingRaijin.Bencode.Test
             var context = Helper.CreateParseContext("i0e");
             var root = new TorrentRoot();
 
-            parser.Parse(context, root);
+            parser(context, root);
             var bnumber = converter.Convert(encoding, (BencodeIntegerNode)root.Children.ElementAt(0));
 
             Assert.Equal(0, bnumber.Value);
@@ -68,7 +67,7 @@ namespace FlyingRaijin.Bencode.Test
             var context = Helper.CreateParseContext(bencode);
             var root = new TorrentRoot();
 
-            parser.Parse(context, root);
+            parser(context, root);
             var bnumber = converter.Convert(encoding, (BencodeIntegerNode)root.Children.ElementAt(0));
 
             Assert.Equal(bnumber.Value, value);
@@ -82,7 +81,7 @@ namespace FlyingRaijin.Bencode.Test
             var context = Helper.CreateParseContext(bencode);
             var root = new TorrentRoot();
 
-            parser.Parse(context, root);
+            parser(context, root);
             var bnumber = converter.Convert(encoding, (BencodeIntegerNode)root.Children.ElementAt(0));
 
             Assert.Equal(bnumber.Value, value);
@@ -100,7 +99,7 @@ namespace FlyingRaijin.Bencode.Test
 
             Action action = () =>
             {
-                parser.Parse(context, root);
+                parser(context, root);
                 converter.Convert(encoding, (BencodeIntegerNode)root.Children.ElementAt(0));
             };
 
@@ -115,7 +114,7 @@ namespace FlyingRaijin.Bencode.Test
 
             Action action = () =>
             {
-                parser.Parse(context, root);
+                parser(context, root);
                 converter.Convert(encoding, (BencodeIntegerNode)root.Children.ElementAt(0));
             };
 
@@ -134,7 +133,7 @@ namespace FlyingRaijin.Bencode.Test
 
             Action action = () =>
             {
-                parser.Parse(context, root);
+                parser(context, root);
                 converter.Convert(encoding, (BencodeIntegerNode)root.Children.ElementAt(0));
             };
 
@@ -153,7 +152,7 @@ namespace FlyingRaijin.Bencode.Test
 
             Action action = () =>
             {
-                parser.Parse(context, root);
+                parser(context, root);
                 converter.Convert(encoding, (BencodeIntegerNode)root.Children.ElementAt(0));
             };
 
@@ -168,7 +167,7 @@ namespace FlyingRaijin.Bencode.Test
 
             Action action = () =>
             {
-                parser.Parse(context, root);
+                parser(context, root);
                 converter.Convert(encoding, (BencodeIntegerNode)root.Children.ElementAt(0));
             };
 
@@ -187,7 +186,7 @@ namespace FlyingRaijin.Bencode.Test
 
             Action action = () =>
             {
-                parser.Parse(context, root);
+                parser(context, root);
                 converter.Convert(encoding, (BencodeIntegerNode)root.Children.ElementAt(0));
             };
 
@@ -208,7 +207,7 @@ namespace FlyingRaijin.Bencode.Test
 
             Action action = () =>
             {
-                parser.Parse(context, root);
+                parser(context, root);
                 converter.Convert(encoding, (BencodeIntegerNode)root.Children.ElementAt(0));
             };
 
@@ -223,7 +222,7 @@ namespace FlyingRaijin.Bencode.Test
 
             Action action = () =>
             {
-                parser.Parse(context, root);
+                parser(context, root);
                 converter.Convert(encoding, (BencodeIntegerNode)root.Children.ElementAt(0));
             };
 
@@ -240,7 +239,7 @@ namespace FlyingRaijin.Bencode.Test
 
             Action action = () =>
             {
-                parser.Parse(context, root);
+                parser(context, root);
                 converter.Convert(encoding, (BencodeIntegerNode)root.Children.ElementAt(0));
             };
 
@@ -258,7 +257,7 @@ namespace FlyingRaijin.Bencode.Test
 
             Action action = () =>
             {
-                parser.Parse(context, root);
+                parser(context, root);
                 converter.Convert(encoding, (BencodeIntegerNode)root.Children.ElementAt(0));
             };
 

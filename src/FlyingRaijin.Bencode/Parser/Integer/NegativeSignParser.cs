@@ -1,21 +1,11 @@
 ﻿using FlyingRaijin.Bencode.Ast.Base;
 using FlyingRaijin.Bencode.Ast.Integer;
-using FlyingRaijin.Bencode.Parser.Base;
 
-namespace FlyingRaijin.Bencode.Parser.Integer
+namespace FlyingRaijin.Bencode.Parser
 {
-    public sealed class NegativeSignParser : TerminalParserBase<NegativeSignNode>
+    public static partial class DelegateParsers
     {
-        public static NegativeSignParser Parser => new NegativeSignParser();
-
-        private NegativeSignParser()
-        {
-
-        }
-        
-        public override Production ProductionType => Production.NEGATIVE_SIGN;
-
-        public override void Parse(ParseContext context, NodeBase ast)
+        public static void NegativeSignParser(ParseContext context, NodeBase ast)
         {
             context.HasTokens();
             context.Match(NegativeSignNode.NegativeSignByte);

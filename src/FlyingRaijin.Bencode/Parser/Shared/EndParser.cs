@@ -1,21 +1,11 @@
 ﻿using FlyingRaijin.Bencode.Ast.Base;
 using FlyingRaijin.Bencode.Ast.Shared;
-using FlyingRaijin.Bencode.Parser.Base;
 
-namespace FlyingRaijin.Bencode.Parser.Shared
+namespace FlyingRaijin.Bencode.Parser
 {
-    public sealed class EndParser : TerminalParserBase<EndNode>
+    public static partial class DelegateParsers
     {
-        public static EndParser Parser => new EndParser();
-
-        private EndParser()
-        {
-
-        }
-
-        public override Production ProductionType => Production.END;
-
-        public override void Parse(ParseContext context, NodeBase ast)
+        public static void EndParser(ParseContext context, NodeBase ast)
         {
             context.HasTokens();
             context.Match(EndNode.IntegerEndNonTerminalByte);

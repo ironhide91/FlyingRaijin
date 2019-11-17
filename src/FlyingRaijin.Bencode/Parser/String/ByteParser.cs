@@ -1,21 +1,11 @@
 ﻿using FlyingRaijin.Bencode.Ast.Base;
 using FlyingRaijin.Bencode.Ast.String;
-using FlyingRaijin.Bencode.Parser.Base;
 
-namespace FlyingRaijin.Bencode.Parser.String
+namespace FlyingRaijin.Bencode.Parser
 {
-    public sealed class ByteParser : IParser
+    public static partial class DelegateParsers
     {
-        public static ByteParser Parser => new ByteParser();
-
-        private ByteParser()
-        {
-
-        }
-
-        public Production ProductionType => Production.BYTE;
-
-        public void Parse(ParseContext context, NodeBase ast)
+        public static void ByteParser(ParseContext context, NodeBase ast)
         {
             context.HasTokens();
 
