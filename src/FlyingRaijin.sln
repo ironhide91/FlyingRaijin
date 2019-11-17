@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29306.81
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FlyingRaijin.Bencode", "FlyingRaijin.Bencode\FlyingRaijin.Bencode.csproj", "{A5A5D5AF-F501-420B-82F1-78273A06FB5D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FlyingRaijin.Test", "FlyingRaijin.Test\FlyingRaijin.Test.csproj", "{11D84268-B44E-437C-8099-26780807E07F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A5A5D5AF-F501-420B-82F1-78273A06FB5D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A5A5D5AF-F501-420B-82F1-78273A06FB5D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A5A5D5AF-F501-420B-82F1-78273A06FB5D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A5A5D5AF-F501-420B-82F1-78273A06FB5D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{11D84268-B44E-437C-8099-26780807E07F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{11D84268-B44E-437C-8099-26780807E07F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{11D84268-B44E-437C-8099-26780807E07F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{11D84268-B44E-437C-8099-26780807E07F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {621CC4F7-EBE3-401D-A96B-431D4EA8D72D}
+	EndGlobalSection
+EndGlobal
