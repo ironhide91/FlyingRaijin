@@ -1,11 +1,9 @@
+using FluentAssertions;
 using FlyingRaijin.Bencode.Ast;
 using FlyingRaijin.Bencode.Ast.String;
 using FlyingRaijin.Bencode.ClrObject;
 using FlyingRaijin.Bencode.Converter;
 using FlyingRaijin.Bencode.Parser;
-using FlyingRaijin.Bencode.Parser.Base;
-using FlyingRaijin.Bencode.Parser.String;
-using FluentAssertions;
 using System;
 using System.IO;
 using System.Linq;
@@ -18,7 +16,7 @@ namespace FlyingRaijin.Bencode.Test
     {
         private static Encoding encoding = Encoding.UTF8;
 
-        private static IParser parser = BencodeStringParser.Parser;
+        private static Parse parser = DelegateParsers.BencodeStringParser;
 
         private static IClrObjectConverter<BencodeStringNode, BString> converter = BStringConverter.Converter;
         
@@ -43,7 +41,7 @@ namespace FlyingRaijin.Bencode.Test
             var context = Helper.CreateParseContext(bencode);
             var root = new TorrentRoot();
 
-            parser.Parse(context, root);
+            parser(context, root);
             var bstring = converter.Convert(encoding, (BencodeStringNode)root.Children.ElementAt(0));
 
             Assert.Equal(length, bstring.Length);
@@ -56,7 +54,7 @@ namespace FlyingRaijin.Bencode.Test
             var context = Helper.CreateParseContext("0:");
             var root = new TorrentRoot();
 
-            parser.Parse(context, root);
+            parser(context, root);
             var bstring = converter.Convert(encoding, (BencodeStringNode)root.Children.ElementAt(0));
 
             Assert.Equal(0, bstring.Length);
@@ -72,7 +70,7 @@ namespace FlyingRaijin.Bencode.Test
             var context = Helper.CreateParseContext(bencode);
             var root = new TorrentRoot();
 
-            Action action = () => parser.Parse(context, root);
+            Action action = () => parser(context, root);
             action.Should().Throw<EndOfStreamException>();
         }
 
@@ -89,7 +87,7 @@ namespace FlyingRaijin.Bencode.Test
             var context = Helper.CreateParseContext(bencode);
             var root = new TorrentRoot();
 
-            Action action = () => parser.Parse(context, root);
+            Action action = () => parser(context, root);
             action.Should().Throw<Exception>();
         }
 
@@ -107,7 +105,7 @@ namespace FlyingRaijin.Bencode.Test
             var context = Helper.CreateParseContext(bencode);
             var root = new TorrentRoot();
 
-            Action action = () => parser.Parse(context, root);
+            Action action = () => parser(context, root);
             action.Should().Throw<Exception>();
         }
 
@@ -119,7 +117,7 @@ namespace FlyingRaijin.Bencode.Test
             var context = Helper.CreateParseContext(bencode);
             var root = new TorrentRoot();
 
-            Action action = () => parser.Parse(context, root);
+            Action action = () => parser(context, root);
             action.Should().Throw<Exception>();
         }
 
@@ -133,7 +131,7 @@ namespace FlyingRaijin.Bencode.Test
             var context = Helper.CreateParseContext(bencode);
             var root = new TorrentRoot();
 
-            Action action = () => parser.Parse(context, root);
+            Action action = () => parser(context, root);
 
             action.Should().Throw<Exception>();
         }
@@ -153,7 +151,7 @@ namespace FlyingRaijin.Bencode.Test
             var context = Helper.CreateParseContext(bencode);
             var root = new TorrentRoot();
 
-            Action action = () => parser.Parse(context, root);
+            Action action = () => parser(context, root);
             action.Should().Throw<Exception>();
         }
 
@@ -164,7 +162,7 @@ namespace FlyingRaijin.Bencode.Test
             var context = Helper.CreateParseContext(bencode);
             var root = new TorrentRoot();
 
-            Action action = () => parser.Parse(context, root);
+            Action action = () => parser(context, root);
 
             action.Should().Throw<Exception>();
         }
@@ -176,7 +174,7 @@ namespace FlyingRaijin.Bencode.Test
             var context = Helper.CreateParseContext(bencode);
             var root = new TorrentRoot();
 
-            Action action = () => parser.Parse(context, root);
+            Action action = () => parser(context, root);
 
             action.Should().Throw<Exception>();
         }
@@ -190,14 +188,14 @@ namespace FlyingRaijin.Bencode.Test
 
             //// "3:זרו"
             //var bytes = new byte[] { 51, 58, 230, 248, 229 };
-            //var bstring = parser.Parse(bytes);     
+            //var bstring = parser(bytes);     
 
             string value = "3:זרו";
 
             var context = new ParseContext(encoding, new MemoryStream(encoding.GetBytes(value)));
             var root = new TorrentRoot();
 
-            parser.Parse(context, root);
+            parser(context, root);
             var bstring = converter.Convert(encoding, (BencodeStringNode)root.Children.ElementAt(0));
 
             Assert.Equal(3, bstring.Length);
@@ -214,7 +212,7 @@ namespace FlyingRaijin.Bencode.Test
             var context = Helper.CreateParseContext(bencode);
             var root = new TorrentRoot();
 
-            Action action = () => parser.Parse(context, root);
+            Action action = () => parser(context, root);
 
             action.Should().Throw<Exception>();
         }
@@ -227,7 +225,7 @@ namespace FlyingRaijin.Bencode.Test
             var context = Helper.CreateParseContext(bencode);
             var root = new TorrentRoot();
 
-            Action action = () => parser.Parse(context, root);
+            Action action = () => parser(context, root);
 
             action.Should().Throw<Exception>();
         }

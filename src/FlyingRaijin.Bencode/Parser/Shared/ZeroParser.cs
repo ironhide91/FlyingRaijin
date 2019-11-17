@@ -1,21 +1,11 @@
 ﻿using FlyingRaijin.Bencode.Ast.Base;
 using FlyingRaijin.Bencode.Ast.Shared;
-using FlyingRaijin.Bencode.Parser.Base;
 
-namespace FlyingRaijin.Bencode.Parser.Shared
+namespace FlyingRaijin.Bencode.Parser
 {
-    public sealed class ZeroParser : TerminalParserBase<ZeroNode>
+    public static partial class DelegateParsers
     {
-        public static ZeroParser Parser => new ZeroParser();
-
-        private ZeroParser()
-        {
-
-        }
-
-        public override Production ProductionType => Production.ZERO;
-
-        public override void Parse(ParseContext context, NodeBase ast)
+        public static void ZeroParser(ParseContext context, NodeBase ast)
         {
             context.HasTokens();
             context.Match(ZeroNode.ZeroDigitByte);

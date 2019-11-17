@@ -3,8 +3,6 @@ using FlyingRaijin.Bencode.Ast.Dictionary;
 using FlyingRaijin.Bencode.ClrObject;
 using FlyingRaijin.Bencode.Converter;
 using FlyingRaijin.Bencode.Parser;
-using FlyingRaijin.Bencode.Parser.Base;
-using FlyingRaijin.Bencode.Parser.Dictionary;
 using System.Linq;
 using System.Text;
 using Xunit;
@@ -15,7 +13,7 @@ namespace FlyingRaijin.Bencode.Test
     {
         private static Encoding encoding = Encoding.UTF8;
 
-        private static IParser parser = BencodeDictionaryParser.Parser;
+        private static Parse parser = DelegateParsers.BencodeDictionaryParser;
 
         private static IClrObjectConverter<BencodeDictionaryNode, BDictionary> converter = BDictionaryConverter.Converter;
 
@@ -28,7 +26,7 @@ namespace FlyingRaijin.Bencode.Test
             var root = new TorrentRoot();
 
             //- Act
-            parser.Parse(context, root);
+            parser(context, root);
             var bDictionary = converter.Convert(encoding, (BencodeDictionaryNode)root.Children.ElementAt(0));
 
             //-Assert
@@ -44,7 +42,7 @@ namespace FlyingRaijin.Bencode.Test
             var root = new TorrentRoot();
 
             //- Act
-            parser.Parse(context, root);
+            parser(context, root);
             var bDictionary = converter.Convert(encoding, (BencodeDictionaryNode)root.Children.ElementAt(0));
 
             //-Assert
@@ -66,7 +64,7 @@ namespace FlyingRaijin.Bencode.Test
             var root = new TorrentRoot();
 
             //- Act
-            parser.Parse(context, root);
+            parser(context, root);
             var bDictionary = converter.Convert(encoding, (BencodeDictionaryNode)root.Children.ElementAt(0));
 
             //- Assert
@@ -92,7 +90,7 @@ namespace FlyingRaijin.Bencode.Test
             var root = new TorrentRoot();
 
             //- Act
-            parser.Parse(context, root);
+            parser(context, root);
             var bDictionary = converter.Convert(encoding, (BencodeDictionaryNode)root.Children.ElementAt(0));
 
             //- Assert
@@ -126,7 +124,7 @@ namespace FlyingRaijin.Bencode.Test
             var root = new TorrentRoot();
 
             //- Act
-            parser.Parse(context, root);
+            parser(context, root);
             var bDictionary = converter.Convert(encoding, (BencodeDictionaryNode)root.Children.ElementAt(0));
 
             //- Assert

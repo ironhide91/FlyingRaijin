@@ -1,24 +1,11 @@
 ﻿using FlyingRaijin.Bencode.Ast.Base;
 using FlyingRaijin.Bencode.Ast.Shared;
-using FlyingRaijin.Bencode.Parser.Base;
 
-namespace FlyingRaijin.Bencode.Parser.Shared
+namespace FlyingRaijin.Bencode.Parser
 {
-    public sealed class NumberParser : NonTerminalParserBase<NumberNode>
+    public static partial class DelegateParsers
     {
-        public static NumberParser Parser =>
-            new NumberParser(Pack(DigitExcludingZeroParser.Parser, ZeroParser.Parser));
-
-        private NumberParser(ParserDictionary dependentParsers) : base(dependentParsers)
-        {
-            Parsers = dependentParsers;
-        }
-
-        public override Production ProductionType => Production.NUMBER;
-
-        protected override ParserDictionary Parsers { get; set; }
-
-        public override void Parse(ParseContext context, NodeBase ast)
+        public static void NumberParser(ParseContext context, NodeBase ast)
         {
             NumberNode node = null;
 
@@ -33,20 +20,20 @@ namespace FlyingRaijin.Bencode.Parser.Shared
             }
 
             context.HasTokens();
-            Parsers[Production.DIGIT_EXCULUDING_ZERO].Parse(context, node);
+            DigitExcludingZeroParser(context, node);
 
             context.HasTokens();
             if (DigitExcludingZeroNode.DigitsExcludingZero.Contains(context.LookAheadByte))
             {
-                Parsers[Production.DIGIT_EXCULUDING_ZERO].Parse(context, node);
-                Parse(context, node);
+                DigitExcludingZeroParser(context, node);
+                NumberParser(context, node);
             }
 
             context.HasTokens();
             if (context.LookAheadByte == ZeroNode.ZeroDigitByte)
             {
-                Parsers[Production.ZERO].Parse(context, node);
-                Parse(context, node);
+                ZeroParser(context, node);
+                NumberParser(context, node);
             }
         }
     }

@@ -4,49 +4,27 @@ using FlyingRaijin.Bencode.Ast.Integer;
 using FlyingRaijin.Bencode.Ast.List;
 using FlyingRaijin.Bencode.Ast.Shared;
 using FlyingRaijin.Bencode.Ast.String;
-using FlyingRaijin.Bencode.Parser.Base;
-using FlyingRaijin.Bencode.Parser.Integer;
-using FlyingRaijin.Bencode.Parser.List;
-using FlyingRaijin.Bencode.Parser.Shared;
-using FlyingRaijin.Bencode.Parser.String;
 using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 
-namespace FlyingRaijin.Bencode.Parser.Dictionary
+namespace FlyingRaijin.Bencode.Parser
 {
-    public sealed class BencodeDictionaryParser : NonTerminalParserBase<BencodeListNode>
+    public static partial class DelegateParsers
     {
-        public static IParser Parser =>
-            new BencodeDictionaryParser(Pack(
-                    DictionaryStartParser.Parser,
-                    BencodeIntegerParser.Parser,
-                    BencodeStringParser.Parser,
-                    BencodeListParser.Parser,
-                    EndParser.Parser));
-
-        private BencodeDictionaryParser(ParserDictionary dependentParsers) : base(dependentParsers)
-        {
-            Parsers = dependentParsers;
-        }
-
-        public override Production ProductionType => Production.BENCODED_LIST;
-
-        protected override ParserDictionary Parsers { get; set; }
-
-        public override void Parse(ParseContext context, NodeBase ast)
+        public static void BencodeDictionaryParser(ParseContext context, NodeBase ast)
         {
             var node = new BencodeDictionaryNode();
             ast.Children.Add(node);
 
             var keys = new HashSet<BencodeStringNode>();
 
-            Parsers[Production.DICTIONARY_START].Parse(context, node);
+            DictionaryStartParser(context, node);
             ParseRecursiveDictionary(context, node, keys);
-            Parsers[Production.END].Parse(context, node);
+            EndParser(context, node);
         }
 
-        private void ParseRecursiveDictionary(ParseContext context, NodeBase ast, HashSet<BencodeStringNode> keys)
+        private static void ParseRecursiveDictionary(ParseContext context, NodeBase ast, HashSet<BencodeStringNode> keys)
         {
             context.HasTokens();
 
@@ -72,7 +50,7 @@ namespace FlyingRaijin.Bencode.Parser.Dictionary
                         throw new Exception();
                     }
                     
-                    Parsers[Production.BENCODED_INTEGER].Parse(context, currentKeyValueNode);
+                    BencodeIntegerParser(context, currentKeyValueNode);
                     node.Children.Add(currentKeyValueNode);
                     expectingKey = true;
                 }
@@ -83,7 +61,7 @@ namespace FlyingRaijin.Bencode.Parser.Dictionary
                     {
                         currentKeyValueNode = new DictionaryKeyValueNode();
 
-                        Parsers[Production.BENCODED_STRING].Parse(context, currentKeyValueNode);
+                        BencodeStringParser(context, currentKeyValueNode);
 
                         if (keys.Contains(currentKeyValueNode.Children.First()))
                         {
@@ -95,7 +73,7 @@ namespace FlyingRaijin.Bencode.Parser.Dictionary
                     }
                     else
                     {
-                        Parsers[Production.BENCODED_STRING].Parse(context, currentKeyValueNode);
+                        BencodeStringParser(context, currentKeyValueNode);
                         node.Children.Add(currentKeyValueNode);
                         expectingKey = true;
                     }
@@ -108,7 +86,7 @@ namespace FlyingRaijin.Bencode.Parser.Dictionary
                         throw new Exception();
                     }
                     
-                    Parsers[Production.BENCODED_LIST].Parse(context, currentKeyValueNode);
+                    BencodeListParser(context, currentKeyValueNode);
                     node.Children.Add(currentKeyValueNode);
                     expectingKey = true;
                 }
@@ -123,9 +101,9 @@ namespace FlyingRaijin.Bencode.Parser.Dictionary
                     var nestedDictionaryNode = new BencodeDictionaryNode();
                     node.Children.Add(nestedDictionaryNode);
 
-                    Parsers[Production.DICTIONARY_START].Parse(context, nestedDictionaryNode);
-                    //ParseRecursiveDictionary(context, nestedDictionaryNode);
-                    Parsers[Production.END].Parse(context, nestedDictionaryNode);
+                    DictionaryStartParser(context, nestedDictionaryNode);
+                    ParseRecursiveDictionary(context, nestedDictionaryNode, new HashSet<BencodeStringNode>());
+                    EndParser(context, nestedDictionaryNode);
 
                     expectingKey = true;
                 }

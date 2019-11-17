@@ -1,11 +1,9 @@
+using FluentAssertions;
 using FlyingRaijin.Bencode.Ast;
 using FlyingRaijin.Bencode.Ast.List;
 using FlyingRaijin.Bencode.ClrObject;
 using FlyingRaijin.Bencode.Converter;
 using FlyingRaijin.Bencode.Parser;
-using FlyingRaijin.Bencode.Parser.Base;
-using FlyingRaijin.Bencode.Parser.List;
-using FluentAssertions;
 using System;
 using System.Linq;
 using System.Text;
@@ -17,7 +15,7 @@ namespace FlyingRaijin.Bencode.Test
     {
         private static Encoding encoding = Encoding.UTF8;
 
-        private static IParser parser = BencodeListParser.Parser;
+        private static Parse parser = DelegateParsers.BencodeListParser;
 
         private static IClrObjectConverter<BencodeListNode, BList> converter = BListConverter.Converter;
         
@@ -35,7 +33,7 @@ namespace FlyingRaijin.Bencode.Test
             var root = new TorrentRoot();
 
             //- Act
-            parser.Parse(context, root);
+            parser(context, root);
             var bList = converter.Convert(encoding, (BencodeListNode)root.Children.ElementAt(0));
 
             //- Assert
@@ -56,7 +54,7 @@ namespace FlyingRaijin.Bencode.Test
             var root = new TorrentRoot();
 
             //- Act
-            parser.Parse(context, root);
+            parser(context, root);
             var bList = converter.Convert(encoding, (BencodeListNode)root.Children.ElementAt(0));
 
             //- Assert
@@ -83,7 +81,7 @@ namespace FlyingRaijin.Bencode.Test
             var root = new TorrentRoot();
 
             //- Act
-            parser.Parse(context, root);
+            parser(context, root);
             var bList = converter.Convert(encoding, (BencodeListNode)root.Children.ElementAt(0));
 
             //- Assert
@@ -126,7 +124,7 @@ namespace FlyingRaijin.Bencode.Test
             var root = new TorrentRoot();
 
             //- Act
-            parser.Parse(context, root);
+            parser(context, root);
             var bList = converter.Convert(encoding, (BencodeListNode)root.Children.ElementAt(0));
 
             //- Assert
@@ -143,7 +141,7 @@ namespace FlyingRaijin.Bencode.Test
             var root = new TorrentRoot();
 
             //- Act
-            Action action = () => parser.Parse(context, root);
+            Action action = () => parser(context, root);
 
             //- Assert
             action.Should().Throw<Exception>();
@@ -163,7 +161,7 @@ namespace FlyingRaijin.Bencode.Test
             var root = new TorrentRoot();
 
             //- Act
-            Action action = () => parser.Parse(context, root);
+            Action action = () => parser(context, root);
 
             //- Assert
             action.Should().Throw<Exception>();
@@ -183,7 +181,7 @@ namespace FlyingRaijin.Bencode.Test
             var root = new TorrentRoot();
 
             //- Act
-            Action action = () => parser.Parse(context, root);
+            Action action = () => parser(context, root);
 
             //- Assert
             action.Should().Throw<Exception>();
@@ -200,7 +198,7 @@ namespace FlyingRaijin.Bencode.Test
             var root = new TorrentRoot();
 
             //- Act
-            Action action = () => parser.Parse(context, root);
+            Action action = () => parser(context, root);
 
             //- Assert
             action.Should().Throw<Exception>();
