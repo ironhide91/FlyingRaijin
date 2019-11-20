@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace FlyingRaijin.Bencode.Ast
 {
-    public sealed class TorrentRoot : NodeBase
+    public sealed class TorrentRoot : NonTerminalNodeBase
     {
         public TorrentRoot()
         {

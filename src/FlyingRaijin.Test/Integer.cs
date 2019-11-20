@@ -3,7 +3,6 @@ using FlyingRaijin.Bencode.Ast.Integer;
 using FlyingRaijin.Bencode.ClrObject;
 using FlyingRaijin.Bencode.Converter;
 using FlyingRaijin.Bencode.Parser;
-using FlyingRaijin.Bencode.Parser.Base;
 using System;
 using System.IO;
 using System.Linq;
@@ -37,7 +36,7 @@ namespace FlyingRaijin.Bencode.Test
             var context = Helper.CreateParseContext(bencode);
             var root = new TorrentRoot();
 
-            parser(context, root);            
+            parser(context, root);
             var bnumber = converter.Convert(encoding, (BencodeIntegerNode)root.Children.ElementAt(0));
 
             Assert.Equal(bnumber.Value, value);
