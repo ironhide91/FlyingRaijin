@@ -26,6 +26,8 @@
         //- Shared
         NUMBER,
         DIGIT_EXCULUDING_ZERO,
-        ZERO
+        ZERO,
+        //- Sentinel
+        Sentinel
     }
 }

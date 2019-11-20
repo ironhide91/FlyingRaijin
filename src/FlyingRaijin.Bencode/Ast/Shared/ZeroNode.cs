@@ -4,7 +4,7 @@ namespace FlyingRaijin.Bencode.Ast.Shared
 {
     public sealed class ZeroNode : TerminalByteNodeBase
     {
-        public override Production ProductionType => Production.INTEGER_START;
+        public override Production ProductionType => Production.ZERO;
 
         public override byte Byte => ZeroDigitByte;
 
