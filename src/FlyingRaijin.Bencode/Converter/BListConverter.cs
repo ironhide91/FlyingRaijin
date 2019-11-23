@@ -8,6 +8,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
+using System;
+using FlyingRaijin.Bencode.Exceptions;
 
 namespace FlyingRaijin.Bencode.Parser
 {
@@ -22,34 +24,46 @@ namespace FlyingRaijin.Bencode.Parser
 
         public BList Convert(Encoding encoding, BencodeListNode node)
         {
-            var list = new List<IClrObject>();
+            BList result;
 
-            foreach (var item in node.Children.ElementAt(1).Children)
+            try
             {
-                switch (item)
-                {
-                    case BencodeIntegerNode n:
-                        var bInteger = BIntegerConverter.Converter.Convert(encoding, n);
-                        list.Add(bInteger);
-                        break;
-                    case BencodeStringNode n:
-                        var bString = BStringConverter.Converter.Convert(encoding, n);
-                        list.Add(bString);
-                        break;
-                    case BencodeListNode n:
-                        var bList = Convert(encoding, n);
-                        list.Add(bList);
-                        break;
-                    case BencodeDictionaryNode n:
-                        var bDictionary = BDictionaryConverter.Converter.Convert(encoding, n);
-                        list.Add(bDictionary);
-                        break;
-                    default:
-                        break;
-                }
-            }
+                var list = new List<IClrObject>();
 
-            return new BList(new ReadOnlyCollection<IClrObject>(list));
+                foreach (var item in node.Children.ElementAt(1).Children)
+                {
+                    switch (item)
+                    {
+                        case BencodeIntegerNode n:
+                            var bInteger = BIntegerConverter.Converter.Convert(encoding, n);
+                            list.Add(bInteger);
+                            break;
+                        case BencodeStringNode n:
+                            var bString = BStringConverter.Converter.Convert(encoding, n);
+                            list.Add(bString);
+                            break;
+                        case BencodeListNode n:
+                            var bList = Convert(encoding, n);
+                            list.Add(bList);
+                            break;
+                        case BencodeDictionaryNode n:
+                            var bDictionary = BDictionaryConverter.Converter.Convert(encoding, n);
+                            list.Add(bDictionary);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
+                result = new BList(new ReadOnlyCollection<IClrObject>(list));
+            }
+            catch (Exception e)
+            {
+                throw ConverterException.Create(
+                        $"{nameof(BStringConverter)} - An error occurred while converting Bencode Abstract Sytax Tree.");
+            }            
+
+            return result;
         }
     }
 }

@@ -1,50 +1,11 @@
-﻿using System;
-using System.Collections.ObjectModel;
+﻿using FlyingRaijin.Bencode.Exceptions;
+using System;
 using System.IO;
 using System.Text;
 
 namespace FlyingRaijin.Bencode.Parser
 {
-    //public sealed class ParseContext
-    //{
-    //    public ParseContext(string bencodedValue)
-    //    {
-    //        BencodedValue = bencodedValue;
-    //        Tokens = Array.AsReadOnly(BencodedValue.ToCharArray());
-    //    }
-
-    //    public readonly string BencodedValue;
-
-    //    private readonly ReadOnlyCollection<char> Tokens;
-
-    //    public char LookAheadChar
-    //    {
-    //        get { return Tokens[LookAheadIndex]; }
-    //    }
-
-    //    public int LookAheadIndex { get; private set; }
-
-    //    public void HasTokens()
-    //    {
-    //        if (LookAheadIndex >= Tokens.Count)
-    //        {
-    //            throw new Exception("");
-    //        }
-    //    }
-
-    //    public void Match(char characterToMatch)
-    //    {
-    //        if (LookAheadChar == characterToMatch)
-    //        {
-    //            LookAheadIndex++;
-    //            return;
-    //        }
-
-    //        throw new Exception("Parsing Error.");
-    //    }
-    //}
-
-    public sealed class ParseContext
+    public sealed class ParseContext : IDisposable
     {
         public ParseContext(Encoding encoding, Stream stream)
         {
@@ -77,7 +38,15 @@ namespace FlyingRaijin.Bencode.Parser
                 return;
             }
 
-            throw new Exception("Parsing Error.");
+            throw ParsingException.Create(Reader.BaseStream.Position+1);
+        }
+
+        public void Dispose()
+        {
+            if (Stream != null)
+            {
+                Stream.Dispose();
+            }
         }
     }
 }

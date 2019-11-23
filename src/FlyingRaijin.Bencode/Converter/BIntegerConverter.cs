@@ -3,6 +3,7 @@ using FlyingRaijin.Bencode.Ast.Integer;
 using FlyingRaijin.Bencode.Ast.Shared;
 using FlyingRaijin.Bencode.ClrObject;
 using FlyingRaijin.Bencode.Converter;
+using FlyingRaijin.Bencode.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,45 +22,64 @@ namespace FlyingRaijin.Bencode.Parser
 
         public BInteger Convert(Encoding encoding, BencodeIntegerNode node)
         {
-            var numberNode = (IntegerNode)node.Children.ElementAt(1);
-
-            var bytes = new List<byte>(numberNode.Children.Count);
-
-            for (int i = 0; i < numberNode.Children.Count; i++)
-            {
-                NodeBase current = numberNode.Children.ElementAt(i);
-
-                switch (current)
-                {
-                    case NegativeSignNode n:
-                        bytes.Add(n.Byte);
-                        break;
-                    case NumberNode n:
-                        bytes.AddRange(NumberConverter.Convert(n));
-                        break;
-                    case ZeroNode n:
-                        bytes.Add(n.Byte);
-                        break;
-                    default:
-                        break;
-                }
-            }
-
-            long value = 0;
+            BInteger result;
 
             try
             {
-                checked
+                var numberNode = (IntegerNode)node.Children.ElementAt(1);
+
+                var bytes = new List<byte>(numberNode.Children.Count);
+
+                for (int i = 0; i < numberNode.Children.Count; i++)
                 {
-                    value = long.Parse(encoding.GetString(bytes.ToArray()));
+                    NodeBase current = numberNode.Children.ElementAt(i);
+
+                    switch (current)
+                    {
+                        case NegativeSignNode n:
+                            bytes.Add(n.Byte);
+                            break;
+                        case NumberNode n:
+                            bytes.AddRange(NumberConverter.Convert(n));
+                            break;
+                        case ZeroNode n:
+                            bytes.Add(n.Byte);
+                            break;
+                        default:
+                            break;
+                    }
                 }
+
+                long value = 0;
+                string intStr = null;
+
+                try
+                {
+                    intStr = encoding.GetString(bytes.ToArray());
+
+                    checked
+                    {
+                        value = long.Parse(intStr);
+                    }
+                }
+                catch (OverflowException)
+                {
+                    throw ConverterException.Create($"Integer Overflow exception while parsing {intStr} into long type.");
+                }
+
+                result = new BInteger(value);
             }
-            catch (OverflowException)
+            catch (ConverterException e)
             {
-                throw new Exception("");
+                throw e;
+            }
+            catch (Exception e)
+            {
+                throw ConverterException.Create(
+                        $"{nameof(BIntegerConverter)} - An error occurred while converting Bencode Abstract Sytax Tree.");
             }
 
-            return new BInteger(value);
+            return result;
         }
     }
 }

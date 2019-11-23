@@ -4,6 +4,8 @@ using FlyingRaijin.Bencode.Ast.List;
 using FlyingRaijin.Bencode.Ast.String;
 using FlyingRaijin.Bencode.ClrObject;
 using FlyingRaijin.Bencode.Converter;
+using FlyingRaijin.Bencode.Exceptions;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -22,38 +24,50 @@ namespace FlyingRaijin.Bencode.Parser
 
         public BDictionary Convert(Encoding encoding, BencodeDictionaryNode node)
         {
-            var dictionary = new Dictionary<string, IClrObject>();
+            BDictionary result;
 
-            foreach (var kv in node.Children.ElementAt(1).Children)
+            try
             {
-                var key = BStringConverter.Converter.Convert(encoding, (BencodeStringNode)kv.Children.ElementAt(0)).Value;
+                var dictionary = new Dictionary<string, IClrObject>();
 
-                var value = kv.Children.ElementAt(1);
-                
-                switch (value)
+                foreach (var kv in node.Children.ElementAt(1).Children)
                 {
-                    case BencodeIntegerNode n:
-                        var bInteger = BIntegerConverter.Converter.Convert(encoding, n);
-                        dictionary.Add(key, bInteger);
-                        break;
-                    case BencodeStringNode n:
-                        var bString = BStringConverter.Converter.Convert(encoding, n);
-                        dictionary.Add(key, bString);
-                        break;
-                    case BencodeListNode n:
-                        var bList = BListConverter.Converter.Convert(encoding, n);
-                        dictionary.Add(key, bList);
-                        break;
-                    case BencodeDictionaryNode n:
-                        var bDictionary = Convert(encoding, n);
-                        dictionary.Add(key, bDictionary);
-                        break;
-                    default:
-                        break;
+                    var key = BStringConverter.Converter.Convert(encoding, (BencodeStringNode)kv.Children.ElementAt(0)).Value;
+
+                    var value = kv.Children.ElementAt(1);
+
+                    switch (value)
+                    {
+                        case BencodeIntegerNode n:
+                            var bInteger = BIntegerConverter.Converter.Convert(encoding, n);
+                            dictionary.Add(key, bInteger);
+                            break;
+                        case BencodeStringNode n:
+                            var bString = BStringConverter.Converter.Convert(encoding, n);
+                            dictionary.Add(key, bString);
+                            break;
+                        case BencodeListNode n:
+                            var bList = BListConverter.Converter.Convert(encoding, n);
+                            dictionary.Add(key, bList);
+                            break;
+                        case BencodeDictionaryNode n:
+                            var bDictionary = Convert(encoding, n);
+                            dictionary.Add(key, bDictionary);
+                            break;
+                        default:
+                            break;
+                    }
                 }
+
+                result = new BDictionary(new ReadOnlyDictionary<string, IClrObject>(dictionary));
+            }
+            catch (Exception e)
+            {
+                throw ConverterException.Create(
+                        $"{nameof(BDictionaryConverter)} - An error occurred while converting Bencode Abstract Sytax Tree.");
             }
 
-            return new BDictionary(new ReadOnlyDictionary<string, IClrObject>(dictionary));
+            return result;
         }
     }
 }
