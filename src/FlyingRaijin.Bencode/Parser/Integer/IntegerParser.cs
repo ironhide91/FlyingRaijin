@@ -1,6 +1,7 @@
 ﻿using FlyingRaijin.Bencode.Ast.Base;
 using FlyingRaijin.Bencode.Ast.Integer;
 using FlyingRaijin.Bencode.Ast.Shared;
+using FlyingRaijin.Bencode.Exceptions;
 using System;
 
 namespace FlyingRaijin.Bencode.Parser
@@ -31,7 +32,7 @@ namespace FlyingRaijin.Bencode.Parser
             }
             else
             {
-                throw new Exception("");
+                throw ParsingException.Create(context.Position);
             }
         }
     }

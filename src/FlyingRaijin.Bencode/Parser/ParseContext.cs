@@ -20,14 +20,25 @@ namespace FlyingRaijin.Bencode.Parser
 
         private readonly BinaryReader Reader;
 
+        public long Position => Reader.BaseStream.Position;
+
         public byte LookAheadByte => HasTokens();
 
         public byte HasTokens()
         {
-            var nextByte = Reader.ReadByte();
-            Reader.BaseStream.Position = Reader.BaseStream.Position - 1;
+            byte b;
 
-            return nextByte;
+            try
+            {
+                b = Reader.ReadByte();
+                Reader.BaseStream.Position = Reader.BaseStream.Position - 1;
+            }
+            catch (EndOfStreamException)
+            {
+                throw ParsingException.Create("Reached end of stream.");
+            }            
+
+            return b;
         }
 
         public void Match(byte byteToMatch)

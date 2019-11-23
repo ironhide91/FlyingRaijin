@@ -11,5 +11,10 @@
         {
             return new ParsingException($"Exception while parsing at position {exceptionAt} within the stream.");
         }
+
+        public static ParsingException Create(string message)
+        {
+            return new ParsingException(message);
+        }
     }
 }

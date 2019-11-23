@@ -3,6 +3,7 @@ using FlyingRaijin.Bencode.Ast;
 using FlyingRaijin.Bencode.Ast.String;
 using FlyingRaijin.Bencode.ClrObject;
 using FlyingRaijin.Bencode.Converter;
+using FlyingRaijin.Bencode.Exceptions;
 using FlyingRaijin.Bencode.Parser;
 using System;
 using System.IO;
@@ -71,7 +72,7 @@ namespace FlyingRaijin.Bencode.Test
             var root = new TorrentRoot();
 
             Action action = () => parser(context, root);
-            action.Should().Throw<EndOfStreamException>();
+            action.Should().Throw<ParsingException>();
         }
 
         [Theory]

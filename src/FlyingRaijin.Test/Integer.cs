@@ -3,6 +3,7 @@ using FlyingRaijin.Bencode.Ast.Integer;
 using FlyingRaijin.Bencode.ClrObject;
 using FlyingRaijin.Bencode.Converter;
 using FlyingRaijin.Bencode.Parser;
+using FlyingRaijin.Bencode.Exceptions;
 using System;
 using System.IO;
 using System.Linq;
@@ -102,7 +103,7 @@ namespace FlyingRaijin.Bencode.Test
                 converter.Convert(encoding, (BencodeIntegerNode)root.Children.ElementAt(0));
             };
 
-            Assert.Throws<Exception>(action);
+            Assert.Throws<ParsingException>(action);
         }
 
         [Fact]
@@ -117,7 +118,7 @@ namespace FlyingRaijin.Bencode.Test
                 converter.Convert(encoding, (BencodeIntegerNode)root.Children.ElementAt(0));
             };
 
-            Assert.Throws<Exception>(action);
+            Assert.Throws<ParsingException>(action);
         }
 
         [Theory]
@@ -136,7 +137,7 @@ namespace FlyingRaijin.Bencode.Test
                 converter.Convert(encoding, (BencodeIntegerNode)root.Children.ElementAt(0));
             };
 
-            Assert.Throws<EndOfStreamException>(action);
+            Assert.Throws<ParsingException>(action);
         }
 
         [Theory]
@@ -155,7 +156,7 @@ namespace FlyingRaijin.Bencode.Test
                 converter.Convert(encoding, (BencodeIntegerNode)root.Children.ElementAt(0));
             };
 
-            Assert.Throws<Exception>(action);
+            Assert.Throws<ParsingException>(action);
         }
 
         [Fact]
@@ -170,7 +171,7 @@ namespace FlyingRaijin.Bencode.Test
                 converter.Convert(encoding, (BencodeIntegerNode)root.Children.ElementAt(0));
             };
 
-            Assert.Throws<Exception>(action);
+            Assert.Throws<ParsingException>(action);
         }
 
         [Theory]
@@ -189,7 +190,7 @@ namespace FlyingRaijin.Bencode.Test
                 converter.Convert(encoding, (BencodeIntegerNode)root.Children.ElementAt(0));
             };
 
-            Assert.Throws<Exception>(action);
+            Assert.Throws<ParsingException>(action);
         }
 
         [Theory]
@@ -210,7 +211,7 @@ namespace FlyingRaijin.Bencode.Test
                 converter.Convert(encoding, (BencodeIntegerNode)root.Children.ElementAt(0));
             };
 
-            Assert.Throws<Exception>(action);
+            Assert.Throws<ParsingException>(action);
         }
 
         [Fact]
@@ -225,7 +226,7 @@ namespace FlyingRaijin.Bencode.Test
                 converter.Convert(encoding, (BencodeIntegerNode)root.Children.ElementAt(0));
             };
 
-            Assert.Throws<Exception>(action);
+            Assert.Throws<ParsingException>(action);
         }
 
         [Theory]
@@ -242,7 +243,7 @@ namespace FlyingRaijin.Bencode.Test
                 converter.Convert(encoding, (BencodeIntegerNode)root.Children.ElementAt(0));
             };
 
-            Assert.Throws<Exception>(action);
+            Assert.Throws<ConverterException>(action);
         }
 
         [Theory]
@@ -260,7 +261,7 @@ namespace FlyingRaijin.Bencode.Test
                 converter.Convert(encoding, (BencodeIntegerNode)root.Children.ElementAt(0));
             };
 
-            Assert.Throws<Exception>(action);
+            Assert.Throws<ConverterException>(action);
         }
     }
 }
