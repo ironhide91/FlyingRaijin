@@ -16,7 +16,7 @@ namespace FlyingRaijin.Bencode.Parser
             NumberParser(context, node);
             StringLengthPrefixParser(context, node);
 
-            var lengthBytes = NumberConverter.Convert(node.Children.ElementAt(0));
+            var lengthBytes = NumberConverter.Convert(node.Children[0]);
             var length = int.Parse(Encoding.UTF8.GetString(lengthBytes));
 
             StringParser(context, node, ref length);

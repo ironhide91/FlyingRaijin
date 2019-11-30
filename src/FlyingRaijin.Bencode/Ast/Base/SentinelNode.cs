@@ -8,7 +8,7 @@ namespace FlyingRaijin.Bencode.Ast.Base
     {
         public override Production ProductionType => Production.Sentinel;
 
-        public override ICollection<NodeBase> Children =>
+        public override IList<NodeBase> Children =>
             new ReadOnlyCollection<NodeBase>(Enumerable.Empty<NodeBase>().ToList());
     }
 }

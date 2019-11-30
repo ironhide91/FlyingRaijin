@@ -1,15 +1,14 @@
-﻿using FlyingRaijin.Bencode.Ast.Integer;
+﻿using FlyingRaijin.Bencode.Ast.Dictionary;
+using FlyingRaijin.Bencode.Ast.Integer;
 using FlyingRaijin.Bencode.Ast.List;
 using FlyingRaijin.Bencode.Ast.String;
-using FlyingRaijin.Bencode.Ast.Dictionary;
 using FlyingRaijin.Bencode.ClrObject;
 using FlyingRaijin.Bencode.Converter;
+using FlyingRaijin.Bencode.Exceptions;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Text;
-using System;
-using FlyingRaijin.Bencode.Exceptions;
 
 namespace FlyingRaijin.Bencode.Parser
 {
@@ -30,7 +29,7 @@ namespace FlyingRaijin.Bencode.Parser
             {
                 var list = new List<IClrObject>();
 
-                foreach (var item in node.Children.ElementAt(1).Children)
+                foreach (var item in node.Children[1].Children)
                 {
                     switch (item)
                     {

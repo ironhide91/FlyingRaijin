@@ -8,9 +8,9 @@ namespace FlyingRaijin.Bencode.Ast.Base
     {
         public abstract byte Byte { get; }
 
-        public override ICollection<NodeBase> Children { get => Empty; }
+        public override IList<NodeBase> Children { get => Empty; }
 
-        private static ICollection<NodeBase> Empty => Enumerable.Empty<NodeBase>().ToList().AsReadOnly();
+        private static IList<NodeBase> Empty => Enumerable.Empty<NodeBase>().ToList().AsReadOnly();
 
         public static byte ToByte(char character)
         {

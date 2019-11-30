@@ -9,6 +9,6 @@ namespace FlyingRaijin.Bencode.Ast.Base
             Children = new List<NodeBase>();
         }
 
-        public override ICollection<NodeBase> Children { get; }
+        public override IList<NodeBase> Children { get; }
     }
 }

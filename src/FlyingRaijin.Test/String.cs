@@ -1,13 +1,7 @@
 using FluentAssertions;
-using FlyingRaijin.Bencode.Ast;
-using FlyingRaijin.Bencode.Ast.String;
 using FlyingRaijin.Bencode.ClrObject;
-using FlyingRaijin.Bencode.Converter;
 using FlyingRaijin.Bencode.Exceptions;
-using FlyingRaijin.Bencode.Parser;
 using System;
-using System.IO;
-using System.Linq;
 using System.Text;
 using Xunit;
 
@@ -15,11 +9,7 @@ namespace FlyingRaijin.Bencode.Test
 {
     public class String
     {
-        private static Encoding encoding = Encoding.UTF8;
-
-        private static Parse parser = DelegateParsers.BencodeStringParser;
-
-        private static IClrObjectConverter<BencodeStringNode, BString> converter = BStringConverter.Converter;
+        private static readonly Encoding encoding = Encoding.UTF8;
         
         public String()
         {
@@ -39,11 +29,7 @@ namespace FlyingRaijin.Bencode.Test
             var length = int.Parse(parts[0]);
             var value = parts[1];
 
-            var context = Helper.CreateParseContext(bencode);
-            var root = new TorrentRoot();
-
-            parser(context, root);
-            var bstring = converter.Convert(encoding, (BencodeStringNode)root.Children.ElementAt(0));
+            var bstring = BencodeReader.Read<BString>(encoding, bencode);
 
             Assert.Equal(length, bstring.Length);
             Assert.Equal(value, bstring.Value);
@@ -52,11 +38,7 @@ namespace FlyingRaijin.Bencode.Test
         [Fact]
         public void CanParse_EmptyString()
         {
-            var context = Helper.CreateParseContext("0:");
-            var root = new TorrentRoot();
-
-            parser(context, root);
-            var bstring = converter.Convert(encoding, (BencodeStringNode)root.Children.ElementAt(0));
+            var bstring = BencodeReader.Read<BString>(encoding, "0:");
 
             Assert.Equal(0, bstring.Length);
             Assert.Equal(string.Empty, bstring.Value);
@@ -68,10 +50,7 @@ namespace FlyingRaijin.Bencode.Test
         [InlineData("100:spam")]
         public void LessCharsThanSpecified_ThrowsInvalidBencodeException(string bencode)
         {
-            var context = Helper.CreateParseContext(bencode);
-            var root = new TorrentRoot();
-
-            Action action = () => parser(context, root);
+            Action action = () => BencodeReader.Read<BString>(encoding, bencode);
             action.Should().Throw<ParsingException>();
         }
 
@@ -85,10 +64,7 @@ namespace FlyingRaijin.Bencode.Test
         [InlineData("4|spam")]
         public void MissingDelimiter_ThrowsInvalidBencodeException(string bencode)
         {
-            var context = Helper.CreateParseContext(bencode);
-            var root = new TorrentRoot();
-
-            Action action = () => parser(context, root);
+            Action action = () => BencodeReader.Read<BString>(encoding, bencode);
             action.Should().Throw<Exception>();
         }
 
@@ -103,10 +79,7 @@ namespace FlyingRaijin.Bencode.Test
         [InlineData("#spam")]
         public void NonDigitFirstChar_ThrowsInvalidBencodeException(string bencode)
         {
-            var context = Helper.CreateParseContext(bencode);
-            var root = new TorrentRoot();
-
-            Action action = () => parser(context, root);
+            Action action = () => BencodeReader.Read<BString>(encoding, bencode);
             action.Should().Throw<Exception>();
         }
 
@@ -115,10 +88,7 @@ namespace FlyingRaijin.Bencode.Test
         [InlineData("4")]
         public void LessThanMinimumLength2_ThrowsInvalidBencodeException(string bencode)
         {
-            var context = Helper.CreateParseContext(bencode);
-            var root = new TorrentRoot();
-
-            Action action = () => parser(context, root);
+            Action action = () => BencodeReader.Read<BString>(encoding, bencode);
             action.Should().Throw<Exception>();
         }
 
@@ -129,11 +99,7 @@ namespace FlyingRaijin.Bencode.Test
         [InlineData("12345678901234:spam")]
         public void LengthAboveMaxDigits10_ThrowsUnsupportedException(string bencode)
         {
-            var context = Helper.CreateParseContext(bencode);
-            var root = new TorrentRoot();
-
-            Action action = () => parser(context, root);
-
+            Action action = () => BencodeReader.Read<BString>(encoding, bencode);
             action.Should().Throw<Exception>();
         }
 
@@ -149,10 +115,7 @@ namespace FlyingRaijin.Bencode.Test
         [InlineData("1234567890:spam")]
         public void LengthAtOrBelowMaxDigits10_DoesNotThrowUnsupportedException(string bencode)
         {
-            var context = Helper.CreateParseContext(bencode);
-            var root = new TorrentRoot();
-
-            Action action = () => parser(context, root);
+            Action action = () => BencodeReader.Read<BString>(encoding, bencode);
             action.Should().Throw<Exception>();
         }
 
@@ -160,10 +123,8 @@ namespace FlyingRaijin.Bencode.Test
         public void LengthAboveInt32MaxValue_ThrowsUnsupportedException()
         {
             var bencode = "2147483648:spam";
-            var context = Helper.CreateParseContext(bencode);
-            var root = new TorrentRoot();
 
-            Action action = () => parser(context, root);
+            Action action = () => BencodeReader.Read<BString>(encoding, bencode);
 
             action.Should().Throw<Exception>();
         }
@@ -172,10 +133,8 @@ namespace FlyingRaijin.Bencode.Test
         public void LengthBelowInt32MaxValue_DoesNotThrowUnsupportedException()
         {
             var bencode = "2147483647:spam";
-            var context = Helper.CreateParseContext(bencode);
-            var root = new TorrentRoot();
 
-            Action action = () => parser(context, root);
+            Action action = () => BencodeReader.Read<BString>(encoding, bencode);
 
             action.Should().Throw<Exception>();
         }
@@ -184,20 +143,9 @@ namespace FlyingRaijin.Bencode.Test
         public void CanParseEncodedAsLatin1()
         {
             var encoding = Encoding.GetEncoding("LATIN1");
-            //var expected = new BString("זרו", encoding);
-            //var parser = new BStringParser(encoding);
-
-            //// "3:זרו"
-            //var bytes = new byte[] { 51, 58, 230, 248, 229 };
-            //var bstring = parser(bytes);     
-
             string value = "3:זרו";
 
-            var context = new ParseContext(encoding, new MemoryStream(encoding.GetBytes(value)));
-            var root = new TorrentRoot();
-
-            parser(context, root);
-            var bstring = converter.Convert(encoding, (BencodeStringNode)root.Children.ElementAt(0));
+            var bstring = BencodeReader.Read<BString>(encoding, value);
 
             Assert.Equal(3, bstring.Length);
             Assert.Equal("זרו", bstring.Value);
@@ -210,11 +158,7 @@ namespace FlyingRaijin.Bencode.Test
         [InlineData("3abc:abc")]
         public void InvalidLengthString_ThrowsInvalidException(string bencode)
         {
-            var context = Helper.CreateParseContext(bencode);
-            var root = new TorrentRoot();
-
-            Action action = () => parser(context, root);
-
+            Action action = () => BencodeReader.Read<BString>(encoding, bencode);
             action.Should().Throw<Exception>();
         }
 
@@ -223,11 +167,7 @@ namespace FlyingRaijin.Bencode.Test
         [InlineData("0")]
         public void BelowMinimumLength_WhenStreamWithoutLengthSupport_ThrowsInvalidException(string bencode)
         {
-            var context = Helper.CreateParseContext(bencode);
-            var root = new TorrentRoot();
-
-            Action action = () => parser(context, root);
-
+            Action action = () => BencodeReader.Read<BString>(encoding, bencode);
             action.Should().Throw<Exception>();
         }
     }

@@ -6,7 +6,6 @@ using FlyingRaijin.Bencode.Converter;
 using FlyingRaijin.Bencode.Exceptions;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 namespace FlyingRaijin.Bencode.Parser
@@ -26,13 +25,13 @@ namespace FlyingRaijin.Bencode.Parser
 
             try
             {
-                var numberNode = (IntegerNode)node.Children.ElementAt(1);
+                var numberNode = (IntegerNode)node.Children[1];
 
                 var bytes = new List<byte>(numberNode.Children.Count);
 
                 for (int i = 0; i < numberNode.Children.Count; i++)
                 {
-                    NodeBase current = numberNode.Children.ElementAt(i);
+                    NodeBase current = numberNode.Children[i];
 
                     switch (current)
                     {
