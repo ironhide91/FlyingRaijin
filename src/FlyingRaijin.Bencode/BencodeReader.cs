@@ -58,7 +58,6 @@ namespace FlyingRaijin.Bencode
             };
 
             _Readers = new ReadOnlyDictionary<Type, Reader>(dict);
-
         }
 
         private static readonly IReadOnlyDictionary<Type, Reader> _Readers;

@@ -1,7 +1,6 @@
 ﻿using FlyingRaijin.Bencode.Ast.Base;
 using FlyingRaijin.Bencode.Ast.Shared;
 using System.Linq;
-using System.Text;
 
 namespace FlyingRaijin.Bencode.Converter
 {

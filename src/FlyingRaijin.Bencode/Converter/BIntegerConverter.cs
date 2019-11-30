@@ -6,7 +6,6 @@ using FlyingRaijin.Bencode.Converter;
 using FlyingRaijin.Bencode.Exceptions;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 namespace FlyingRaijin.Bencode.Parser

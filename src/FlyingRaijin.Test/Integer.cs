@@ -1,8 +1,5 @@
-using FlyingRaijin.Bencode.Ast;
 using FlyingRaijin.Bencode.ClrObject;
 using FlyingRaijin.Bencode.Exceptions;
-using FlyingRaijin.Bencode.Parser;
-using System;
 using System.Text;
 using Xunit;
 
@@ -70,7 +67,7 @@ namespace FlyingRaijin.Bencode.Test
         {
             Assert.Throws<ParsingException>(() =>
             {
-                var bnumber = BencodeReader.Read<BInteger>(encoding, bencode);
+                BencodeReader.Read<BInteger>(encoding, bencode);
             });
         }
 
@@ -79,7 +76,7 @@ namespace FlyingRaijin.Bencode.Test
         {
             Assert.Throws<ParsingException>(() =>
             {
-                var bnumber = BencodeReader.Read<BInteger>(encoding, "i-0e");
+                BencodeReader.Read<BInteger>(encoding, "i-0e");
             });
         }
 
@@ -92,7 +89,7 @@ namespace FlyingRaijin.Bencode.Test
         {
             Assert.Throws<ParsingException>(() =>
             {
-                var bnumber = BencodeReader.Read<BInteger>(encoding, bencode);
+                BencodeReader.Read<BInteger>(encoding, bencode);
             });
         }
 
@@ -105,7 +102,7 @@ namespace FlyingRaijin.Bencode.Test
         {
             Assert.Throws<ParsingException>(() =>
             {
-                var bnumber = BencodeReader.Read<BInteger>(encoding, bencode);
+                BencodeReader.Read<BInteger>(encoding, bencode);
             });
         }
 
@@ -114,7 +111,7 @@ namespace FlyingRaijin.Bencode.Test
         {
             Assert.Throws<ParsingException>(() =>
             {
-                var bnumber = BencodeReader.Read<BInteger>(encoding, "i-e");
+                BencodeReader.Read<BInteger>(encoding, "i-e");
             });
         }
 
@@ -127,7 +124,7 @@ namespace FlyingRaijin.Bencode.Test
         {
             Assert.Throws<ParsingException>(() =>
             {
-                var bnumber = BencodeReader.Read<BInteger>(encoding, bencode);
+                BencodeReader.Read<BInteger>(encoding, bencode);
             });
         }
 
