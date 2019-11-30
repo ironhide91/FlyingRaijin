@@ -6,7 +6,7 @@ namespace FlyingRaijin.Bencode.Ast.Base
     {
         public abstract Production ProductionType { get; }
 
-        public abstract ICollection<NodeBase> Children { get; }
+        public abstract IList<NodeBase> Children { get; }
 
         public void TreeTextRepresentation()
         {

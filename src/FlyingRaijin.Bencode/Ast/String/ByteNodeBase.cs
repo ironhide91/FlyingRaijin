@@ -13,9 +13,9 @@ namespace FlyingRaijin.Bencode.Ast.String
 
         public readonly byte Byte;
 
-        public override ICollection<NodeBase> Children { get => Empty; }
+        public override IList<NodeBase> Children { get => Empty; }
 
-        private static ICollection<NodeBase> Empty => Enumerable.Empty<NodeBase>().ToList().AsReadOnly();
+        private static IList<NodeBase> Empty => Enumerable.Empty<NodeBase>().ToList().AsReadOnly();
 
         public override Production ProductionType => Production.BYTE;
     }

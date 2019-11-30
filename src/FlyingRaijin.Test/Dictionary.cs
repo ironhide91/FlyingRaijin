@@ -1,8 +1,4 @@
-﻿using FlyingRaijin.Bencode.Ast;
-using FlyingRaijin.Bencode.Ast.Dictionary;
-using FlyingRaijin.Bencode.ClrObject;
-using FlyingRaijin.Bencode.Converter;
-using FlyingRaijin.Bencode.Parser;
+﻿using FlyingRaijin.Bencode.ClrObject;
 using System.Linq;
 using System.Text;
 using Xunit;
@@ -11,23 +7,14 @@ namespace FlyingRaijin.Bencode.Test
 {
     public class Dictionary
     {
-        private static Encoding encoding = Encoding.UTF8;
-
-        private static Parse parser = DelegateParsers.BencodeDictionaryParser;
-
-        private static IClrObjectConverter<BencodeDictionaryNode, BDictionary> converter = BDictionaryConverter.Converter;
+        private static readonly Encoding encoding = Encoding.UTF8;
 
         [Theory]
         [InlineData("de")]
         public void CanParseEmpty(string bencode)
         {
-            //- Arrange
-            var context = Helper.CreateParseContext(bencode);
-            var root = new TorrentRoot();
-
             //- Act
-            parser(context, root);
-            var bDictionary = converter.Convert(encoding, (BencodeDictionaryNode)root.Children.ElementAt(0));
+            var bDictionary = BencodeReader.Read<BDictionary>(encoding, bencode);
 
             //-Assert
             Assert.Equal(0, bDictionary.Value.Count);
@@ -37,13 +24,8 @@ namespace FlyingRaijin.Bencode.Test
         [InlineData("d4:spam3:egge")]
         public void Case1(string bencode)
         {
-            //- Arrange
-            var context = Helper.CreateParseContext(bencode);
-            var root = new TorrentRoot();
-
             //- Act
-            parser(context, root);
-            var bDictionary = converter.Convert(encoding, (BencodeDictionaryNode)root.Children.ElementAt(0));
+            var bDictionary = BencodeReader.Read<BDictionary>(encoding, bencode);
 
             //-Assert
             Assert.Equal(1, bDictionary.Value.Count);
@@ -59,13 +41,8 @@ namespace FlyingRaijin.Bencode.Test
         [InlineData("d4:spam3:egg3:cow3:mooe")]
         public void Case2(string bencode)
         {
-            //- Arrange
-            var context = Helper.CreateParseContext(bencode);
-            var root = new TorrentRoot();
-
             //- Act
-            parser(context, root);
-            var bDictionary = converter.Convert(encoding, (BencodeDictionaryNode)root.Children.ElementAt(0));
+            var bDictionary = BencodeReader.Read<BDictionary>(encoding, bencode);
 
             //- Assert
             Assert.Equal(2, bDictionary.Value.Count);
@@ -85,13 +62,8 @@ namespace FlyingRaijin.Bencode.Test
         [InlineData("d4:spam3:egg3:cow3:moo3:inti99e6:numberi753ee")]
         public void Case3(string bencode)
         {
-            //- Arrange
-            var context = Helper.CreateParseContext(bencode);
-            var root = new TorrentRoot();
-
             //- Act
-            parser(context, root);
-            var bDictionary = converter.Convert(encoding, (BencodeDictionaryNode)root.Children.ElementAt(0));
+            var bDictionary = BencodeReader.Read<BDictionary>(encoding, bencode);
 
             //- Assert
             Assert.Equal(4, bDictionary.Value.Count);
@@ -119,13 +91,8 @@ namespace FlyingRaijin.Bencode.Test
         [InlineData("d4:spam3:egg3:cow3:moo3:inti99e6:numberi753e4:listl5:rahul5:bipini123456789eee")]
         public void Case4(string bencode)
         {
-            //- Arrange
-            var context = Helper.CreateParseContext(bencode);
-            var root = new TorrentRoot();
-
             //- Act
-            parser(context, root);
-            var bDictionary = converter.Convert(encoding, (BencodeDictionaryNode)root.Children.ElementAt(0));
+            var bDictionary = BencodeReader.Read<BDictionary>(encoding, bencode);
 
             //- Assert
             Assert.Equal(5, bDictionary.Value.Count);
@@ -152,7 +119,7 @@ namespace FlyingRaijin.Bencode.Test
             var value5 = (BList)bDictionary.Value["list"];
             Assert.Equal(3, value5.Value.Count);
 
-            var value50 = (BString)value5.Value.ElementAt(0);
+            var value50 = (BString)value5.Value[0];
             Assert.Equal(5, value50.Length);
             Assert.Equal("rahul", value50.Value);
 

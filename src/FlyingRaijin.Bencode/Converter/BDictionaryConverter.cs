@@ -30,11 +30,11 @@ namespace FlyingRaijin.Bencode.Parser
             {
                 var dictionary = new Dictionary<string, IClrObject>();
 
-                foreach (var kv in node.Children.ElementAt(1).Children)
+                foreach (var kv in node.Children[1].Children)
                 {
-                    var key = BStringConverter.Converter.Convert(encoding, (BencodeStringNode)kv.Children.ElementAt(0)).Value;
+                    var key = BStringConverter.Converter.Convert(encoding, (BencodeStringNode)kv.Children[0]).Value;
 
-                    var value = kv.Children.ElementAt(1);
+                    var value = kv.Children[1];
 
                     switch (value)
                     {

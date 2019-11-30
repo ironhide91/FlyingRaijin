@@ -23,13 +23,13 @@ namespace FlyingRaijin.Bencode.Parser
 
             try
             {
-                var numberBytes = NumberConverter.Convert(node.Children.ElementAt(0)).ToArray();
+                var numberBytes = NumberConverter.Convert(node.Children[0]).ToArray();
 
                 var length = int.Parse(encoding.GetString(numberBytes));
 
-                var isConsitent = (length == node.Children.ElementAt(2).Children.Count);
+                var isConsitent = (length == node.Children[2].Children.Count);
 
-                var bytes = node.Children.ElementAt(2).Children.Cast<ByteNode>().Select(x => x.Byte).ToArray();
+                var bytes = node.Children[2].Children.Cast<ByteNode>().Select(x => x.Byte).ToArray();
 
                 result = new BString(length, encoding.GetString(bytes));
             }

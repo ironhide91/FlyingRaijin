@@ -14,6 +14,13 @@ namespace FlyingRaijin.Bencode.Parser
             Reader = new BinaryReader(Stream, Encoding);
         }
 
+        public ParseContext(Encoding encoding, string bencodeString)
+        {
+            Encoding = encoding;
+            Stream = new MemoryStream(encoding.GetBytes(bencodeString));
+            Reader = new BinaryReader(Stream, Encoding);
+        }
+
         public readonly Encoding Encoding;
 
         private readonly Stream Stream;

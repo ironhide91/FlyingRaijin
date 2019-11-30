@@ -1,11 +1,6 @@
 using FluentAssertions;
-using FlyingRaijin.Bencode.Ast;
-using FlyingRaijin.Bencode.Ast.List;
 using FlyingRaijin.Bencode.ClrObject;
-using FlyingRaijin.Bencode.Converter;
-using FlyingRaijin.Bencode.Parser;
 using System;
-using System.Linq;
 using System.Text;
 using Xunit;
 
@@ -13,11 +8,7 @@ namespace FlyingRaijin.Bencode.Test
 {
     public class List
     {
-        private static Encoding encoding = Encoding.UTF8;
-
-        private static Parse parser = DelegateParsers.BencodeListParser;
-
-        private static IClrObjectConverter<BencodeListNode, BList> converter = BListConverter.Converter;
+        private static readonly Encoding encoding = Encoding.UTF8;
         
         public List()
         {
@@ -28,13 +19,8 @@ namespace FlyingRaijin.Bencode.Test
         [InlineData("l4:spame")]
         public void CanParseSimple1(string bencode)
         {
-            //- Arrange
-            var context = Helper.CreateParseContext(bencode);
-            var root = new TorrentRoot();
-
             //- Act
-            parser(context, root);
-            var bList = converter.Convert(encoding, (BencodeListNode)root.Children.ElementAt(0));
+            var bList = BencodeReader.Read<BList>(encoding, bencode);
 
             //- Assert
             Assert.Equal(1, bList.Value.Count);
@@ -49,13 +35,8 @@ namespace FlyingRaijin.Bencode.Test
         [InlineData("l4:spami42ee")]
         public void CanParseSimple2(string bencode)
         {
-            //- Arrange
-            var context = Helper.CreateParseContext(bencode);
-            var root = new TorrentRoot();
-
             //- Act
-            parser(context, root);
-            var bList = converter.Convert(encoding, (BencodeListNode)root.Children.ElementAt(0));
+            var bList = BencodeReader.Read<BList>(encoding, bencode);
 
             //- Assert
             Assert.Equal(2, bList.Value.Count);
@@ -76,13 +57,8 @@ namespace FlyingRaijin.Bencode.Test
         [InlineData("l5:Hello6:World!li123ei456eeetesting")]
         public void CanParseNested1(string bencode)
         {
-            //- Arrange
-            var context = Helper.CreateParseContext(bencode);
-            var root = new TorrentRoot();
-
             //- Act
-            parser(context, root);
-            var bList = converter.Convert(encoding, (BencodeListNode)root.Children.ElementAt(0));
+            var bList = BencodeReader.Read<BList>(encoding, bencode);
 
             //- Assert
             Assert.Equal(3, bList.Value.Count);
@@ -119,13 +95,8 @@ namespace FlyingRaijin.Bencode.Test
         [InlineData("le")]
         public void CanParseEmptyList(string bencode)
         {
-            //- Arrange
-            var context = Helper.CreateParseContext(bencode);
-            var root = new TorrentRoot();
-
             //- Act
-            parser(context, root);
-            var bList = converter.Convert(encoding, (BencodeListNode)root.Children.ElementAt(0));
+            var bList = BencodeReader.Read<BList>(encoding, bencode);
 
             //- Assert
             Assert.Equal(0, bList.Value.Count);
@@ -136,12 +107,8 @@ namespace FlyingRaijin.Bencode.Test
         [InlineData("l")]
         public void BelowMinimumLength2_ThrowsInvalidBencodeException(string bencode)
         {
-            //- Arrange
-            var context = Helper.CreateParseContext(bencode);
-            var root = new TorrentRoot();
-
             //- Act
-            Action action = () => parser(context, root);
+            Action action = () => BencodeReader.Read<BList>(encoding, bencode);
 
             //- Assert
             action.Should().Throw<Exception>();
@@ -156,12 +123,8 @@ namespace FlyingRaijin.Bencode.Test
         [InlineData("e")]
         public void BelowMinimumLength2_WhenStreamLengthNotSupported_ThrowsInvalidBencodeException(string bencode)
         {
-            //- Arrange
-            var context = Helper.CreateParseContext(bencode);
-            var root = new TorrentRoot();
-
             //- Act
-            Action action = () => parser(context, root);
+            Action action = () => BencodeReader.Read<BList>(encoding, bencode);
 
             //- Assert
             action.Should().Throw<Exception>();
@@ -176,12 +139,8 @@ namespace FlyingRaijin.Bencode.Test
         [InlineData(".e")]
         public void InvalidFirstChar_ThrowsInvalidBencodeException(string bencode)
         {
-            //- Arrange
-            var context = Helper.CreateParseContext(bencode);
-            var root = new TorrentRoot();
-
             //- Act
-            Action action = () => parser(context, root);
+            Action action = () => BencodeReader.Read<BList>(encoding, bencode);
 
             //- Assert
             action.Should().Throw<Exception>();
@@ -193,12 +152,8 @@ namespace FlyingRaijin.Bencode.Test
         [InlineData("l:")]
         public void MissingEndChar_ThrowsInvalidBencodeException(string bencode)
         {
-            //- Arrange
-            var context = Helper.CreateParseContext(bencode);
-            var root = new TorrentRoot();
-
             //- Act
-            Action action = () => parser(context, root);
+            Action action = () => BencodeReader.Read<BList>(encoding, bencode);
 
             //- Assert
             action.Should().Throw<Exception>();

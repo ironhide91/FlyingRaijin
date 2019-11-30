@@ -30,7 +30,7 @@ namespace FlyingRaijin.Bencode.Parser
             {
                 var list = new List<IClrObject>();
 
-                foreach (var item in node.Children.ElementAt(1).Children)
+                foreach (var item in node.Children[1].Children)
                 {
                     switch (item)
                     {

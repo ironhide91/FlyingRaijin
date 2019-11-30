@@ -12,6 +12,6 @@ namespace FlyingRaijin.Bencode.Ast
 
         public override Production ProductionType => Production.TORRENT;
 
-        public override ICollection<NodeBase> Children { get; }
+        public override IList<NodeBase> Children { get; }
     }
 }
