@@ -1,14 +1,15 @@
 ﻿using System.Collections.Generic;
+using System.Collections.Immutable;
 
 namespace FlyingRaijin.Bencode.Read.ClrObject
 {
-    public sealed class BList : IClrObject<IReadOnlyList<IClrObject>>
+    public readonly struct BList : IClrObject<ImmutableList<IClrObject>>
     {
-        public BList(IReadOnlyList<IClrObject> value)
+        public BList(ImmutableList<IClrObject> value)
         {
             Value = value;
         }
 
-        public IReadOnlyList<IClrObject> Value { get; private set; }
+        public ImmutableList<IClrObject> Value { get; }
     }
 }

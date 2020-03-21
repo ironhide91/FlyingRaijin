@@ -1,6 +1,6 @@
 ﻿namespace FlyingRaijin.Bencode.Read.ClrObject
 {
-    public sealed class BString : IClrObject<string>
+    public readonly struct BString : IClrObject<string>
     {
         public BString(int length, string value)
         {
@@ -8,8 +8,8 @@
             Value = value;
         }
 
-        public int Length { get; private set; }
+        public int Length { get; }
 
-        public string Value { get; private set; }
+        public string Value { get; }
     }
 }

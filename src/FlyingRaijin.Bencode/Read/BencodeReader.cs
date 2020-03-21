@@ -62,7 +62,7 @@ namespace FlyingRaijin.Bencode.Read
 
         private static readonly IReadOnlyDictionary<Type, Reader> _Readers;
 
-        public static T Read<T>(Encoding encoding, string bencodeValue) where T : class, IClrObject
+        public static T Read<T>(Encoding encoding, string bencodeValue) where T : struct, IClrObject
         {
             T bObject = default;
 
@@ -70,7 +70,7 @@ namespace FlyingRaijin.Bencode.Read
             {
                 var root = new TorrentRoot();
 
-                bObject = _Readers[typeof(T)](encoding, context, root) as T;
+                bObject = (T)_Readers[typeof(T)](encoding, context, root);
 
                 System.Diagnostics.Debug.WriteLine(AstPrinter.Print(root));
             }          

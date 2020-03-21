@@ -12,8 +12,8 @@ namespace FlyingRaijin.Client.Torrent
 
         private void Initilaize(BDictionary dictionary)
         {
-            if (dictionary == null)
-                throw new ArgumentNullException(nameof(dictionary));
+            //if (dictionary == null)
+            //    throw new ArgumentNullException(nameof(dictionary));
 
             //- Required
             AnnounceUrl  = new Uri(MetaInfoHelper.ReadComment(dictionary));

@@ -7,6 +7,7 @@ using FlyingRaijin.Bencode.Read.Converter;
 using FlyingRaijin.Bencode.Read.Exceptions;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Collections.ObjectModel;
 using System.Text;
 
@@ -54,7 +55,7 @@ namespace FlyingRaijin.Bencode.Read.Parser
                     }
                 }
 
-                result = new BList(new ReadOnlyCollection<IClrObject>(list));
+                result = new BList(ImmutableList.CreateRange(list));
             }
             catch (Exception e)
             {

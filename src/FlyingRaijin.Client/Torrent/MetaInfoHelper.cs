@@ -31,7 +31,7 @@ namespace FlyingRaijin.Client.Torrent
         private const string   INFO_MULTIPLE_ITEM_PATH = "path";
 
         //- Required
-        public static string ReadAnnounceUrl(this BDictionary bDict)
+        public static string ReadAnnounceUrl(this in BDictionary bDict)
         {
             return bDict.GetValue<string>(ROOT_ANNOUNCE_URL);
         }

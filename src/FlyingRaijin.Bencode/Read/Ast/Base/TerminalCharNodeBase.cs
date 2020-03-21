@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Collections.Immutable;
 
 namespace FlyingRaijin.Bencode.Read.Ast.Base
 {
@@ -10,7 +10,7 @@ namespace FlyingRaijin.Bencode.Read.Ast.Base
 
         public override IList<NodeBase> Children { get => Empty; }
 
-        private static IList<NodeBase> Empty => Enumerable.Empty<NodeBase>().ToList().AsReadOnly();
+        private static ImmutableList<NodeBase> Empty => ImmutableList.Create<NodeBase>();
 
         public static byte ToByte(char character)
         {
