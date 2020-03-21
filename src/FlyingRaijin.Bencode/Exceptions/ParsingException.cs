@@ -1,4 +1,4 @@
-﻿namespace FlyingRaijin.Bencode.Exceptions
+﻿namespace FlyingRaijin.Bencode.Read.Exceptions
 {
     public sealed class ParsingException : BencodeException
     {
