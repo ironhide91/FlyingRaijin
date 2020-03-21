@@ -4,9 +4,9 @@
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <IsPackable>false</IsPackable>
 
-    <AssemblyName>FlyingRaijin.Bencode.Test</AssemblyName>
+    <AssemblyName>FlyingRaijin.Test</AssemblyName>
 
-    <RootNamespace>FlyingRaijin.Bencode.Test</RootNamespace>
+    <RootNamespace>FlyingRaijin.Test</RootNamespace>
 
     <ApplicationIcon />
 
@@ -14,6 +14,16 @@
 
     <StartupObject />
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Client\hex.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Client\hex.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="5.9.0" />
@@ -31,6 +41,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\FlyingRaijin.Bencode\FlyingRaijin.Bencode.csproj" />
+    <ProjectReference Include="..\FlyingRaijin.Client\FlyingRaijin.Client.csproj" />
   </ItemGroup>
 
 </Project>

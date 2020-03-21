@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace FlyingRaijin.Bencode.Exceptions
+namespace FlyingRaijin.Bencode.Read.Exceptions
 {
     public abstract class BencodeException : Exception
     {
