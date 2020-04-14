@@ -1,5 +1,4 @@
-﻿using FlyingRaijin.Client.Torrent;
-using System.IO;
+﻿using System.IO;
 using Xunit;
 
 namespace FlyingRaijin.Bencode.Client
@@ -10,7 +9,7 @@ namespace FlyingRaijin.Bencode.Client
         public void Test()
         {
             var hex = File.ReadAllText(@"Client\hex.txt");
-            var bytes = hex.HexToByteArray();
+            //var bytes = hex.HexToByteArray();
         }
     }
 }

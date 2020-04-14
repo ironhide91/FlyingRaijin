@@ -41,7 +41,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\FlyingRaijin.Bencode\FlyingRaijin.Bencode.csproj" />
-    <ProjectReference Include="..\FlyingRaijin.Client\FlyingRaijin.Client.csproj" />
+    <ProjectReference Include="..\FlyingRaijin.Client\FlyingRaijin.Engine.csproj" />
   </ItemGroup>
 
 </Project>

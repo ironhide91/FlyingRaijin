@@ -1,14 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections.Immutable;
 
 namespace FlyingRaijin.Bencode.Read.ClrObject
 {
-    public readonly struct BDictionary : IClrObject<IReadOnlyDictionary<string, IClrObject>>
+    public readonly struct BDictionary : IClrObject<ImmutableDictionary<string, IClrObject>>
     {
-        public BDictionary(IReadOnlyDictionary<string, IClrObject> value)
+        public BDictionary(ImmutableDictionary<string, IClrObject> value)
         {
             Value = value;
         }
 
-        public IReadOnlyDictionary<string, IClrObject> Value { get; /*private set;*/ }
+        public ImmutableDictionary<string, IClrObject> Value { get; }
     }
 }

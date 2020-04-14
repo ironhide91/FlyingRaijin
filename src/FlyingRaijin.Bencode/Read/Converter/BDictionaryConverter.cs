@@ -7,7 +7,7 @@ using FlyingRaijin.Bencode.Read.Converter;
 using FlyingRaijin.Bencode.Read.Exceptions;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
+using System.Collections.Immutable;
 using System.Text;
 
 namespace FlyingRaijin.Bencode.Read.Parser
@@ -58,7 +58,7 @@ namespace FlyingRaijin.Bencode.Read.Parser
                     }
                 }
 
-                result = new BDictionary(new ReadOnlyDictionary<string, IClrObject>(dictionary));
+                result = new BDictionary(ImmutableDictionary.CreateRange(dictionary));
             }
             catch (Exception e)
             {

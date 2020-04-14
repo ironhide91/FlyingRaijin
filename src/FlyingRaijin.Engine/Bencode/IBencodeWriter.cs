@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace FlyingRaijin.Client.Bencode
+namespace FlyingRaijin.Engine.Bencode
 {
     public interface IBencodeWriter
     {

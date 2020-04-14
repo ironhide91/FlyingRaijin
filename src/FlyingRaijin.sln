@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FlyingRaijin.Bencode", "Fly
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FlyingRaijin.Test", "FlyingRaijin.Test\FlyingRaijin.Test.csproj", "{11D84268-B44E-437C-8099-26780807E07F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlyingRaijin.Client", "FlyingRaijin.Client\FlyingRaijin.Client.csproj", "{C901F3DF-DFFD-4007-82F1-7418FCAAA4E7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FlyingRaijin.Engine", "FlyingRaijin.Engine\FlyingRaijin.Engine.csproj", "{C901F3DF-DFFD-4007-82F1-7418FCAAA4E7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
