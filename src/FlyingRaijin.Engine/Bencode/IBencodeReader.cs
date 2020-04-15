@@ -5,6 +5,8 @@ namespace FlyingRaijin.Engine.Bencode
 {
     public interface IBencodeReader
     {
-        //ITorrent Read(Encoding encoding, string bencodeValue);
+        SingleFileTorrent ReadsingleFile(Encoding encoding, string bencodeValue);
+
+        MultiFileTorrent ReadMultiFile(Encoding encoding, string bencodeValue);
     }
 }

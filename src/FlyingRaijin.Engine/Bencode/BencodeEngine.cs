@@ -1,24 +1,39 @@
-﻿using FlyingRaijin.Engine.Torrent;
+﻿using FlyingRaijin.Bencode.Read;
+using FlyingRaijin.Bencode.Read.ClrObject;
+using FlyingRaijin.Engine.Torrent;
 using System;
 using System.Text;
 
 namespace FlyingRaijin.Engine.Bencode
 {
-    public sealed class BencodeEngine //: //IBencodeEngine
+    public sealed class BencodeEngine : IBencodeEngine, IBencodeWriter
     {
-        //public BencodeEngine()
-        //{
+        private BencodeEngine()
+        {
 
-        //}
+        }
 
-        //public ITorrent Read(Encoding encoding, string bencodeValue)
-        //{
-        //    throw new NotImplementedException();
-        //}
+        private static readonly Lazy<BencodeEngine> lazy =
+            new Lazy<BencodeEngine> (() => new BencodeEngine());
 
-        //public string Write(Encoding encoding, string path)
-        //{
-        //    throw new NotImplementedException();
-        //}
+        public static BencodeEngine Instance { get { return lazy.Value; } }
+
+        public SingleFileTorrent ReadsingleFile(Encoding encoding, string bencodeValue)
+        {
+            var metaData = BencodeReader.Read<BDictionary>(encoding, bencodeValue);
+
+            var torrent = new SingleFileTorrent(metaData);
+
+            return torrent;
+        }
+
+        public MultiFileTorrent ReadMultiFile(Encoding encoding, string bencodeValue)
+        {
+            var metaData = BencodeReader.Read<BDictionary>(encoding, bencodeValue);
+
+            var torrent = new MultiFileTorrent(metaData);
+
+            return torrent;
+        }
     }
 }

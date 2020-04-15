@@ -4,6 +4,6 @@ namespace FlyingRaijin.Engine.Bencode
 {
     public interface IBencodeWriter
     {
-        string Write(Encoding encoding, string path);
+        //string Write(Encoding encoding, string path);
     }
 }

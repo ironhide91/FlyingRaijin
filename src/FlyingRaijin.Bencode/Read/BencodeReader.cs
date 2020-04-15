@@ -71,8 +71,6 @@ namespace FlyingRaijin.Bencode.Read
                 var root = new TorrentRoot();
 
                 bObject = (T)_Readers[typeof(T)](encoding, context, root);
-
-                System.Diagnostics.Debug.WriteLine(AstPrinter.Print(root));
             }          
 
             return bObject;
