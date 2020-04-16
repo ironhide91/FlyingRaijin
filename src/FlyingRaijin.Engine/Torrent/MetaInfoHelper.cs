@@ -1,39 +1,14 @@
-﻿using System;
+﻿using FlyingRaijin.Bencode.Read.ClrObject;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using FlyingRaijin.Bencode.Read.ClrObject;
 
 namespace FlyingRaijin.Engine.Torrent
 {
     public static class MetaInfoHelper
     {
-        ////- Root level keys
-        //private const string                 ROOT_INFO = "info";
-        //private const string         ROOT_ANNOUNCE_URL = "announce";
-        //private const string        ROOT_ANNOUNCE_LIST = "announce-list";
-        //private const string        ROOT_CREATION_DATE = "creation date";
-        //private const string              ROOT_COMMENT = "comment";
-        //private const string           ROOT_CREATED_BY = "created by";
-        //private const string             ROOT_ENCODING = "encoding";
-        ////- Info Dictionary Keys
-        //private const string     INFO_PIECE_LENGTH_KEY = "piece length";
-        //private const string           INFO_PIECES_KEY = "pieces";
-        //private const string          INFO_PRIVATE_KEY = "private";
-        ////- Info Dictionary Single File Keys
-        //private const string          INFO_SINGLE_NAME = "name";
-        //private const string        INFO_SINGLE_LENGTH = "length";
-        //private const string        INFO_SINGLE_MD5SUM = "md5sum";
-        ////- Info Dictionary Multi File Keys
-        //private const string        INFO_Multi_NAME = "name";
-        //private const string       INFO_Multi_FILES = "files";
-        ////- Info Dictionary Multi File Item Keys
-        //private const string INFO_Multi_ITEM_LENGTH = "length";
-        //private const string INFO_Multi_ITEM_MD5SUM = "md5sum";
-        //private const string   INFO_Multi_ITEM_PATH = "path";
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static T GetValue<T>(this BDictionary dictionary, string key) where T : IClrObject
         {
@@ -51,7 +26,13 @@ namespace FlyingRaijin.Engine.Torrent
             return value;
         }
 
-        private const string RootInfoKey = "Info";
+        private const string RootInfoKey = "info";
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static BDictionary ReadInfo(this BDictionary bDict)
+        {
+            return bDict.GetValue<BDictionary>(RootInfoKey);
+        }
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static SingleFileInfoDictionary ReadSingleFileInfoDictionary(this BDictionary bDict)
         {
@@ -60,6 +41,7 @@ namespace FlyingRaijin.Engine.Torrent
 
             return typedInfo;
         }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static MultiFileInfoDictionary ReadMultiFileInfoDictionary(this BDictionary bDict)
         {
@@ -78,9 +60,19 @@ namespace FlyingRaijin.Engine.Torrent
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static AnnounceList ReadAnnounceList(this BDictionary bDict)
         {
-            var bList = bDict.GetValue<BList>(RootAnnounceListKey);
+            var bList = bDict.GetValue<BList>(RootAnnounceListKey);          
 
-            var tiers = new List<ImmutableList<string>>();
+            if (bList.Value == null)
+                return AnnounceList.Empty;
+
+            var levelOneAreNotBlist = bList.Value.Any(x => x.GetType() != typeof(BList));
+
+            var levelTwoAreNotBstring = bList.Value.Cast<BList>().Any(one => one.Value.Any(two => two.GetType() != typeof(BString)));
+
+            if (levelOneAreNotBlist || levelTwoAreNotBstring)
+                return AnnounceList.Empty;
+
+            var tiers = new List<IImmutableList<string>>();
 
             foreach (BList tier in bList.Value)
             {
@@ -93,7 +85,7 @@ namespace FlyingRaijin.Engine.Torrent
                     tiers.Add(ImmutableList.CreateRange(trackers));
             }
 
-            var announceList = ImmutableList.CreateRange(tiers);
+            IImmutableList<IImmutableList<string>> announceList = ImmutableList.CreateRange(tiers);
 
             return new AnnounceList(announceList);
         }

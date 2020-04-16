@@ -16,16 +16,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Client\hex.txt" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="Client\hex.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="5.9.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.4.0" />
     <PackageReference Include="xunit" Version="2.4.1" />
@@ -41,7 +31,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\FlyingRaijin.Bencode\FlyingRaijin.Bencode.csproj" />
-    <ProjectReference Include="..\FlyingRaijin.Client\FlyingRaijin.Engine.csproj" />
+    <ProjectReference Include="..\FlyingRaijin.Engine\FlyingRaijin.Engine.csproj" />
   </ItemGroup>
 
 </Project>

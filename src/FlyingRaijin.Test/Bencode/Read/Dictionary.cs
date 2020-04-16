@@ -14,22 +14,18 @@ namespace FlyingRaijin.Test.Bencode.Read
         [InlineData("de")]
         public void CanParseEmpty(string bencode)
         {
-            //- Act
             var bDictionary = BencodeReader.Read<BDictionary>(encoding, bencode);
 
-            //-Assert
-            Assert.Equal(0, bDictionary.Value.Count);
+            Assert.Empty(bDictionary.Value);
         }
 
         [Theory]
         [InlineData("d4:spam3:egge")]
         public void Case1(string bencode)
         {
-            //- Act
             var bDictionary = BencodeReader.Read<BDictionary>(encoding, bencode);
 
-            //-Assert
-            Assert.Equal(1, bDictionary.Value.Count);
+            Assert.Single(bDictionary.Value);
             Assert.True(bDictionary.Value.ContainsKey("spam"));
 
             var value = (BString)bDictionary.Value["spam"];
@@ -42,10 +38,8 @@ namespace FlyingRaijin.Test.Bencode.Read
         [InlineData("d4:spam3:egg3:cow3:mooe")]
         public void Case2(string bencode)
         {
-            //- Act
             var bDictionary = BencodeReader.Read<BDictionary>(encoding, bencode);
 
-            //- Assert
             Assert.Equal(2, bDictionary.Value.Count);
             Assert.True(bDictionary.Value.ContainsKey("spam"));
             Assert.True(bDictionary.Value.ContainsKey("cow"));
@@ -63,10 +57,8 @@ namespace FlyingRaijin.Test.Bencode.Read
         [InlineData("d4:spam3:egg3:cow3:moo3:inti99e6:numberi753ee")]
         public void Case3(string bencode)
         {
-            //- Act
             var bDictionary = BencodeReader.Read<BDictionary>(encoding, bencode);
 
-            //- Assert
             Assert.Equal(4, bDictionary.Value.Count);
             Assert.True(bDictionary.Value.ContainsKey("spam"));
             Assert.True(bDictionary.Value.ContainsKey("cow"));
@@ -92,10 +84,8 @@ namespace FlyingRaijin.Test.Bencode.Read
         [InlineData("d4:spam3:egg3:cow3:moo3:inti99e6:numberi753e4:listl5:rahul5:bipini123456789eee")]
         public void Case4(string bencode)
         {
-            //- Act
             var bDictionary = BencodeReader.Read<BDictionary>(encoding, bencode);
 
-            //- Assert
             Assert.Equal(5, bDictionary.Value.Count);
             Assert.True(bDictionary.Value.ContainsKey("spam"));
             Assert.True(bDictionary.Value.ContainsKey("cow"));
