@@ -34,4 +34,17 @@
     <ProjectReference Include="..\FlyingRaijin.Engine\FlyingRaijin.Engine.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Artifacts\Pieces\ImperfectPiecesSample1.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Artifacts\Pieces\PerfectPiecesSample1.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Artifacts\Torrents\" />
+  </ItemGroup>
+
 </Project>

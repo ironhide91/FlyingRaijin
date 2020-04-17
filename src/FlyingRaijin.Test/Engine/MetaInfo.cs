@@ -6,7 +6,7 @@ using System.Text;
 using System.Linq;
 using Xunit;
 
-namespace FlyingRaijin.Bencode.Engine
+namespace FlyingRaijin.Test.Engine
 {
     public class MetaInfo
     {
@@ -30,7 +30,7 @@ namespace FlyingRaijin.Bencode.Engine
             var result = bDictionary.ReadInfo();
 
             result.Should().NotBeNull();
-            result.Value.Should().BeNull();            
+            result.Value.Should().BeNull();
         }
 
         [Theory]

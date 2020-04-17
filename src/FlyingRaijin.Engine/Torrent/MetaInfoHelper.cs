@@ -1,14 +1,18 @@
 ﻿using FlyingRaijin.Bencode.Read.ClrObject;
+using SimpleBase;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text;
 
 namespace FlyingRaijin.Engine.Torrent
 {
     public static class MetaInfoHelper
     {
+        private static readonly Base16 Base16 = new Base16(Base16Alphabet.UpperCase);
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static T GetValue<T>(this BDictionary dictionary, string key) where T : IClrObject
         {
@@ -123,13 +127,37 @@ namespace FlyingRaijin.Engine.Torrent
 
         private const string InfoPiecesKey = "pieces";
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ImmutableList<string> ReadPieces(this BDictionary bDict)
+        public static Pieces ReadPieces(this BDictionary bDict)
         {
             var str = bDict.GetValue<BString>(InfoPiecesKey).Value;
 
-            var temp = SimpleBase.Base16.Decode(str);
+            if (string.IsNullOrEmpty(str))
+                return Pieces.Empty;
 
-            return null;
+              byte[] bytes = Encoding.Default.GetBytes(str);
+               var utf8Str = Encoding.UTF8.GetString(bytes).AsSpan().Slice(2);
+
+            var sha1Pieces = Base16.Decode(utf8Str);
+
+            var isNotMultipleOf20 = (sha1Pieces.Length % 20) != 0;
+
+            if (isNotMultipleOf20)
+                return Pieces.Empty;
+
+            int start = 0, end = (sha1Pieces.Length - 21);
+
+            var sha1Checksumns = new List<byte[]>();
+
+            while (start <= end)
+            {
+                var sha1 = sha1Pieces.Slice(start, 20);
+
+                sha1Checksumns.Add(sha1.ToArray());
+
+                start += 20;
+            }
+
+            return new Pieces(ImmutableList.CreateRange(sha1Checksumns));
         }
 
         //-> Single File Info Dictionary
