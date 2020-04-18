@@ -8,7 +8,7 @@ using Xunit;
 
 namespace FlyingRaijin.Test.Engine
 {
-    public class CommonInfoDictionary
+    public class MetaDataInfoShared
     {
         private static readonly Encoding encoding = Encoding.UTF8;
 
