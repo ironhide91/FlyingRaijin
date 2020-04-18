@@ -65,7 +65,7 @@ namespace FlyingRaijin.Test.Engine
         [Fact]
         public void CanReadPiecesInfoKey()
         {
-            var piecesStr = File.ReadAllText("Artifacts\\Pieces\\PiecesSample1.txt");
+            var piecesStr = File.ReadAllText("Artifacts\\Pieces\\PerfectPiecesSample1.txt");
 
             var strBuilder = new StringBuilder();
             strBuilder.Append("d");

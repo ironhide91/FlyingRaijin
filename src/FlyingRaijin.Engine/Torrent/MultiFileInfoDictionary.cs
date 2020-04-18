@@ -23,6 +23,6 @@ namespace FlyingRaijin.Engine.Torrent
         public override Pieces Pieces => _Pieces;
 
         public readonly string DirectoryName;
-        public readonly ImmutableList<MultiFileInfoDictionaryItem> Files;
+        public readonly IImmutableList<MultiFileInfoDictionaryItem> Files;
     }
 }
