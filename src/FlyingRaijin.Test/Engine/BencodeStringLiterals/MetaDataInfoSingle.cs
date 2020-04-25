@@ -5,9 +5,9 @@ using FlyingRaijin.Engine.Torrent;
 using System.Text;
 using Xunit;
 
-namespace FlyingRaijin.Test.Engine
+namespace FlyingRaijin.Test.Engine.BencodeStringLiterals
 {
-    public class MetaDataInfoSharedSingle
+    public class MetaDataInfoSingle
     {
         private static readonly Encoding encoding = Encoding.UTF8;
 

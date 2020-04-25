@@ -6,7 +6,7 @@ using System.Text;
 using System.Linq;
 using Xunit;
 
-namespace FlyingRaijin.Test.Engine
+namespace FlyingRaijin.Test.Engine.BencodeStringLiterals
 {
     public class SharedMetaData
     {

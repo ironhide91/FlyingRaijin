@@ -8,16 +8,22 @@ namespace FlyingRaijin.Engine.Torrent
 {
     public static partial class MetaDataHelper
     {
+        private static IImmutableList<MultiFileInfoDictionaryItem> EmptyFiles =
+            ImmutableList.CreateRange(Enumerable.Empty<MultiFileInfoDictionaryItem>());
+
         private const string InfoMultiNameKey = "name";
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string ReadMultiName(this BDictionary bDict)
-            => bDict.GetValue<BString>(InfoMultiNameKey).Value;
+            => bDict.GetValue<BString>(InfoMultiNameKey).Value;        
 
         private const string InfoMultiFiles = "files";
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static IImmutableList<MultiFileInfoDictionaryItem> ReadMultiFiles(this BDictionary bDict)
         {
             var files = bDict.GetValue<BList>(InfoMultiFiles).Value;
+
+            if (files == null)
+                return EmptyFiles;
 
             var typedFiles = new List<MultiFileInfoDictionaryItem>(files.Count);
 
@@ -26,8 +32,8 @@ namespace FlyingRaijin.Engine.Torrent
                 var item =
                     new MultiFileInfoDictionaryItem(
                         fileDict.ReadMultiFileLength(),
-                        fileDict.ReadInfoMultiFilePath(),
-                        fileDict.ReadMultiFileM55Checksum());
+                        fileDict.ReadMultiFileM55Checksum(),
+                        fileDict.ReadInfoMultiFilePath());
 
                 typedFiles.Add(item);
             }
@@ -51,10 +57,11 @@ namespace FlyingRaijin.Engine.Torrent
         {
             var list = bDict.GetValue<BList>(InfoMultiFilePathKey).Value;
 
+            if (list == null)
+                return string.Empty;
+
             if (list.Count == 1)
-            {
                 return ((BString)list.First()).Value;
-            }
 
             return string.Join('/', list.Cast<BString>().Select(s => s.Value));
         }
