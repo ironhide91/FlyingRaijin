@@ -98,12 +98,14 @@ namespace FlyingRaijin.Bencode.Read.Parser
                     }
 
                     //- Possible Bencoded Dictionary
-                    var nestedDictionaryNode = new BencodeDictionaryNode();
-                    node.Children.Add(nestedDictionaryNode);
+                    var nestedDictionaryNode = new BencodeDictionaryNode();                    
 
                     DictionaryStartParser(context, nestedDictionaryNode);
                     ParseRecursiveDictionary(context, nestedDictionaryNode, new HashSet<BencodeStringNode>());
                     EndParser(context, nestedDictionaryNode);
+
+                    currentKeyValueNode.Children.Add(nestedDictionaryNode);
+                    node.Children.Add(currentKeyValueNode);
 
                     expectingKey = true;
                 }
