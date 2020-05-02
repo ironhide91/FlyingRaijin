@@ -17,21 +17,21 @@ namespace FlyingRaijin.Bencode.Read.Parser
 
         }
 
-        public BString Convert(Encoding encoding, BencodeStringNode node)
+        public BString Convert(BencodeStringNode node)
         {
             BString result;
 
             try
             {
-                var numberBytes = NumberConverter.Convert(node.Children[0]).ToArray();
+                var intChars = new string(NumberConverter.Convert(node.Children[0]));
 
-                var length = int.Parse(encoding.GetString(numberBytes));
+                var length = int.Parse(intChars);
 
                 var isConsitent = (length == node.Children[2].Children.Count);
 
-                var bytes = node.Children[2].Children.Cast<ByteNode>().Select(x => x.Byte).ToArray();
+                var chars = node.Children[2].Children.Cast<CharNode>().Select(x => x.Character).ToArray();
 
-                result = new BString(length, encoding.GetString(bytes));
+                result = new BString(length, new string(chars));
             }
             catch (Exception e)
             {

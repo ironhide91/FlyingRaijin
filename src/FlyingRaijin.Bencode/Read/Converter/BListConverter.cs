@@ -22,7 +22,7 @@ namespace FlyingRaijin.Bencode.Read.Parser
 
         }
 
-        public BList Convert(Encoding encoding, BencodeListNode node)
+        public BList Convert(BencodeListNode node)
         {
             BList result;
 
@@ -35,19 +35,19 @@ namespace FlyingRaijin.Bencode.Read.Parser
                     switch (item)
                     {
                         case BencodeIntegerNode n:
-                            var bInteger = BIntegerConverter.Converter.Convert(encoding, n);
+                            var bInteger = BIntegerConverter.Converter.Convert(n);
                             list.Add(bInteger);
                             break;
                         case BencodeStringNode n:
-                            var bString = BStringConverter.Converter.Convert(encoding, n);
+                            var bString = BStringConverter.Converter.Convert(n);
                             list.Add(bString);
                             break;
                         case BencodeListNode n:
-                            var bList = Convert(encoding, n);
+                            var bList = Convert(n);
                             list.Add(bList);
                             break;
                         case BencodeDictionaryNode n:
-                            var bDictionary = BDictionaryConverter.Converter.Convert(encoding, n);
+                            var bDictionary = BDictionaryConverter.Converter.Convert(n);
                             list.Add(bDictionary);
                             break;
                         default:

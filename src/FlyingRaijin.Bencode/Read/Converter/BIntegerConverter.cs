@@ -19,7 +19,7 @@ namespace FlyingRaijin.Bencode.Read.Parser
 
         }
 
-        public BInteger Convert(Encoding encoding, BencodeIntegerNode node)
+        public BInteger Convert(BencodeIntegerNode node)
         {
             BInteger result;
 
@@ -27,7 +27,7 @@ namespace FlyingRaijin.Bencode.Read.Parser
             {
                 var numberNode = (IntegerNode)node.Children[1];
 
-                var bytes = new List<byte>(numberNode.Children.Count);
+                var chars = new List<char>(numberNode.Children.Count);
 
                 for (int i = 0; i < numberNode.Children.Count; i++)
                 {
@@ -36,13 +36,13 @@ namespace FlyingRaijin.Bencode.Read.Parser
                     switch (current)
                     {
                         case NegativeSignNode n:
-                            bytes.Add(n.Byte);
+                            chars.Add(n.Character);
                             break;
                         case NumberNode n:
-                            bytes.AddRange(NumberConverter.Convert(n));
+                            chars.AddRange(NumberConverter.Convert(n));
                             break;
                         case ZeroNode n:
-                            bytes.Add(n.Byte);
+                            chars.Add(n.Character);
                             break;
                         default:
                             break;
@@ -54,7 +54,7 @@ namespace FlyingRaijin.Bencode.Read.Parser
 
                 try
                 {
-                    intStr = encoding.GetString(bytes.ToArray());
+                    intStr = new string(chars.ToArray());
 
                     checked
                     {

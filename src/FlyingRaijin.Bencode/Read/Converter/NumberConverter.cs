@@ -6,11 +6,11 @@ namespace FlyingRaijin.Bencode.Read.Converter
 {
     internal static class NumberConverter
     {
-        internal static byte[] Convert(NodeBase node)
+        internal static char[] Convert(NodeBase node)
         {
-            var numberNode = node.CastOrThrow<NumberNode>();
+            var numberNode = (NumberNode)node;
 
-            return numberNode.Children.Cast<TerminalByteNodeBase>().Select(x => x.Byte).ToArray();
+            return numberNode.Children.Cast<TerminalCharNodeBase>().Select(x => x.Character).ToArray();
         }
     }
 }
