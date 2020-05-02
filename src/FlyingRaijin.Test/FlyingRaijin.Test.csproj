@@ -41,6 +41,12 @@
     <None Update="Artifacts\Pieces\PerfectPiecesSample1.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Artifacts\Torrents\linuxmint-18-cinnamon-64bit.torrent">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Artifacts\Torrents\Slackware64-14.1-install-dvd.torrent">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <ItemGroup>

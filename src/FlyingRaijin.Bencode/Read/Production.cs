@@ -21,7 +21,7 @@
         BENCODED_STRING,
         STRING_LENGTH_PREFIX,
         STRING,
-        BYTE,
+        CHAR,
         //- Shared
         NUMBER,
         DIGIT_EXCULUDING_ZERO,

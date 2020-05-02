@@ -29,8 +29,11 @@ namespace FlyingRaijin.Engine.Torrent
             if (string.IsNullOrEmpty(str))
                 return Pieces.Empty;
 
-            byte[] bytes = Encoding.Default.GetBytes(str);
-            var utf8Str = Encoding.UTF8.GetString(bytes).AsSpan().Slice(2);
+            byte[] bytes = Encoding.UTF8.GetBytes(str);
+
+            var temp = System.Text.Encoding.Convert(Encoding.UTF8, Encoding.ASCII, bytes);
+
+            var utf8Str = Encoding.ASCII.GetString(bytes).AsSpan().Slice(2);
 
             var sha1Pieces = Base16.Decode(utf8Str);
 

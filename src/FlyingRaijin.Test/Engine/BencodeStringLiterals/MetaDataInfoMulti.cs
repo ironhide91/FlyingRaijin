@@ -9,13 +9,11 @@ namespace FlyingRaijin.Test.Engine.BencodeStringLiterals
 {
     public class MetaDataInfoMulti
     {
-        private static readonly Encoding encoding = Encoding.UTF8;
-
         [Theory]
         [InlineData("d4:name10:SomeFoldere")]
         public void CanReadNameInfoMultiKey(string bencode)
         {
-            var bDictionary = BencodeReader.Read<BDictionary>(encoding, bencode);
+            var bDictionary = BencodeReader.Read<BDictionary>(bencode);
             var result = bDictionary.ReadMultiName();
 
             result.Should().NotBeNull();
@@ -26,7 +24,7 @@ namespace FlyingRaijin.Test.Engine.BencodeStringLiterals
         [InlineData("d3:nam10:SomeFoldere")]
         public void MissingNameInfoMultiKey(string bencode)
         {
-            var bDictionary = BencodeReader.Read<BDictionary>(encoding, bencode);
+            var bDictionary = BencodeReader.Read<BDictionary>(bencode);
             var result = bDictionary.ReadMultiName();
 
             result.Should().BeNull();
@@ -36,7 +34,7 @@ namespace FlyingRaijin.Test.Engine.BencodeStringLiterals
         [InlineData("d5:filesldededeee")]
         public void CanReadFilesInfoMultiKey(string bencode)
         {
-            var bDictionary = BencodeReader.Read<BDictionary>(encoding, bencode);
+            var bDictionary = BencodeReader.Read<BDictionary>(bencode);
             var result = bDictionary.ReadMultiFiles();
 
             result.Should().NotBeNull();
@@ -47,7 +45,7 @@ namespace FlyingRaijin.Test.Engine.BencodeStringLiterals
         [InlineData("d4:fileldededeee")]
         public void MissingFilesInfoMultiKey(string bencode)
         {
-            var bDictionary = BencodeReader.Read<BDictionary>(encoding, bencode);
+            var bDictionary = BencodeReader.Read<BDictionary>(bencode);
             var result = bDictionary.ReadMultiFiles();
 
             result.Should().NotBeNull();
@@ -89,7 +87,7 @@ namespace FlyingRaijin.Test.Engine.BencodeStringLiterals
                 strBuilder.Append("e");
             strBuilder.Append("e");
 
-            var bDictionary = BencodeReader.Read<BDictionary>(encoding, strBuilder.ToString());
+            var bDictionary = BencodeReader.Read<BDictionary>(strBuilder.ToString());
             var result = bDictionary.ReadMultiFiles();
 
             result.Should().NotBeNull();

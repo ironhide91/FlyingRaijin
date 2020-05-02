@@ -19,18 +19,18 @@ namespace FlyingRaijin.Engine.Bencode
 
         public static BencodeEngine Instance { get { return lazy.Value; } }
 
-        public SingleFileTorrent ReadsingleFile(Encoding encoding, Stream stream)
+        public SingleFileTorrent ReadsingleFile(Stream stream)
         {
-            var metaData = BencodeReader.Read<BDictionary>(encoding, stream);
+            var metaData = BencodeReader.Read<BDictionary>(stream);
 
             var torrent = new SingleFileTorrent(metaData);
 
             return torrent;
         }
 
-        public MultiFileTorrent ReadMultiFile(Encoding encoding, Stream stream)
+        public MultiFileTorrent ReadMultiFile(Stream stream)
         {
-            var metaData = BencodeReader.Read<BDictionary>(encoding, stream);
+            var metaData = BencodeReader.Read<BDictionary>(stream);
 
             var torrent = new MultiFileTorrent(metaData);
 

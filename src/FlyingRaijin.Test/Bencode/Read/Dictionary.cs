@@ -1,20 +1,17 @@
 ﻿using FlyingRaijin.Bencode.Read;
 using FlyingRaijin.Bencode.Read.ClrObject;
 using System.Linq;
-using System.Text;
 using Xunit;
 
 namespace FlyingRaijin.Test.Bencode.Read
 {
     public class Dictionary
     {
-        private static readonly Encoding encoding = Encoding.UTF8;
-
         [Theory]
         [InlineData("de")]
         public void CanParseEmpty(string bencode)
         {
-            var bDictionary = BencodeReader.Read<BDictionary>(encoding, bencode);
+            var bDictionary = BencodeReader.Read<BDictionary>(bencode);
 
             Assert.Empty(bDictionary.Value);
         }
@@ -23,7 +20,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         [InlineData("d4:spam3:egge")]
         public void Case1(string bencode)
         {
-            var bDictionary = BencodeReader.Read<BDictionary>(encoding, bencode);
+            var bDictionary = BencodeReader.Read<BDictionary>(bencode);
 
             Assert.Single(bDictionary.Value);
             Assert.True(bDictionary.Value.ContainsKey("spam"));
@@ -38,7 +35,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         [InlineData("d4:spam3:egg3:cow3:mooe")]
         public void Case2(string bencode)
         {
-            var bDictionary = BencodeReader.Read<BDictionary>(encoding, bencode);
+            var bDictionary = BencodeReader.Read<BDictionary>(bencode);
 
             Assert.Equal(2, bDictionary.Value.Count);
             Assert.True(bDictionary.Value.ContainsKey("spam"));
@@ -57,7 +54,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         [InlineData("d4:spam3:egg3:cow3:moo3:inti99e6:numberi753ee")]
         public void Case3(string bencode)
         {
-            var bDictionary = BencodeReader.Read<BDictionary>(encoding, bencode);
+            var bDictionary = BencodeReader.Read<BDictionary>(bencode);
 
             Assert.Equal(4, bDictionary.Value.Count);
             Assert.True(bDictionary.Value.ContainsKey("spam"));
@@ -84,7 +81,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         [InlineData("d4:spam3:egg3:cow3:moo3:inti99e6:numberi753e4:listl5:rahul5:bipini123456789eee")]
         public void Case4(string bencode)
         {
-            var bDictionary = BencodeReader.Read<BDictionary>(encoding, bencode);
+            var bDictionary = BencodeReader.Read<BDictionary>(bencode);
 
             Assert.Equal(5, bDictionary.Value.Count);
             Assert.True(bDictionary.Value.ContainsKey("spam"));

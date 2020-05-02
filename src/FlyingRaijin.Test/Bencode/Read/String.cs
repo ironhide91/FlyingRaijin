@@ -1,8 +1,9 @@
-using FluentAssertions;
+﻿using FluentAssertions;
 using FlyingRaijin.Bencode.Read;
 using FlyingRaijin.Bencode.Read.ClrObject;
 using FlyingRaijin.Bencode.Read.Exceptions;
 using System;
+using System.IO;
 using System.Text;
 using Xunit;
 
@@ -23,14 +24,14 @@ namespace FlyingRaijin.Test.Bencode.Read
         [InlineData("8:spameggs")]
         [InlineData("9:spam eggs")]
         [InlineData("9:spam:eggs")]
-        [InlineData("14:!@#�%&/()=?$|")]
+        [InlineData("12:!@#%&/()=?$|")]
         public void CanParseSimple(string bencode)
         {
             var parts = bencode.Split(new[] { ':' }, 2);
             var length = int.Parse(parts[0]);
             var value = parts[1];
 
-            var bstring = BencodeReader.Read<BString>(encoding, bencode);
+            var bstring = BencodeReader.Read<BString>(bencode);
 
             Assert.Equal(length, bstring.Length);
             Assert.Equal(value, bstring.Value);
@@ -39,7 +40,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         [Fact]
         public void CanParse_EmptyString()
         {
-            var bstring = BencodeReader.Read<BString>(encoding, "0:");
+            var bstring = BencodeReader.Read<BString>("0:");
 
             Assert.Equal(0, bstring.Length);
             Assert.Equal(string.Empty, bstring.Value);
@@ -51,8 +52,8 @@ namespace FlyingRaijin.Test.Bencode.Read
         [InlineData("100:spam")]
         public void LessCharsThanSpecified_ThrowsInvalidBencodeException(string bencode)
         {
-            Action action = () => BencodeReader.Read<BString>(encoding, bencode);
-            action.Should().Throw<ParsingException>();
+            Action action = () => BencodeReader.Read<BString>(bencode);
+            action.Should().Throw<EndOfStreamException>();
         }
 
         [Theory]
@@ -65,7 +66,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         [InlineData("4|spam")]
         public void MissingDelimiter_ThrowsInvalidBencodeException(string bencode)
         {
-            Action action = () => BencodeReader.Read<BString>(encoding, bencode);
+            Action action = () => BencodeReader.Read<BString>(bencode);
             action.Should().Throw<Exception>();
         }
 
@@ -80,7 +81,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         [InlineData("#spam")]
         public void NonDigitFirstChar_ThrowsInvalidBencodeException(string bencode)
         {
-            Action action = () => BencodeReader.Read<BString>(encoding, bencode);
+            Action action = () => BencodeReader.Read<BString>(bencode);
             action.Should().Throw<Exception>();
         }
 
@@ -89,7 +90,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         [InlineData("4")]
         public void LessThanMinimumLength2_ThrowsInvalidBencodeException(string bencode)
         {
-            Action action = () => BencodeReader.Read<BString>(encoding, bencode);
+            Action action = () => BencodeReader.Read<BString>(bencode);
             action.Should().Throw<Exception>();
         }
 
@@ -100,7 +101,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         [InlineData("12345678901234:spam")]
         public void LengthAboveMaxDigits10_ThrowsUnsupportedException(string bencode)
         {
-            Action action = () => BencodeReader.Read<BString>(encoding, bencode);
+            Action action = () => BencodeReader.Read<BString>(bencode);
             action.Should().Throw<Exception>();
         }
 
@@ -116,7 +117,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         [InlineData("1234567890:spam")]
         public void LengthAtOrBelowMaxDigits10_DoesNotThrowUnsupportedException(string bencode)
         {
-            Action action = () => BencodeReader.Read<BString>(encoding, bencode);
+            Action action = () => BencodeReader.Read<BString>(bencode);
             action.Should().Throw<Exception>();
         }
 
@@ -125,7 +126,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         {
             var bencode = "2147483648:spam";
 
-            Action action = () => BencodeReader.Read<BString>(encoding, bencode);
+            Action action = () => BencodeReader.Read<BString>(bencode);
 
             action.Should().Throw<Exception>();
         }
@@ -135,21 +136,20 @@ namespace FlyingRaijin.Test.Bencode.Read
         {
             var bencode = "2147483647:spam";
 
-            Action action = () => BencodeReader.Read<BString>(encoding, bencode);
+            Action action = () => BencodeReader.Read<BString>(bencode);
 
             action.Should().Throw<Exception>();
         }
 
         [Fact]
-        public void CanParseEncodedAsLatin1()
+        public void CanParseUnicode()
         {
-            var encoding = Encoding.GetEncoding("LATIN1");
-            string value = "3:���";
+            var utf8Value = Encoding.UTF8.GetString(Encoding.UTF8.GetBytes("65:$€£¥¢₹₨₱₩฿₫₪©®℗™℠αβγδεζηθικλμνξοπρστυφχψωΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ"));
 
-            var bstring = BencodeReader.Read<BString>(encoding, value);
+            var bstring = BencodeReader.Read<BString>(utf8Value);
 
-            Assert.Equal(3, bstring.Length);
-            Assert.Equal("���", bstring.Value);
+            Assert.Equal(65, bstring.Length);
+            Assert.Equal("$€£¥¢₹₨₱₩฿₫₪©®℗™℠αβγδεζηθικλμνξοπρστυφχψωΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ", bstring.Value);
         }
 
         [Theory]
@@ -159,7 +159,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         [InlineData("3abc:abc")]
         public void InvalidLengthString_ThrowsInvalidException(string bencode)
         {
-            Action action = () => BencodeReader.Read<BString>(encoding, bencode);
+            Action action = () => BencodeReader.Read<BString>(bencode);
             action.Should().Throw<Exception>();
         }
 
@@ -168,7 +168,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         [InlineData("0")]
         public void BelowMinimumLength_WhenStreamWithoutLengthSupport_ThrowsInvalidException(string bencode)
         {
-            Action action = () => BencodeReader.Read<BString>(encoding, bencode);
+            Action action = () => BencodeReader.Read<BString>(bencode);
             action.Should().Throw<Exception>();
         }
     }
