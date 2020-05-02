@@ -2,12 +2,24 @@
 
 namespace FlyingRaijin.Bencode.Read.Ast.Shared
 {
-    public sealed class ZeroNode : TerminalByteNodeBase
+    public sealed class ZeroNode : TerminalCharNodeBase
     {
+        static ZeroNode()
+        {
+            Instance = new ZeroNode();
+        }
+
+        private ZeroNode()
+        {
+
+        }
+
+        private static char UTF8Char = ToUTF8Char("0");
+
+        public static readonly ZeroNode Instance;
+
         public override Production ProductionType => Production.ZERO;
 
-        public override byte Byte => ZeroDigitByte;
-
-        public static byte ZeroDigitByte = ToByte('0');
+        public override char Character => UTF8Char;
     }
 }

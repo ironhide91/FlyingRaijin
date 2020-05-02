@@ -1,14 +1,25 @@
 ﻿using FlyingRaijin.Bencode.Read.Ast.Base;
-using System;
 
 namespace FlyingRaijin.Bencode.Read.Ast.Integer
 {
-    public sealed class IntegerStartNode : TerminalByteNodeBase
+    public sealed class IntegerStartNode : TerminalCharNodeBase
     {
+        static IntegerStartNode()
+        {
+            Instance = new IntegerStartNode();
+        }
+
+        private IntegerStartNode()
+        {
+
+        }
+
+        public static readonly IntegerStartNode Instance;
+
         public override Production ProductionType => Production.INTEGER_START;
 
-        public override byte Byte => IntegerStartNonTerminalByte;
+        public override char Character => UTF8Char;
 
-        public static byte IntegerStartNonTerminalByte = ToByte('i');
+        private static char UTF8Char = ToUTF8Char("i");
     }
 }
