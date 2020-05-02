@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace FlyingRaijin.Bencode.Read.Parser
@@ -24,16 +25,13 @@ namespace FlyingRaijin.Bencode.Read.Parser
 
         private readonly Stream Stream;
 
-        public readonly StreamReader Reader;
+        private readonly StreamReader Reader;
 
         public char LookAheadChar { get; private set; }
 
         public void Match(char charToMatch)
         {
-            if (Reader.EndOfStream)
-            {
-                throw ParsingException.Create("Reached End Of Stream.");
-            }
+            CheckEndOfStream();
 
             var value = Reader.Peek();
 
@@ -44,22 +42,49 @@ namespace FlyingRaijin.Bencode.Read.Parser
                 return;
             }
 
-            throw ParsingException.Create("Invalid Encode.");
+            throw ParsingException.Create("Invalid Bencode.");
         }
 
         public bool IsMatch(char charToMatch)
         {
-            return (charToMatch == (char)Reader.Peek());
+            CheckEndOfStream();
+
+            var value = (char)Reader.Peek();
+
+            if (value == charToMatch)
+            {
+                LookAheadChar = value;
+                return true;
+            }
+
+            return false;
         }
 
         public bool IsMatch(HashSet<char> charsToMatch)
         {
-            return charsToMatch.Contains((char)Reader.Peek());
+            CheckEndOfStream();
+
+            var value = (char)Reader.Peek();
+
+            if (charsToMatch.Contains(value))
+            {
+                LookAheadChar = value;
+                return true;
+            }
+
+            return false;
         }
 
         public void Advance(int numBytes, byte[] buffer)
         {
             var result = Reader.BaseStream.Read(buffer, 0, numBytes);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void CheckEndOfStream()
+        {
+            if (Reader.EndOfStream)
+                throw ParsingException.Create("Reached End Of Stream.");
         }
 
         public void Dispose()

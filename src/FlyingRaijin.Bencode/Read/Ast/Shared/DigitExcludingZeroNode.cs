@@ -12,7 +12,7 @@ namespace FlyingRaijin.Bencode.Read.Ast.Shared
             "1", "2", "3", "4", "5", "6", "7", "8", "9"
         };
 
-        public static HashSet<char> DigitsExcludingZero =>
+        public static HashSet<char> DigitsExcludingZero =
             new HashSet<char>(DigitsExcludingZeroChars.Select(x => ToUTF8Char(x)));
 
         public DigitExcludingZeroNode(char nonZeroDigit)

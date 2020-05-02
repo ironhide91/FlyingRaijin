@@ -7,15 +7,13 @@ namespace FlyingRaijin.Bencode.Read.Parser
     {
         public static void DigitExcludingZeroParser(ParserContext context, NodeBase ast)
         {
-            //context.HasTokens();
-
-            var chr = context.LookAheadChar;
-
-            if (DigitExcludingZeroNode.DigitsExcludingZero.Contains(context.LookAheadChar))
+            if (context.IsMatch(DigitExcludingZeroNode.DigitsExcludingZero))
             {
-                context.Match(context.LookAheadChar);
+                var nonZeroDigit = context.LookAheadChar;
 
-                var node = new DigitExcludingZeroNode(chr);
+                context.Match(nonZeroDigit);
+
+                var node = new DigitExcludingZeroNode(nonZeroDigit);
 
                 ast.Children.Add(node);
             }

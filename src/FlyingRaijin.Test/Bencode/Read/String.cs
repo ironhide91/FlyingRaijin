@@ -53,7 +53,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         public void LessCharsThanSpecified_ThrowsInvalidBencodeException(string bencode)
         {
             Action action = () => BencodeReader.Read<BString>(bencode);
-            action.Should().Throw<EndOfStreamException>();
+            action.Should().Throw<ParsingException>();
         }
 
         [Theory]
@@ -67,7 +67,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         public void MissingDelimiter_ThrowsInvalidBencodeException(string bencode)
         {
             Action action = () => BencodeReader.Read<BString>(bencode);
-            action.Should().Throw<Exception>();
+            action.Should().Throw<ParsingException>();
         }
 
         [Theory]
@@ -82,7 +82,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         public void NonDigitFirstChar_ThrowsInvalidBencodeException(string bencode)
         {
             Action action = () => BencodeReader.Read<BString>(bencode);
-            action.Should().Throw<Exception>();
+            action.Should().Throw<ParsingException>();
         }
 
         [Theory]
@@ -91,7 +91,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         public void LessThanMinimumLength2_ThrowsInvalidBencodeException(string bencode)
         {
             Action action = () => BencodeReader.Read<BString>(bencode);
-            action.Should().Throw<Exception>();
+            action.Should().Throw<ParsingException>();
         }
 
         [Theory]
@@ -102,7 +102,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         public void LengthAboveMaxDigits10_ThrowsUnsupportedException(string bencode)
         {
             Action action = () => BencodeReader.Read<BString>(bencode);
-            action.Should().Throw<Exception>();
+            action.Should().Throw<OverflowException>();
         }
 
         [Theory]
@@ -118,7 +118,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         public void LengthAtOrBelowMaxDigits10_DoesNotThrowUnsupportedException(string bencode)
         {
             Action action = () => BencodeReader.Read<BString>(bencode);
-            action.Should().Throw<Exception>();
+            action.Should().Throw<ParsingException>();
         }
 
         [Fact]
@@ -128,7 +128,7 @@ namespace FlyingRaijin.Test.Bencode.Read
 
             Action action = () => BencodeReader.Read<BString>(bencode);
 
-            action.Should().Throw<Exception>();
+            action.Should().Throw<OverflowException>();
         }
 
         [Fact]
@@ -138,7 +138,7 @@ namespace FlyingRaijin.Test.Bencode.Read
 
             Action action = () => BencodeReader.Read<BString>(bencode);
 
-            action.Should().Throw<Exception>();
+            action.Should().Throw<ParsingException>();
         }
 
         [Fact]
@@ -160,7 +160,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         public void InvalidLengthString_ThrowsInvalidException(string bencode)
         {
             Action action = () => BencodeReader.Read<BString>(bencode);
-            action.Should().Throw<Exception>();
+            action.Should().Throw<ParsingException>();
         }
 
         [Theory]
@@ -169,7 +169,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         public void BelowMinimumLength_WhenStreamWithoutLengthSupport_ThrowsInvalidException(string bencode)
         {
             Action action = () => BencodeReader.Read<BString>(bencode);
-            action.Should().Throw<Exception>();
+            action.Should().Throw<ParsingException>();
         }
     }
 }

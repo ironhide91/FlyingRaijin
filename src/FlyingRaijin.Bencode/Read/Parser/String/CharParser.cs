@@ -8,14 +8,11 @@ namespace FlyingRaijin.Bencode.Read.Parser
     {
         public static void CharParser(ParserContext context, NodeBase ast)
         {
-            //var nextChar = context.LookAheadChar;            
+            var character = context.LookAheadChar;
 
-            //context.Match(nextChar);
+            context.Match(character);
 
-            var b = context.Reader.Read();
-
-            //var node = new CharNode(BitConverter.ToCharParse(b));
-            var node = new CharNode((char)b);
+            var node = new CharNode(character);
 
             ast.Children.Add(node);
         }

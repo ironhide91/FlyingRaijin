@@ -1,6 +1,7 @@
 using FluentAssertions;
 using FlyingRaijin.Bencode.Read;
 using FlyingRaijin.Bencode.Read.ClrObject;
+using FlyingRaijin.Bencode.Read.Exceptions;
 using System;
 using System.Text;
 using Xunit;
@@ -95,7 +96,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         {
             Action action = () => BencodeReader.Read<BList>(bencode);
 
-            action.Should().Throw<Exception>();
+            action.Should().Throw<ParsingException>();
         }
 
         [Theory]
@@ -109,7 +110,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         {
             Action action = () => BencodeReader.Read<BList>(bencode);
 
-            action.Should().Throw<Exception>();
+            action.Should().Throw<ParsingException>();
         }
 
         [Theory]
@@ -123,7 +124,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         {
             Action action = () => BencodeReader.Read<BList>(bencode);
 
-            action.Should().Throw<Exception>();
+            action.Should().Throw<ParsingException>();
         }
 
         [Theory]
@@ -134,7 +135,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         {
             Action action = () => BencodeReader.Read<BList>(bencode);
 
-            action.Should().Throw<Exception>();
+            action.Should().Throw<ParsingException>();
         }
     }
 }

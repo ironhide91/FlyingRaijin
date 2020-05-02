@@ -24,9 +24,15 @@ namespace FlyingRaijin.Bencode.Read.Parser
                 ast.Children.Add(node);
             }
 
-            byte[] bytes = new byte[bytesToProcess];
+            while (bytesToProcess-- > 0)
+            {
+                CharParser(context, node);
+            }
 
-            context.Advance(bytesToProcess, bytes);
+
+            //byte[] bytes = new byte[bytesToProcess];
+
+            //context.Advance(bytesToProcess, bytes);
         }
     }
 }
