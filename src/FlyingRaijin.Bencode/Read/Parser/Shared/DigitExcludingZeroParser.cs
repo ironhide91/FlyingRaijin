@@ -5,15 +5,15 @@ namespace FlyingRaijin.Bencode.Read.Parser
 {
     public static partial class DelegateParsers
     {
-        public static void DigitExcludingZeroParser(ParseContext context, NodeBase ast)
+        public static void DigitExcludingZeroParser(ParserContext context, NodeBase ast)
         {
-            context.HasTokens();
+            //context.HasTokens();
 
-            var chr = context.LookAheadByte;
+            var chr = context.LookAheadChar;
 
-            if (DigitExcludingZeroNode.DigitsExcludingZero.Contains(context.LookAheadByte))
+            if (DigitExcludingZeroNode.DigitsExcludingZero.Contains(context.LookAheadChar))
             {
-                context.Match(context.LookAheadByte);
+                context.Match(context.LookAheadChar);
 
                 var node = new DigitExcludingZeroNode(chr);
 

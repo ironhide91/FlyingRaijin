@@ -8,31 +8,32 @@ namespace FlyingRaijin.Bencode.Read.Parser
 {
     public static partial class DelegateParsers
     {
-        public static void IntegerParser(ParseContext context, NodeBase ast)
+        public static void IntegerParser(ParserContext context, NodeBase ast)
         {
-            context.HasTokens();
+            ////context.HasTokens();
 
             var node = new IntegerNode();
             ast.Children.Add(node);
 
-            if (context.LookAheadByte == '0')
+            if (context.IsMatch(ZeroNode.Instance.Character))
             {
                 ZeroParser(context, node);
                 return;
             }
 
-            if (context.LookAheadByte == '-')
+            if (context.IsMatch(NegativeSignNode.Instance.Character))
             {
                 NegativeSignParser(context, node);
             }
 
-            if (DigitExcludingZeroNode.DigitsExcludingZero.Contains(context.LookAheadByte))
+            //if (DigitExcludingZeroNode.DigitsExcludingZero.Contains(context.LookAheadChar))
+            if (context.IsMatch(DigitExcludingZeroNode.DigitsExcludingZero))
             {
                 NumberParser(context, node);
             }
             else
             {
-                throw ParsingException.Create(context.Position);
+                throw ParsingException.Create("");
             }
         }
     }

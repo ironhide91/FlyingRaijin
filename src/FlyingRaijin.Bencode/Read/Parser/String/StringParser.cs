@@ -10,7 +10,7 @@ namespace FlyingRaijin.Bencode.Read.Parser
 
     public static partial class DelegateParsers
     {
-        public static void StringParser(ParseContext context, NodeBase ast, ref int bytesToProcess)
+        public static void StringParser(ParserContext context, NodeBase ast, ref int bytesToProcess)
         {
             StringNode node;
 
@@ -24,10 +24,9 @@ namespace FlyingRaijin.Bencode.Read.Parser
                 ast.Children.Add(node);
             }
 
-            while (bytesToProcess-- > 0)
-            {
-                ByteParser(context, node);
-            }
+            byte[] bytes = new byte[bytesToProcess];
+
+            context.Advance(bytesToProcess, bytes);
         }
     }
 }

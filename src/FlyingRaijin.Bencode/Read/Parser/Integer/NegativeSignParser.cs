@@ -5,14 +5,12 @@ namespace FlyingRaijin.Bencode.Read.Parser
 {
     public static partial class DelegateParsers
     {
-        public static void NegativeSignParser(ParseContext context, NodeBase ast)
+        public static void NegativeSignParser(ParserContext context, NodeBase ast)
         {
-            context.HasTokens();
-            context.Match(NegativeSignNode.NegativeSignByte);
+            //context.HasTokens();
+            context.Match(NegativeSignNode.Instance.Character);
 
-            var node = new NegativeSignNode();
-
-            ast.Children.Add(node);
+            ast.Children.Add(NegativeSignNode.Instance);
         }
     }
 }

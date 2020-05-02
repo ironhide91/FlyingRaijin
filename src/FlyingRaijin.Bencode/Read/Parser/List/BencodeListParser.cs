@@ -9,7 +9,7 @@ namespace FlyingRaijin.Bencode.Read.Parser
 {
     public static partial class DelegateParsers
     {
-        public static void BencodeListParser(ParseContext context, NodeBase ast)
+        public static void BencodeListParser(ParserContext context, NodeBase ast)
         {
             var node = new BencodeListNode();
             ast.Children.Add(node);
@@ -19,31 +19,31 @@ namespace FlyingRaijin.Bencode.Read.Parser
             EndParser(context, node);
         }
 
-        private static void ParseRecursiveList(ParseContext context, NodeBase ast)
+        private static void ParseRecursiveList(ParserContext context, NodeBase ast)
         {
-            context.HasTokens();
+            //context.HasTokens();
 
             var node = new ListElementsNode();
             ast.Children.Add(node);
 
             while (true)
             {
-                if (context.LookAheadByte == EndNode.IntegerEndNonTerminalByte)
+                if (context.LookAheadChar == EndNode.Instance.Character)
                 {
                     break;
                 }
 
-                if (context.LookAheadByte == IntegerStartNode.IntegerStartNonTerminalByte)
+                if (context.LookAheadChar == IntegerStartNode.Instance.Character)
                 {
                     //- Possible Bencoded Integer
                     BencodeIntegerParser(context, node);
                 }
-                else if (char.IsDigit(Convert.ToChar(context.LookAheadByte)))
+                else if (char.IsDigit(Convert.ToChar(context.LookAheadChar)))
                 {
                     //- Possible Bencoded String
                     BencodeStringParser(context, node);
                 }
-                else if (context.LookAheadByte == ListStartNode.ListStartTerminalByte)
+                else if (context.LookAheadChar == ListStartNode.Instance.Character)
                 {
                     //- Possible Bencoded List
                     var nestedListNode = new BencodeListNode();
@@ -53,14 +53,14 @@ namespace FlyingRaijin.Bencode.Read.Parser
                     ParseRecursiveList(context, nestedListNode);
                     EndParser(context, nestedListNode);
                 }
-                else if (context.LookAheadByte == DictionaryStartNode.DictionaryStartTerminalByte)
+                else if (context.LookAheadChar == DictionaryStartNode.Instance.Character)
                 {
                     //- Possible Bencoded Dictionary
                     BencodeDictionaryParser(context, node);
                 }
                 else
                 {
-                    context.Match(context.LookAheadByte);
+                    context.Match(context.LookAheadChar);
                 }
             }
         }

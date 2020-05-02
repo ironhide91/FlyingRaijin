@@ -8,7 +8,7 @@ namespace FlyingRaijin.Bencode.Read.Parser
 {
     public static partial class DelegateParsers
     {
-        public static void BencodeStringParser(ParseContext context, NodeBase ast)
+        public static void BencodeStringParser(ParserContext context, NodeBase ast)
         {
             var node = new BencodeStringNode();
             ast.Children.Add(node);
@@ -16,8 +16,8 @@ namespace FlyingRaijin.Bencode.Read.Parser
             NumberParser(context, node);
             StringLengthPrefixParser(context, node);
 
-            var lengthBytes = NumberConverter.Convert(node.Children[0]);
-            var length = int.Parse(Encoding.UTF8.GetString(lengthBytes));
+            var chars = NumberConverter.Convert(node.Children[0]);
+            var length = int.Parse(new string(chars));
 
             StringParser(context, node, ref length);
         }

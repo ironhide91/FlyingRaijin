@@ -5,14 +5,12 @@ namespace FlyingRaijin.Bencode.Read.Parser
 {
     public static partial class DelegateParsers
     {
-        public static void ListStartParser(ParseContext context, NodeBase ast)
+        public static void ListStartParser(ParserContext context, NodeBase ast)
         {
-            context.HasTokens();
-            context.Match(ListStartNode.ListStartTerminalByte);
+            //context.HasTokens();
+            context.Match(ListStartNode.Instance.Character);
 
-            var node = new ListStartNode();
-
-            ast.Children.Add(node);
+            ast.Children.Add(ListStartNode.Instance);
         }
     }
 }
