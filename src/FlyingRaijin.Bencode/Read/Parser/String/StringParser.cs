@@ -1,5 +1,6 @@
 ﻿using FlyingRaijin.Bencode.Read.Ast.Base;
 using FlyingRaijin.Bencode.Read.Ast.String;
+using System.Linq;
 
 namespace FlyingRaijin.Bencode.Read.Parser
 {
@@ -24,15 +25,23 @@ namespace FlyingRaijin.Bencode.Read.Parser
                 ast.Children.Add(node);
             }
 
-            while (bytesToProcess-- > 0)
+            if (bytesToProcess == 32400)
             {
-                CharParser(context, node);
+                byte[] bytes = new byte[bytesToProcess];
+
+                context.Advance(bytes.Length, bytes);
+
+                //var temp1 = System.Convert.ToBase64String(bytes.Take(20).ToArray());
+
+                //var temp = System.Text.Encoding.UTF8.GetString(bytes.Take(20).ToArray());
             }
-
-
-            //byte[] bytes = new byte[bytesToProcess];
-
-            //context.Advance(bytesToProcess, bytes);
+            else
+            {
+                while (bytesToProcess-- > 0)
+                {
+                    CharParser(context, node);
+                }
+            }
         }
     }
 }

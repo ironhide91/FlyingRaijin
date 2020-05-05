@@ -31,11 +31,14 @@ namespace FlyingRaijin.Engine.Torrent
 
             byte[] bytes = Encoding.UTF8.GetBytes(str);
 
-            var temp = System.Text.Encoding.Convert(Encoding.UTF8, Encoding.ASCII, bytes);
+            string base64 = Convert.ToBase64String(bytes, Base64FormattingOptions.InsertLineBreaks);
 
-            var utf8Str = Encoding.ASCII.GetString(bytes).AsSpan().Slice(2);
+            //var temp = System.Text.Encoding.Convert(Encoding.UTF8, Encoding.ASCII, bytes);
 
-            var sha1Pieces = Base16.Decode(utf8Str);
+            //var utf8Str = Encoding.ASCII.GetString(bytes).AsSpan().Slice(2);
+
+            //var sha1Pieces = Base16.ModHex.Decode(base64);
+            var sha1Pieces = base64.AsSpan().Slice(2);
 
             var isNotMultipleOf20 = (sha1Pieces.Length % 20) != 0;
 
@@ -50,7 +53,7 @@ namespace FlyingRaijin.Engine.Torrent
             {
                 var sha1 = sha1Pieces.Slice(start, 20);
 
-                sha1Checksumns.Add(sha1.ToArray());
+                //sha1Checksumns.Add(sha1.ToArray());
 
                 start += 20;
             }

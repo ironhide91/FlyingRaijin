@@ -8,6 +8,13 @@ namespace FlyingRaijin.Test.Bencode.Read
     public class Dictionary
     {
         [Theory]
+        [InlineData(@"d8:announce70:http://linuxtracker.org:2710/00000000000000000000000000000000/announce13:announce-listll70:http://linuxtracker.org:2710/00000000000000000000000000000000/announceel42:http://torrents.linuxmint.com/announce.phpee10:created by25:Transmission/2.84 (14307)13:creation datei1467279331e8:encoding5:UTF-84:infod6:lengthi1697906688e4:name31:linuxmint-18-cinnamon-64bit.iso12:piece lengthi1048576e6:pieces4:test7:privatei0eee")]
+        public void Real(string bencode)
+        {
+            var bDictionary = BencodeReader.Read<BDictionary>(bencode);
+        }
+
+        [Theory]
         [InlineData("de")]
         public void CanParseEmpty(string bencode)
         {

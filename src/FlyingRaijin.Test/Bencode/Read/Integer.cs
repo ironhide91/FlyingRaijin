@@ -131,7 +131,6 @@ namespace FlyingRaijin.Test.Bencode.Read
         [InlineData("i42ae")]
         public void NonDigit_ThrowsInvalidBencodeException(string bencode)
         {
-
             Assert.Throws<ParsingException>(() =>
             {
                 var bnumber = BencodeReader.Read<BInteger>(bencode);

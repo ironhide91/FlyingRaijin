@@ -4,6 +4,7 @@ using FlyingRaijin.Bencode.Read.Ast.Integer;
 using FlyingRaijin.Bencode.Read.Ast.List;
 using FlyingRaijin.Bencode.Read.Ast.String;
 using FlyingRaijin.Bencode.Read.ClrObject;
+using FlyingRaijin.Bencode.Read.Exceptions;
 using FlyingRaijin.Bencode.Read.Parser;
 using System;
 using System.Collections.Generic;
@@ -67,12 +68,25 @@ namespace FlyingRaijin.Bencode.Read
         {
             T bObject = default;
 
-            using (var context = new ParserContext(bencodeValue))
+            var context = new ParserContext(bencodeValue);
+
+            try
             {
                 var root = new TorrentRoot();
-
                 bObject = (T)_Readers[typeof(T)](context, root);
-            }          
+            }
+            //catch (ParsingException e)
+            //{
+            //    System.Diagnostics.Debug.WriteLine(e);
+            //}
+            catch (StackOverflowException e)
+            {
+                System.Diagnostics.Debug.WriteLine(e);
+            }
+            finally
+            {
+                context.Dispose();
+            }            
 
             return bObject;
         }

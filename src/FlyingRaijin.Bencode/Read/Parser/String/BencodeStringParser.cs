@@ -19,6 +19,11 @@ namespace FlyingRaijin.Bencode.Read.Parser
             var chars = NumberConverter.Convert(node.Children[0]);
             var length = int.Parse(new string(chars));
 
+            if (length == 32400)            
+            {
+
+            }
+
             StringParser(context, node, ref length);
         }
     }

@@ -10,8 +10,6 @@ namespace FlyingRaijin.Bencode.Read.Parser
     {
         public static void IntegerParser(ParserContext context, NodeBase ast)
         {
-            ////context.HasTokens();
-
             var node = new IntegerNode();
             ast.Children.Add(node);
 
@@ -26,14 +24,13 @@ namespace FlyingRaijin.Bencode.Read.Parser
                 NegativeSignParser(context, node);
             }
 
-            //if (DigitExcludingZeroNode.DigitsExcludingZero.Contains(context.LookAheadChar))
             if (context.IsMatch(DigitExcludingZeroNode.DigitsExcludingZero))
             {
                 NumberParser(context, node);
             }
             else
             {
-                throw ParsingException.Create("");
+                throw ParsingException.Create("Invalid Bencode.");
             }
         }
     }
