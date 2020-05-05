@@ -7,7 +7,6 @@ namespace FlyingRaijin.Bencode.Read.Parser
     {
         public static void StringLengthPrefixParser(ParserContext context, NodeBase ast)
         {
-            //context.HasTokens();
             context.Match(StringLengthPrefixNode.Instance.Character);
 
             ast.Children.Add(StringLengthPrefixNode.Instance);

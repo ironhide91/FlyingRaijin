@@ -7,7 +7,6 @@ namespace FlyingRaijin.Bencode.Read.Parser
     {
         public static void ZeroParser(ParserContext context, NodeBase ast)
         {
-            //context.HasTokens();
             context.Match(ZeroNode.Instance.Character);           
 
             ast.Children.Add(ZeroNode.Instance);

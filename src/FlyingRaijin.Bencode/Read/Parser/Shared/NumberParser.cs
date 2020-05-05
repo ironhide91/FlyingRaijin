@@ -19,18 +19,14 @@ namespace FlyingRaijin.Bencode.Read.Parser
                 ast.Children.Add(node);
             }
 
-            //context.HasTokens();
             DigitExcludingZeroParser(context, node);
 
-            //context.HasTokens();
-            //if (DigitExcludingZeroNode.DigitsExcludingZero.Contains(context.LookAheadChar))
             if (context.IsMatch(DigitExcludingZeroNode.DigitsExcludingZero))
             {
                 DigitExcludingZeroParser(context, node);
                 NumberParser(context, node);
             }
 
-            //context.HasTokens();
             if (context.IsMatch(ZeroNode.Instance.Character))
             {
                 ZeroParser(context, node);

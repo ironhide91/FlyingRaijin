@@ -7,7 +7,6 @@ namespace FlyingRaijin.Bencode.Read.Parser
     {
         public static void IntegerStartParser(ParserContext context, NodeBase ast)
         {
-            //context.HasTokens();
             context.Match(IntegerStartNode.Instance.Character);
 
             ast.Children.Add(IntegerStartNode.Instance);

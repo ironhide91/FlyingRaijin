@@ -7,7 +7,6 @@ namespace FlyingRaijin.Bencode.Read.Parser
     {
         public static void NegativeSignParser(ParserContext context, NodeBase ast)
         {
-            //context.HasTokens();
             context.Match(NegativeSignNode.Instance.Character);
 
             ast.Children.Add(NegativeSignNode.Instance);

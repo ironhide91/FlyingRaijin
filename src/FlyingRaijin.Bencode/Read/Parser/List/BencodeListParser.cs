@@ -21,8 +21,6 @@ namespace FlyingRaijin.Bencode.Read.Parser
 
         private static void ParseRecursiveList(ParserContext context, NodeBase ast)
         {
-            //context.HasTokens();
-
             var node = new ListElementsNode();
             ast.Children.Add(node);
 

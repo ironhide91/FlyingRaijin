@@ -7,7 +7,6 @@ namespace FlyingRaijin.Bencode.Read.Parser
     {
         public static void DictionaryStartParser(ParserContext context, NodeBase ast)
         {
-            //context.HasTokens();
             context.Match(DictionaryStartNode.Instance.Character);
 
             ast.Children.Add(DictionaryStartNode.Instance);

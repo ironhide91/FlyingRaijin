@@ -26,8 +26,6 @@ namespace FlyingRaijin.Bencode.Read.Parser
 
         private static void ParseRecursiveDictionary(ParserContext context, NodeBase ast, HashSet<BencodeStringNode> keys)
         {
-            //context.HasTokens();
-
             var node = new DictionaryElementsNode();
             ast.Children.Add(node);
 
