@@ -14,7 +14,7 @@ namespace FlyingRaijin.Bencode.Read.Ast.Shared
 
         }
 
-        private static char UTF8Char = ToUTF8Char("e");
+        private static readonly char UTF8Char = ToUTF8Char("e");
 
         public static readonly EndNode Instance;
 

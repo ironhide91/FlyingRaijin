@@ -14,7 +14,7 @@ namespace FlyingRaijin.Bencode.Read.Ast.Shared
 
         }
 
-        private static char UTF8Char = ToUTF8Char("0");
+        private static readonly char UTF8Char = ToUTF8Char("0");
 
         public static readonly ZeroNode Instance;
 

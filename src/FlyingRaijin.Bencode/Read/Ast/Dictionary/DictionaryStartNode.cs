@@ -14,7 +14,7 @@ namespace FlyingRaijin.Bencode.Read.Ast.Dictionary
 
         }
 
-        private static char UTF8Char = ToUTF8Char("d");
+        private static readonly char UTF8Char = ToUTF8Char("d");
 
         public static readonly DictionaryStartNode Instance;
 

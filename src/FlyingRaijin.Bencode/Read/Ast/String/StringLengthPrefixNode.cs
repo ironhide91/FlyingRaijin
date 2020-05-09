@@ -14,7 +14,7 @@ namespace FlyingRaijin.Bencode.Read.Ast.String
 
         }
 
-        private static char UTF8Char = ToUTF8Char(":");
+        private static readonly char UTF8Char = ToUTF8Char(":");
         
         public static readonly StringLengthPrefixNode Instance;
 

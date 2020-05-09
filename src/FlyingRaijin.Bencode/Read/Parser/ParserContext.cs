@@ -22,16 +22,17 @@ namespace FlyingRaijin.Bencode.Read.Parser
 
         public ParserContext(string bencodeString)
         {
-            //var numOfBytes = CurrentEncoding.GetByteCount(bencodeString);
-            //pooledBuffer = arrayPool.Rent(numOfBytes);
-            //CurrentEncoding.GetBytes(bencodeString.AsSpan(), pooledBuffer.AsSpan());
+            var numOfBytes = CurrentEncoding.GetByteCount(bencodeString);
+            pooledBuffer = arrayPool.Rent(numOfBytes);
+            CurrentEncoding.GetBytes(bencodeString.AsSpan(), pooledBuffer.AsSpan());
 
-            //Stream = manager.GetStream();
-            //Stream.Write(pooledBuffer.AsSpan().Slice(0, numOfBytes));
-            //Stream.Flush();
-            //Stream.Position = 0;
+            Stream = manager.GetStream();
+            Stream.Write(pooledBuffer.AsSpan().Slice(0, numOfBytes));
+            Stream.Flush();
+            Stream.Position = 0;
 
-            Stream = new MemoryStream(CurrentEncoding.GetBytes(bencodeString));
+            //Stream = new MemoryStream(CurrentEncoding.GetBytes(bencodeString));
+            TryPeek();
         }
 
         private static readonly Encoding CurrentEncoding = new UTF8Encoding(false, false);
@@ -46,14 +47,14 @@ namespace FlyingRaijin.Bencode.Read.Parser
 
         public void Match(char charToMatch)
         {
-            CheckEndOfStream();
-
-            var value = PeekChar();
-
-            if (value == charToMatch)
+            if (LookAheadChar == charToMatch)
             {
-                ReadChar();
-                LookAheadChar = PeekChar();
+                var result = Stream.Read(buffer, 0, 1);
+
+                if (result == 0)
+                    throw ParsingException.Create("Reached End Of Stream.");
+
+                TryPeek();
                 return;
             }
 
@@ -62,66 +63,35 @@ namespace FlyingRaijin.Bencode.Read.Parser
 
         public bool IsMatch(char charToMatch)
         {
-            CheckEndOfStream();
-
-            var value = PeekChar();
-
-            if (value == charToMatch)
-            {
-                LookAheadChar = value;
-                return true;
-            }
-
-            return false;
+            return LookAheadChar == charToMatch;
         }
 
         public bool IsMatch(HashSet<char> charsToMatch)
         {
-            CheckEndOfStream();
-
-            var value = PeekChar();
-
-            if (charsToMatch.Contains(value))
-            {
-                LookAheadChar = value;
-                return true;
-            }
-
-            return false;
+            return charsToMatch.Contains(LookAheadChar);
         }
 
         public void Advance(int numBytes, byte[] buffer)
         {
-            Stream.Read(buffer, 0, numBytes);
-        }
+            var result = Stream.Read(buffer, 0, numBytes);
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void CheckEndOfStream()
-        {
-            if (Stream.Position > Stream.Length)
+            if (result == 0)
                 throw ParsingException.Create("Reached End Of Stream.");
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private char PeekChar()
+        private void TryPeek()
         {
-            CheckEndOfStream();
+            var result = Stream.Read(buffer, 0, 1);
 
-            Stream.Read(buffer, 0, 1);
+            if (result == 0)
+                return;
 
             Stream.Position--;
 
-            return (char)buffer[0];
-        }
+            LookAheadChar = (char)buffer[0];
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private char ReadChar()
-        {
-            CheckEndOfStream();
-
-            var value = (char)Stream.Read(buffer, 0, 1);
-
-            return value;
+            return;
         }
 
         public void Dispose()

@@ -14,7 +14,7 @@ namespace FlyingRaijin.Bencode.Read.Ast.List
 
         }
 
-        private static char UTF8Char = ToUTF8Char("l"); 
+        private static readonly char UTF8Char = ToUTF8Char("l"); 
         
         public static readonly ListStartNode Instance;
 

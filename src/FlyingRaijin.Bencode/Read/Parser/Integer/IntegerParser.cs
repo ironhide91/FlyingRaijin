@@ -2,7 +2,6 @@
 using FlyingRaijin.Bencode.Read.Ast.Integer;
 using FlyingRaijin.Bencode.Read.Ast.Shared;
 using FlyingRaijin.Bencode.Read.Exceptions;
-using System;
 
 namespace FlyingRaijin.Bencode.Read.Parser
 {
