@@ -2,12 +2,24 @@
 
 namespace FlyingRaijin.Bencode.Read.Ast.List
 {
-    public sealed class ListStartNode : TerminalByteNodeBase
+    public sealed class ListStartNode : TerminalCharNodeBase
     {
+        static ListStartNode()
+        {
+            Instance = new ListStartNode();
+        }
+
+        private ListStartNode()
+        {
+
+        }
+
+        private static readonly char UTF8Char = ToUTF8Char("l"); 
+        
+        public static readonly ListStartNode Instance;
+
         public override Production ProductionType => Production.LIST_START;
 
-        public override byte Byte => ListStartTerminalByte;
-
-        public static byte ListStartTerminalByte = ToByte('l');
+        public override char Character => UTF8Char;        
     }
 }

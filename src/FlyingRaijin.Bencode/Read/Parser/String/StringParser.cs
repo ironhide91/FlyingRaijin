@@ -1,33 +1,28 @@
 ﻿using FlyingRaijin.Bencode.Read.Ast.Base;
 using FlyingRaijin.Bencode.Read.Ast.String;
+using System;
 
 namespace FlyingRaijin.Bencode.Read.Parser
 {
-    public interface IStringParser
-    {
-        int BytesToProcess { get; set; }
-    }
-
     public static partial class DelegateParsers
     {
-        public static void StringParser(ParseContext context, NodeBase ast, ref int bytesToProcess)
+        public static void StringParser(ParserContext context, NodeBase ast, ref int bytesToProcess)
         {
-            StringNode node;
+            var pooledBuffer = BytePool.Pool.Rent(bytesToProcess);
 
-            if (ast is StringNode)
-            {
-                node = (StringNode)ast;
-            }
-            else
-            {
-                node = new StringNode();
-                ast.Children.Add(node);
-            }
+            StringNode node = new StringNode(pooledBuffer);
 
-            while (bytesToProcess-- > 0)
+            try
             {
-                ByteParser(context, node);
+                context.Advance(bytesToProcess, pooledBuffer);
             }
+            catch (Exception e)
+            {
+                BytePool.Pool.Return(pooledBuffer);
+                throw e;
+            }                        
+
+            ast.Children.Add(node);
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace FlyingRaijin.Client.Bencode
+﻿namespace FlyingRaijin.Engine.Bencode
 {
     public interface IBencodeEngine : IBencodeReader, IBencodeWriter
     {

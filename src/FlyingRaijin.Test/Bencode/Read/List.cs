@@ -1,30 +1,21 @@
 using FluentAssertions;
 using FlyingRaijin.Bencode.Read;
 using FlyingRaijin.Bencode.Read.ClrObject;
+using FlyingRaijin.Bencode.Read.Exceptions;
 using System;
-using System.Text;
 using Xunit;
 
 namespace FlyingRaijin.Test.Bencode.Read
 {
     public class List
     {
-        private static readonly Encoding encoding = Encoding.UTF8;
-        
-        public List()
-        {
-
-        }
-
         [Theory]
         [InlineData("l4:spame")]
         public void CanParseSimple1(string bencode)
         {
-            //- Act
-            var bList = BencodeReader.Read<BList>(encoding, bencode);
+            var bList = BencodeReader.Read<BList>(bencode);
 
-            //- Assert
-            Assert.Equal(1, bList.Value.Count);
+            Assert.Single(bList.Value);
             bList.Value[0].Should().BeOfType<BString>();
 
             var stringElement = (BString)bList.Value[0];
@@ -36,10 +27,8 @@ namespace FlyingRaijin.Test.Bencode.Read
         [InlineData("l4:spami42ee")]
         public void CanParseSimple2(string bencode)
         {
-            //- Act
-            var bList = BencodeReader.Read<BList>(encoding, bencode);
+            var bList = BencodeReader.Read<BList>(bencode);
 
-            //- Assert
             Assert.Equal(2, bList.Value.Count);
 
             // element 1
@@ -58,10 +47,8 @@ namespace FlyingRaijin.Test.Bencode.Read
         [InlineData("l5:Hello6:World!li123ei456eeetesting")]
         public void CanParseNested1(string bencode)
         {
-            //- Act
-            var bList = BencodeReader.Read<BList>(encoding, bencode);
+            var bList = BencodeReader.Read<BList>(bencode);
 
-            //- Assert
             Assert.Equal(3, bList.Value.Count);
 
             // element 1
@@ -96,11 +83,9 @@ namespace FlyingRaijin.Test.Bencode.Read
         [InlineData("le")]
         public void CanParseEmptyList(string bencode)
         {
-            //- Act
-            var bList = BencodeReader.Read<BList>(encoding, bencode);
+            var bList = BencodeReader.Read<BList>(bencode);
 
-            //- Assert
-            Assert.Equal(0, bList.Value.Count);
+            Assert.Empty(bList.Value);
         }
 
         [Theory]
@@ -108,11 +93,9 @@ namespace FlyingRaijin.Test.Bencode.Read
         [InlineData("l")]
         public void BelowMinimumLength2_ThrowsInvalidBencodeException(string bencode)
         {
-            //- Act
-            Action action = () => BencodeReader.Read<BList>(encoding, bencode);
+            Action action = () => BencodeReader.Read<BList>(bencode);
 
-            //- Assert
-            action.Should().Throw<Exception>();
+            action.Should().Throw<ParsingException>();
         }
 
         [Theory]
@@ -124,11 +107,9 @@ namespace FlyingRaijin.Test.Bencode.Read
         [InlineData("e")]
         public void BelowMinimumLength2_WhenStreamLengthNotSupported_ThrowsInvalidBencodeException(string bencode)
         {
-            //- Act
-            Action action = () => BencodeReader.Read<BList>(encoding, bencode);
+            Action action = () => BencodeReader.Read<BList>(bencode);
 
-            //- Assert
-            action.Should().Throw<Exception>();
+            action.Should().Throw<ParsingException>();
         }
 
         [Theory]
@@ -140,11 +121,9 @@ namespace FlyingRaijin.Test.Bencode.Read
         [InlineData(".e")]
         public void InvalidFirstChar_ThrowsInvalidBencodeException(string bencode)
         {
-            //- Act
-            Action action = () => BencodeReader.Read<BList>(encoding, bencode);
+            Action action = () => BencodeReader.Read<BList>(bencode);
 
-            //- Assert
-            action.Should().Throw<Exception>();
+            action.Should().Throw<ParsingException>();
         }
 
         [Theory]
@@ -153,11 +132,9 @@ namespace FlyingRaijin.Test.Bencode.Read
         [InlineData("l:")]
         public void MissingEndChar_ThrowsInvalidBencodeException(string bencode)
         {
-            //- Act
-            Action action = () => BencodeReader.Read<BList>(encoding, bencode);
+            Action action = () => BencodeReader.Read<BList>(bencode);
 
-            //- Assert
-            action.Should().Throw<Exception>();
+            action.Should().Throw<ParsingException>();
         }
     }
 }

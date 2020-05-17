@@ -5,11 +5,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 
-namespace FlyingRaijin.Client.Torrent
+namespace FlyingRaijin.Engine.Torrent
 {
-    public sealed class MultipleFileItem
+    public sealed class MultiFileItem
     {
-        public MultipleFileItem()
+        public MultiFileItem()
         {
 
         }

@@ -4,17 +4,19 @@ using FlyingRaijin.Bencode.Read.Ast.Integer;
 using FlyingRaijin.Bencode.Read.Ast.List;
 using FlyingRaijin.Bencode.Read.Ast.String;
 using FlyingRaijin.Bencode.Read.ClrObject;
+using FlyingRaijin.Bencode.Read.Exceptions;
 using FlyingRaijin.Bencode.Read.Parser;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Text;
 
 namespace FlyingRaijin.Bencode.Read
 {
     public static class BencodeReader
     {
-        private delegate IClrObject Reader(Encoding e, ParseContext c, TorrentRoot r);
+        private delegate IClrObject Reader(ParserContext c, TorrentRoot r);
 
         static BencodeReader()
         {
@@ -22,37 +24,37 @@ namespace FlyingRaijin.Bencode.Read
             {
                 {
                     typeof(BInteger),
-                    (encoding, context, root) =>
+                    (context, root) =>
                     {
                         DelegateParsers.BencodeIntegerParser(context, root);
-                        return BIntegerConverter.Converter.Convert(encoding, (BencodeIntegerNode)root.Children[0]);
+                        return BIntegerConverter.Converter.Convert((BencodeIntegerNode)root.Children[0]);
                     }
                 },
 
                 {
                     typeof(BString),
-                    (encoding, context, root) =>
+                    (context, root) =>
                     {
                         DelegateParsers.BencodeStringParser(context, root);
-                        return BStringConverter.Converter.Convert(encoding, (BencodeStringNode)root.Children[0]);
+                        return BStringConverter.Converter.Convert((BencodeStringNode)root.Children[0]);
                     }
                 },
 
                 {
                     typeof(BList),
-                    (encoding, context, root) =>
+                    (context, root) =>
                     {
                         DelegateParsers.BencodeListParser(context, root);
-                        return BListConverter.Converter.Convert(encoding, (BencodeListNode)root.Children[0]);
+                        return BListConverter.Converter.Convert((BencodeListNode)root.Children[0]);
                     }
                 },
 
                 {
                     typeof(BDictionary),
-                    (encoding, context, root) =>
+                    (context, root) =>
                     {
                         DelegateParsers.BencodeDictionaryParser(context, root);
-                        return BDictionaryConverter.Converter.Convert(encoding, (BencodeDictionaryNode)root.Children[0]);
+                        return BDictionaryConverter.Converter.Convert((BencodeDictionaryNode)root.Children[0]);
                     }
                 }
             };
@@ -62,18 +64,43 @@ namespace FlyingRaijin.Bencode.Read
 
         private static readonly IReadOnlyDictionary<Type, Reader> _Readers;
 
-        public static T Read<T>(Encoding encoding, string bencodeValue) where T : struct, IClrObject
+        public static T Read<T>(string bencodeValue) where T : IClrObject
         {
             T bObject = default;
 
-            using (var context = new ParseContext(encoding, bencodeValue))
+            var context = new ParserContext(bencodeValue);
+
+            try
+            {
+                var root = new TorrentRoot();
+                bObject = (T)_Readers[typeof(T)](context, root);
+            }
+            //catch (ParsingException e)
+            //{
+            //    System.Diagnostics.Debug.WriteLine(e);
+            //}
+            catch (StackOverflowException e)
+            {
+                System.Diagnostics.Debug.WriteLine(e);
+            }
+            finally
+            {
+                context.Dispose();
+            }            
+
+            return bObject;
+        }
+
+        public static T Read<T>(Stream stream) where T : IClrObject
+        {
+            T bObject = default;
+
+            using (var context = new ParserContext(stream))
             {
                 var root = new TorrentRoot();
 
-                bObject = (T)_Readers[typeof(T)](encoding, context, root);
-
-                System.Diagnostics.Debug.WriteLine(AstPrinter.Print(root));
-            }          
+                bObject = (T)_Readers[typeof(T)](context, root);
+            }
 
             return bObject;
         }

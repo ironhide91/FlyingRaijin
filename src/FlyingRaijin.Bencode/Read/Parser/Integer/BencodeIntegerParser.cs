@@ -5,7 +5,7 @@ namespace FlyingRaijin.Bencode.Read.Parser
 {
     public static partial class DelegateParsers
     {
-        public static void BencodeIntegerParser(ParseContext context, NodeBase ast)
+        public static void BencodeIntegerParser(ParserContext context, NodeBase ast)
         {
             var node = new BencodeIntegerNode();
             ast.Children.Add(node);

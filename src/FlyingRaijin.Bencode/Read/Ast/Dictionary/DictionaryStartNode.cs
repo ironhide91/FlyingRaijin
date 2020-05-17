@@ -2,12 +2,24 @@
 
 namespace FlyingRaijin.Bencode.Read.Ast.Dictionary
 {
-    public sealed class DictionaryStartNode : TerminalByteNodeBase
+    public sealed class DictionaryStartNode : TerminalCharNodeBase
     {
+        static DictionaryStartNode()
+        {
+            Instance = new DictionaryStartNode();
+        }
+
+        private DictionaryStartNode()
+        {
+
+        }
+
+        private static readonly char UTF8Char = ToUTF8Char("d");
+
+        public static readonly DictionaryStartNode Instance;
+
         public override Production ProductionType => Production.DICTIONARY_START;
 
-        public override byte Byte => DictionaryStartTerminalByte;
-
-        public static byte DictionaryStartTerminalByte = ToByte('d');
+        public override char Character => UTF8Char;
     }
 }

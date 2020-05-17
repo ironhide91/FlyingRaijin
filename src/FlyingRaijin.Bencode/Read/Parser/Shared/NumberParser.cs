@@ -5,7 +5,7 @@ namespace FlyingRaijin.Bencode.Read.Parser
 {
     public static partial class DelegateParsers
     {
-        public static void NumberParser(ParseContext context, NodeBase ast)
+        public static void NumberParser(ParserContext context, NodeBase ast)
         {
             NumberNode node = null;
 
@@ -19,18 +19,15 @@ namespace FlyingRaijin.Bencode.Read.Parser
                 ast.Children.Add(node);
             }
 
-            context.HasTokens();
             DigitExcludingZeroParser(context, node);
 
-            context.HasTokens();
-            if (DigitExcludingZeroNode.DigitsExcludingZero.Contains(context.LookAheadByte))
+            if (context.IsMatch(DigitExcludingZeroNode.DigitsExcludingZero))
             {
                 DigitExcludingZeroParser(context, node);
                 NumberParser(context, node);
             }
 
-            context.HasTokens();
-            if (context.LookAheadByte == ZeroNode.ZeroDigitByte)
+            if (context.IsMatch(ZeroNode.Instance.Character))
             {
                 ZeroParser(context, node);
                 NumberParser(context, node);

@@ -12,7 +12,7 @@ namespace FlyingRaijin.Bencode.Read.Parser
 {
     public static partial class DelegateParsers
     {
-        public static void BencodeDictionaryParser(ParseContext context, NodeBase ast)
+        public static void BencodeDictionaryParser(ParserContext context, NodeBase ast)
         {
             var node = new BencodeDictionaryNode();
             ast.Children.Add(node);
@@ -24,10 +24,8 @@ namespace FlyingRaijin.Bencode.Read.Parser
             EndParser(context, node);
         }
 
-        private static void ParseRecursiveDictionary(ParseContext context, NodeBase ast, HashSet<BencodeStringNode> keys)
+        private static void ParseRecursiveDictionary(ParserContext context, NodeBase ast, HashSet<BencodeStringNode> keys)
         {
-            context.HasTokens();
-
             var node = new DictionaryElementsNode();
             ast.Children.Add(node);
 
@@ -37,12 +35,12 @@ namespace FlyingRaijin.Bencode.Read.Parser
 
             while (true)
             {
-                if (context.LookAheadByte == EndNode.IntegerEndNonTerminalByte)
+                if (context.IsMatch(EndNode.Instance.Character))
                 {
                     break;
                 }
 
-                if (context.LookAheadByte == IntegerStartNode.IntegerStartNonTerminalByte)
+                if (context.IsMatch(IntegerStartNode.Instance.Character))
                 {
                     //- Possible Bencoded Integer
                     if (expectingKey)
@@ -54,7 +52,7 @@ namespace FlyingRaijin.Bencode.Read.Parser
                     node.Children.Add(currentKeyValueNode);
                     expectingKey = true;
                 }
-                else if (char.IsDigit(Convert.ToChar(context.LookAheadByte)))
+                else if (char.IsDigit(Convert.ToChar(context.LookAheadChar)))
                 {
                     //- Possible Bencoded String
                     if (expectingKey)
@@ -78,7 +76,7 @@ namespace FlyingRaijin.Bencode.Read.Parser
                         expectingKey = true;
                     }
                 }
-                else if (context.LookAheadByte == ListStartNode.ListStartTerminalByte)
+                else if (context.IsMatch(ListStartNode.Instance.Character))
                 {
                     //- Possible Bencoded List
                     if (expectingKey)
@@ -90,7 +88,7 @@ namespace FlyingRaijin.Bencode.Read.Parser
                     node.Children.Add(currentKeyValueNode);
                     expectingKey = true;
                 }
-                else if (context.LookAheadByte == DictionaryStartNode.DictionaryStartTerminalByte)
+                else if (context.IsMatch(DictionaryStartNode.Instance.Character))
                 {
                     if (expectingKey)
                     {
@@ -98,18 +96,20 @@ namespace FlyingRaijin.Bencode.Read.Parser
                     }
 
                     //- Possible Bencoded Dictionary
-                    var nestedDictionaryNode = new BencodeDictionaryNode();
-                    node.Children.Add(nestedDictionaryNode);
+                    var nestedDictionaryNode = new BencodeDictionaryNode();                    
 
                     DictionaryStartParser(context, nestedDictionaryNode);
                     ParseRecursiveDictionary(context, nestedDictionaryNode, new HashSet<BencodeStringNode>());
                     EndParser(context, nestedDictionaryNode);
 
+                    currentKeyValueNode.Children.Add(nestedDictionaryNode);
+                    node.Children.Add(currentKeyValueNode);
+
                     expectingKey = true;
                 }
                 else
                 {
-                    context.Match(context.LookAheadByte);
+                    context.Match(context.LookAheadChar);
                 }
             }
         }

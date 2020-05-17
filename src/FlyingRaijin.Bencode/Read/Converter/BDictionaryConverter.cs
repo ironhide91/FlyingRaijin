@@ -7,7 +7,7 @@ using FlyingRaijin.Bencode.Read.Converter;
 using FlyingRaijin.Bencode.Read.Exceptions;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
+using System.Collections.Immutable;
 using System.Text;
 
 namespace FlyingRaijin.Bencode.Read.Parser
@@ -21,7 +21,7 @@ namespace FlyingRaijin.Bencode.Read.Parser
 
         }
 
-        public BDictionary Convert(Encoding encoding, BencodeDictionaryNode node)
+        public BDictionary Convert(BencodeDictionaryNode node)
         {
             BDictionary result;
 
@@ -31,26 +31,26 @@ namespace FlyingRaijin.Bencode.Read.Parser
 
                 foreach (var kv in node.Children[1].Children)
                 {
-                    var key = BStringConverter.Converter.Convert(encoding, (BencodeStringNode)kv.Children[0]).Value;
+                    var key = BStringConverter.Converter.Convert((BencodeStringNode)kv.Children[0]).Value;
 
                     var value = kv.Children[1];
 
                     switch (value)
                     {
                         case BencodeIntegerNode n:
-                            var bInteger = BIntegerConverter.Converter.Convert(encoding, n);
+                            var bInteger = BIntegerConverter.Converter.Convert( n);
                             dictionary.Add(key, bInteger);
                             break;
                         case BencodeStringNode n:
-                            var bString = BStringConverter.Converter.Convert(encoding, n);
+                            var bString = BStringConverter.Converter.Convert(n);
                             dictionary.Add(key, bString);
                             break;
                         case BencodeListNode n:
-                            var bList = BListConverter.Converter.Convert(encoding, n);
+                            var bList = BListConverter.Converter.Convert(n);
                             dictionary.Add(key, bList);
                             break;
                         case BencodeDictionaryNode n:
-                            var bDictionary = Convert(encoding, n);
+                            var bDictionary = Convert(n);
                             dictionary.Add(key, bDictionary);
                             break;
                         default:
@@ -58,7 +58,7 @@ namespace FlyingRaijin.Bencode.Read.Parser
                     }
                 }
 
-                result = new BDictionary(new ReadOnlyDictionary<string, IClrObject>(dictionary));
+                result = new BDictionary(ImmutableDictionary.CreateRange(dictionary));
             }
             catch (Exception e)
             {

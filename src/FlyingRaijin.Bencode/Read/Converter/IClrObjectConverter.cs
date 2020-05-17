@@ -8,6 +8,6 @@ namespace FlyingRaijin.Bencode.Read.Converter
         where N : NonTerminalNodeBase
         where T : IClrObject
     {
-        T Convert(Encoding encoding, N node);
+        T Convert(N node);
     }
 }

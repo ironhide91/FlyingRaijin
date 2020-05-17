@@ -1,19 +1,18 @@
 ﻿using FlyingRaijin.Bencode.Read.Ast.Base;
 using FlyingRaijin.Bencode.Read.Ast.String;
+using System;
 
 namespace FlyingRaijin.Bencode.Read.Parser
 {
     public static partial class DelegateParsers
     {
-        public static void ByteParser(ParseContext context, NodeBase ast)
+        public static void CharParser(ParserContext context, NodeBase ast)
         {
-            context.HasTokens();
+            var character = context.LookAheadChar;
 
-            var nextByte = context.LookAheadByte;
+            context.Match(character);
 
-            context.Match(nextByte);
-
-            var node = new ByteNode(nextByte);
+            var node = new CharNode(character);
 
             ast.Children.Add(node);
         }

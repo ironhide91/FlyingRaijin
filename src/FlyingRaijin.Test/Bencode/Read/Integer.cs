@@ -8,13 +8,6 @@ namespace FlyingRaijin.Test.Bencode.Read
 {
     public class Integer
     {
-        private static readonly Encoding encoding = Encoding.UTF8;
-        
-        public Integer()
-        {
-
-        }
-
         [Theory]
         [InlineData("i1e", 1)]
         [InlineData("i2e", 2)]
@@ -24,7 +17,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         [InlineData("i1234567890e", 1234567890)]
         public void CanParsePositive(string bencode, int value)
         {
-            var bnumber = BencodeReader.Read<BInteger>(encoding, bencode);            
+            var bnumber = BencodeReader.Read<BInteger>(bencode);            
 
             Assert.Equal(bnumber.Value, value);
         }
@@ -32,7 +25,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         [Fact]
         public void CanParseZero()
         {
-            var bnumber = BencodeReader.Read<BInteger>(encoding, "i0e");
+            var bnumber = BencodeReader.Read<BInteger>("i0e");
 
             Assert.Equal(0, bnumber.Value);
         }
@@ -46,7 +39,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         [InlineData("i-1234567890e", -1234567890)]
         public void CanParseNegative(string bencode, int value)
         {
-            var bnumber = BencodeReader.Read<BInteger>(encoding, bencode);
+            var bnumber = BencodeReader.Read<BInteger>(bencode);
             Assert.Equal(bnumber.Value, value);
         }
 
@@ -55,7 +48,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         [InlineData("i-9223372036854775808e", -9223372036854775808)]
         public void CanParseInt64(string bencode, long value)
         {
-            var bnumber = BencodeReader.Read<BInteger>(encoding, bencode);
+            var bnumber = BencodeReader.Read<BInteger>(bencode);
             Assert.Equal(bnumber.Value, value);
         }
 
@@ -68,7 +61,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         {
             Assert.Throws<ParsingException>(() =>
             {
-                BencodeReader.Read<BInteger>(encoding, bencode);
+                BencodeReader.Read<BInteger>(bencode);
             });
         }
 
@@ -77,7 +70,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         {
             Assert.Throws<ParsingException>(() =>
             {
-                BencodeReader.Read<BInteger>(encoding, "i-0e");
+                BencodeReader.Read<BInteger>("i-0e");
             });
         }
 
@@ -90,7 +83,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         {
             Assert.Throws<ParsingException>(() =>
             {
-                BencodeReader.Read<BInteger>(encoding, bencode);
+                BencodeReader.Read<BInteger>(bencode);
             });
         }
 
@@ -103,7 +96,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         {
             Assert.Throws<ParsingException>(() =>
             {
-                BencodeReader.Read<BInteger>(encoding, bencode);
+                BencodeReader.Read<BInteger>(bencode);
             });
         }
 
@@ -112,7 +105,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         {
             Assert.Throws<ParsingException>(() =>
             {
-                BencodeReader.Read<BInteger>(encoding, "i-e");
+                BencodeReader.Read<BInteger>("i-e");
             });
         }
 
@@ -125,7 +118,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         {
             Assert.Throws<ParsingException>(() =>
             {
-                BencodeReader.Read<BInteger>(encoding, bencode);
+                BencodeReader.Read<BInteger>(bencode);
             });
         }
 
@@ -138,10 +131,9 @@ namespace FlyingRaijin.Test.Bencode.Read
         [InlineData("i42ae")]
         public void NonDigit_ThrowsInvalidBencodeException(string bencode)
         {
-
             Assert.Throws<ParsingException>(() =>
             {
-                var bnumber = BencodeReader.Read<BInteger>(encoding, bencode);
+                var bnumber = BencodeReader.Read<BInteger>(bencode);
             });
         }
 
@@ -150,7 +142,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         {
             Assert.Throws<ParsingException>(() =>
             {
-                var bnumber = BencodeReader.Read<BInteger>(encoding, "ie");
+                var bnumber = BencodeReader.Read<BInteger>("ie");
             });
         }
 
@@ -161,7 +153,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         {
             Assert.Throws<ConverterException>(() =>
             {
-                var bnumber = BencodeReader.Read<BInteger>(encoding, bencode);
+                var bnumber = BencodeReader.Read<BInteger>(bencode);
             });
         }
 
@@ -173,7 +165,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         {
             Assert.Throws<ConverterException>(() =>
             {
-                var bnumber = BencodeReader.Read<BInteger>(encoding, bencode);
+                var bnumber = BencodeReader.Read<BInteger>(bencode);
             });
         }
     }

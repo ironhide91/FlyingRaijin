@@ -2,12 +2,24 @@
 
 namespace FlyingRaijin.Bencode.Read.Ast.String
 {
-    public sealed class StringLengthPrefixNode : TerminalByteNodeBase
+    public sealed class StringLengthPrefixNode : TerminalCharNodeBase
     {
+        static StringLengthPrefixNode()
+        {
+            Instance = new StringLengthPrefixNode();
+        }
+
+        private StringLengthPrefixNode()
+        {
+
+        }
+
+        private static readonly char UTF8Char = ToUTF8Char(":");
+        
+        public static readonly StringLengthPrefixNode Instance;
+
         public override Production ProductionType => Production.STRING_LENGTH_PREFIX;
 
-        public override byte Byte => LENGTH_PREFIX;
-
-        public static byte LENGTH_PREFIX = ToByte(':');
+        public override char Character => UTF8Char;
     }
 }

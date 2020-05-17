@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <IsPackable>false</IsPackable>
 
     <AssemblyName>FlyingRaijin.Test</AssemblyName>
@@ -15,24 +15,18 @@
     <StartupObject />
   </PropertyGroup>
 
-  <ItemGroup>
-    <None Remove="Client\hex.txt" />
-  </ItemGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="Client\hex.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="FluentAssertions" Version="5.9.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.4.0" />
-    <PackageReference Include="xunit" Version="2.4.1" />
-    <PackageReference Include="coverlet.collector" Version="1.1.0">
+    <PackageReference Include="FluentAssertions" Version="5.10.3" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.6.1" />
+    <PackageReference Include="coverlet.collector" Version="1.2.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -41,7 +35,20 @@
 
   <ItemGroup>
     <ProjectReference Include="..\FlyingRaijin.Bencode\FlyingRaijin.Bencode.csproj" />
-    <ProjectReference Include="..\FlyingRaijin.Client\FlyingRaijin.Client.csproj" />
+    <ProjectReference Include="..\FlyingRaijin.Engine\FlyingRaijin.Engine.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Artifacts\Torrents\linuxmint-18-cinnamon-64bit.torrent">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Artifacts\Torrents\Slackware64-14.1-install-dvd.torrent">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Artifacts\Torrents\" />
   </ItemGroup>
 
 </Project>
