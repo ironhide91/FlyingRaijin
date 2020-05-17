@@ -8,16 +8,37 @@ namespace FlyingRaijin.Engine.Torrent
         private const string InfoSingleNameKey = "name";
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string ReadSingleName(this BDictionary bDict)
-            => bDict.GetValue<BString>(InfoSingleNameKey).Value;
+        {
+            var result = bDict.GetValue<BString>(InfoSingleNameKey);
+
+            if (result == null)
+                return string.Empty;
+
+            return result.Value;
+        }
 
         private const string InfoSingleLengthKey = "length";
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static long ReadSingleLength(this BDictionary bDict)
-            => bDict.GetValue<BInteger>(InfoSingleLengthKey).Value;
+        {
+            var result = bDict.GetValue<BInteger>(InfoSingleLengthKey);
+
+            if (result == null)
+                return 0L;
+
+            return result.Value;
+        }
 
         private const string InfoSingleMD5ChecksumKey = "md5sum";
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string ReadSingleMD5Checksum(this BDictionary bDict)
-            => bDict.GetValue<BString>(InfoSingleMD5ChecksumKey).Value;
+        {
+            var result = bDict.GetValue<BString>(InfoSingleMD5ChecksumKey);
+
+            if (result == null)
+                return string.Empty;
+
+            return result.Value;
+        }
     }
 }

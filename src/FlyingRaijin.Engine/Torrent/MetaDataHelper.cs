@@ -19,7 +19,8 @@ namespace FlyingRaijin.Engine.Torrent
 
             try
             {
-                value = (T)dictionary.Value[key];
+                if (dictionary.Value.ContainsKey(key))
+                    value = (T)dictionary.Value[key];
             }
             catch (Exception e)
             {
@@ -57,7 +58,14 @@ namespace FlyingRaijin.Engine.Torrent
         private const string RootAnnounceUrlKey = "announce";
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string ReadAnnounceUrl(this BDictionary bDict)
-            => bDict.GetValue<BString>(RootAnnounceUrlKey).Value;        
+        {
+            var result = bDict.GetValue<BString>(RootAnnounceUrlKey);
+
+            if (result == null)
+                return string.Empty;
+
+            return result.Value;
+        }
 
         private const string RootAnnounceListKey = "announce-list";
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -65,7 +73,7 @@ namespace FlyingRaijin.Engine.Torrent
         {
             var bList = bDict.GetValue<BList>(RootAnnounceListKey);          
 
-            if (bList.Value == null)
+            if (bList == null || bList.Value == null)
                 return AnnounceList.Empty;
 
             var levelOneAreNotBlist = bList.Value.Any(x => x.GetType() != typeof(BList));
@@ -96,22 +104,49 @@ namespace FlyingRaijin.Engine.Torrent
         private const string RootCreationDateKey = "creation date";
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static long ReadCreationDate(this BDictionary bDict)
-            => bDict.GetValue<BInteger>(RootCreationDateKey).Value;
+        {
+            var result = bDict.GetValue<BInteger>(RootCreationDateKey);
+
+            if (result == null)
+                return 0L;
+
+            return result.Value;
+        }
 
         private const string RootCommentKey = "comment";
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string ReadComment(this BDictionary bDict)
-            => bDict.GetValue<BString>(RootCommentKey).Value;
+        {
+            var result = bDict.GetValue<BString>(RootCommentKey);
+
+            if (result == null)
+                return string.Empty;
+
+            return result.Value;
+        }
 
         private const string RootCreatedByKey = "created by";
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string ReadCreatedBy(this BDictionary bDict)
-            => bDict.GetValue<BString>(RootCreatedByKey).Value;
+        {
+            var result = bDict.GetValue<BString>(RootCreatedByKey);
+
+            if (result == null)
+                return string.Empty;
+
+            return result.Value;
+        }
 
         private const string RootEncodingKey = "encoding";
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string ReadEncoding(this BDictionary bDict)
-            => bDict.GetValue<BString>(RootEncodingKey).Value;
+        {
+            var result = bDict.GetValue<BString>(RootEncodingKey);
 
+            if (result == null)
+                return string.Empty;
+
+            return result.Value;
+        }
     }
 }

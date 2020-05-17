@@ -3,16 +3,13 @@ using FlyingRaijin.Bencode.Read;
 using FlyingRaijin.Bencode.Read.ClrObject;
 using FlyingRaijin.Bencode.Read.Exceptions;
 using System;
-using System.IO;
 using System.Text;
 using Xunit;
 
 namespace FlyingRaijin.Test.Bencode.Read
 {
     public class String
-    {
-        private static readonly Encoding encoding = Encoding.UTF8;
-        
+    {        
         public String()
         {
 
@@ -115,7 +112,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         [InlineData("12345678:spam")]
         [InlineData("123456789:spam")]
         [InlineData("1234567890:spam")]
-        public void LengthAtOrBelowMaxDigits10_DoesNotThrowUnsupportedException(string bencode)
+        public void LengthAtOrBelowMaxDigits10_ThrowsParsingException(string bencode)
         {
             Action action = () => BencodeReader.Read<BString>(bencode);
             action.Should().Throw<ParsingException>();
@@ -132,24 +129,26 @@ namespace FlyingRaijin.Test.Bencode.Read
         }
 
         [Fact]
-        public void LengthBelowInt32MaxValue_DoesNotThrowUnsupportedException()
+        public void LengthNearInt32MaxValue_ThrowsException()
         {
             var bencode = "2147483647:spam";
 
             Action action = () => BencodeReader.Read<BString>(bencode);
 
-            action.Should().Throw<ParsingException>();
+            action.Should().Throw<Exception>();
         }
 
         [Fact]
         public void CanParseUnicode()
         {
-            var utf8Value = Encoding.UTF8.GetString(Encoding.UTF8.GetBytes("65:$€£¥¢₹₨₱₩฿₫₪©®℗™℠αβγδεζηθικλμνξοπρστυφχψωΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ"));
+            var unicodeStr = "$€£¥¢₹₨₱₩฿₫₪©®℗™℠αβγδεζηθικλμνξοπρστυφχψωΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ";
+            var length = Encoding.UTF8.GetBytes(unicodeStr).Length;
+            var utf8Str = Encoding.UTF8.GetString(Encoding.UTF8.GetBytes($"{length}:{unicodeStr}"));
 
-            var bstring = BencodeReader.Read<BString>(utf8Value);
+            var bstring = BencodeReader.Read<BString>(utf8Str);
 
-            Assert.Equal(65, bstring.Length);
-            Assert.Equal("$€£¥¢₹₨₱₩฿₫₪©®℗™℠αβγδεζηθικλμνξοπρστυφχψωΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ", bstring.Value);
+            Assert.Equal(length, bstring.Length);
+            Assert.Equal(unicodeStr, bstring.Value);
         }
 
         [Theory]

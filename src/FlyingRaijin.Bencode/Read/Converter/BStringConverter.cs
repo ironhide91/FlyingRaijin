@@ -19,24 +19,28 @@ namespace FlyingRaijin.Bencode.Read.Parser
 
         public BString Convert(BencodeStringNode node)
         {
+            var intChars = new string(NumberConverter.Convert(node.Children[0]));
+            var length = int.Parse(intChars);
+            if (length == 0)
+                return new BString(null, length, string.Empty);
+
+            var strNode = (StringNode)node.Children[2];
             BString result;
 
             try
             {
-                var intChars = new string(NumberConverter.Convert(node.Children[0]));
-
-                var length = int.Parse(intChars);
-
-                var isConsitent = (length == node.Children[2].Children.Count);
-
-                var chars = node.Children[2].Children.Cast<CharNode>().Select(x => x.Character).ToArray();
-
-                result = new BString(length, new string(chars));
+                var bytes = strNode.Bytes.AsSpan().Slice(0, length);
+                var str = Encoding.UTF8.GetString(strNode.Bytes.AsSpan().Slice(0, length));
+                result = new BString(bytes.ToArray(), length, str);
             }
             catch (Exception e)
             {
                 throw ConverterException.Create(
-                        $"{nameof(BStringConverter)} - An error occurred while converting Bencode Abstract Sytax Tree.");
+                    $"{nameof(BStringConverter)} - An error occurred while converting Bencode Abstract Sytax Tree.");
+            }
+            finally
+            {
+                BytePool.Pool.Return(strNode.Bytes, true);
             }
 
             return result;

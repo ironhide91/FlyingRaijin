@@ -27,7 +27,7 @@ namespace FlyingRaijin.Test.Engine.BencodeStringLiterals
             var bDictionary = BencodeReader.Read<BDictionary>(bencode);
             var result = bDictionary.ReadMultiName();
 
-            result.Should().BeNull();
+            result.Should().BeEmpty();
         }
 
         [Theory]

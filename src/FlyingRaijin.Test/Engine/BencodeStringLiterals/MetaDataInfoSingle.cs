@@ -27,7 +27,7 @@ namespace FlyingRaijin.Test.Engine.BencodeStringLiterals
             var bDictionary = BencodeReader.Read<BDictionary>(bencode);
             var result = bDictionary.ReadSingleName();
 
-            result.Should().BeNull();
+            result.Should().BeEmpty();
         }
 
         [Theory]
@@ -68,7 +68,7 @@ namespace FlyingRaijin.Test.Engine.BencodeStringLiterals
             var bDictionary = BencodeReader.Read<BDictionary>(bencode);
             var result = bDictionary.ReadSingleMD5Checksum();
 
-            result.Should().BeNull();
+            result.Should().BeEmpty();
         }
     }
 }

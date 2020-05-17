@@ -11,7 +11,7 @@ namespace FlyingRaijin.Test.Engine.BencodeStringLiterals
     public class SharedMetaData
     {
         [Theory]
-        [InlineData("d4:info6:samplee")]
+        [InlineData("d4:infodee")]
         public void CanReadInfoKey(string bencode)
         {
             var bDictionary = BencodeReader.Read<BDictionary>(bencode);
@@ -27,8 +27,7 @@ namespace FlyingRaijin.Test.Engine.BencodeStringLiterals
             var bDictionary = BencodeReader.Read<BDictionary>(bencode);
             var result = bDictionary.ReadInfo();
 
-            result.Should().NotBeNull();
-            result.Value.Should().BeNull();
+            result.Should().BeNull();
         }
 
         [Theory]
@@ -49,7 +48,7 @@ namespace FlyingRaijin.Test.Engine.BencodeStringLiterals
             var bDictionary = BencodeReader.Read<BDictionary>(bencode);
             var info = bDictionary.ReadAnnounceUrl();
 
-            info.Should().BeNull();
+            info.Should().BeEmpty();
         }
 
         [Theory]
@@ -149,7 +148,7 @@ namespace FlyingRaijin.Test.Engine.BencodeStringLiterals
             var bDictionary = BencodeReader.Read<BDictionary>(bencode);
             var result = bDictionary.ReadComment();
 
-            result.Should().BeNull();
+            result.Should().BeEmpty();
         }
 
         [Theory]
@@ -170,7 +169,7 @@ namespace FlyingRaijin.Test.Engine.BencodeStringLiterals
             var bDictionary = BencodeReader.Read<BDictionary>(bencode);
             var result = bDictionary.ReadCreatedBy();
 
-            result.Should().BeNull();
+            result.Should().BeEmpty();
         }
 
         [Theory]
@@ -191,7 +190,7 @@ namespace FlyingRaijin.Test.Engine.BencodeStringLiterals
             var bDictionary = BencodeReader.Read<BDictionary>(bencode);
             var result = bDictionary.ReadEncoding();
 
-            result.Should().BeNull();
+            result.Should().BeEmpty();
         }
     }
 }

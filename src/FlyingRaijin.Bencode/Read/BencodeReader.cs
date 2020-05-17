@@ -64,7 +64,7 @@ namespace FlyingRaijin.Bencode.Read
 
         private static readonly IReadOnlyDictionary<Type, Reader> _Readers;
 
-        public static T Read<T>(string bencodeValue) where T : struct, IClrObject
+        public static T Read<T>(string bencodeValue) where T : IClrObject
         {
             T bObject = default;
 
@@ -91,7 +91,7 @@ namespace FlyingRaijin.Bencode.Read
             return bObject;
         }
 
-        public static T Read<T>(Stream stream) where T : struct, IClrObject
+        public static T Read<T>(Stream stream) where T : IClrObject
         {
             T bObject = default;
 

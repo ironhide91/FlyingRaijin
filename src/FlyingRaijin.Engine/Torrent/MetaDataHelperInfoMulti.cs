@@ -14,20 +14,27 @@ namespace FlyingRaijin.Engine.Torrent
         private const string InfoMultiNameKey = "name";
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string ReadMultiName(this BDictionary bDict)
-            => bDict.GetValue<BString>(InfoMultiNameKey).Value;        
+        {
+            var result = bDict.GetValue<BString>(InfoMultiNameKey);
+
+            if (result == null)
+                return string.Empty;
+
+            return result.Value;
+        }
 
         private const string InfoMultiFiles = "files";
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static IImmutableList<MultiFileInfoDictionaryItem> ReadMultiFiles(this BDictionary bDict)
         {
-            var files = bDict.GetValue<BList>(InfoMultiFiles).Value;
+            var files = bDict.GetValue<BList>(InfoMultiFiles);
 
             if (files == null)
                 return EmptyFiles;
 
-            var typedFiles = new List<MultiFileInfoDictionaryItem>(files.Count);
+            var typedFiles = new List<MultiFileInfoDictionaryItem>(files.Value.Count);
 
-            foreach (var fileDict in files.Cast<BDictionary>())
+            foreach (var fileDict in files.Value.Cast<BDictionary>())
             {
                 var item =
                     new MultiFileInfoDictionaryItem(
@@ -44,26 +51,40 @@ namespace FlyingRaijin.Engine.Torrent
         private const string InfoMultiFileLengthKey = "length";
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static long ReadMultiFileLength(this BDictionary bDict)
-            => bDict.GetValue<BInteger>(InfoMultiFileLengthKey).Value;
+        {
+            var result = bDict.GetValue<BInteger>(InfoMultiFileLengthKey);
+
+            if (result == null)
+                return 0L;
+
+            return result.Value;
+        }
 
         private const string InfoMultiFileMd5ChecksumKey = "md5sum";
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static string ReadMultiFileM55Checksum(this BDictionary bDict)
-            => bDict.GetValue<BString>(InfoMultiFileMd5ChecksumKey).Value;
+        {
+            var result = bDict.GetValue<BString>(InfoMultiFileMd5ChecksumKey);
+
+            if (result == null)
+                return string.Empty;
+
+            return result.Value;
+        }
 
         private const string InfoMultiFilePathKey = "path";
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static string ReadInfoMultiFilePath(this BDictionary bDict)
         {
-            var list = bDict.GetValue<BList>(InfoMultiFilePathKey).Value;
+            var list = bDict.GetValue<BList>(InfoMultiFilePathKey);
 
             if (list == null)
                 return string.Empty;
 
-            if (list.Count == 1)
-                return ((BString)list.First()).Value;
+            if (list.Value.Count == 1)
+                return ((BString)list.Value.First()).Value;
 
-            return string.Join('/', list.Cast<BString>().Select(s => s.Value));
+            return string.Join('/', list.Value.Cast<BString>().Select(s => s.Value));
         }
     }
 }

@@ -3,7 +3,6 @@ using FlyingRaijin.Bencode.Read;
 using FlyingRaijin.Bencode.Read.ClrObject;
 using FlyingRaijin.Bencode.Read.Exceptions;
 using System;
-using System.Text;
 using Xunit;
 
 namespace FlyingRaijin.Test.Bencode.Read

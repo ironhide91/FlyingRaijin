@@ -13,17 +13,16 @@ namespace FlyingRaijin.Bencode.Read.Parser
     {
         private static readonly RecyclableMemoryStreamManager manager = new RecyclableMemoryStreamManager();
 
-        private static readonly ArrayPool<byte> arrayPool = ArrayPool<byte>.Shared;        
-
         public ParserContext(Stream stream)
         {
             Stream = stream;
+            TryPeek();
         }
 
         public ParserContext(string bencodeString)
         {
             var numOfBytes = CurrentEncoding.GetByteCount(bencodeString);
-            pooledBuffer = arrayPool.Rent(numOfBytes);
+            pooledBuffer = BytePool.Pool.Rent(numOfBytes);
             CurrentEncoding.GetBytes(bencodeString.AsSpan(), pooledBuffer.AsSpan());
 
             Stream = manager.GetStream();
@@ -31,7 +30,6 @@ namespace FlyingRaijin.Bencode.Read.Parser
             Stream.Flush();
             Stream.Position = 0;
 
-            //Stream = new MemoryStream(CurrentEncoding.GetBytes(bencodeString));
             TryPeek();
         }
 
@@ -39,9 +37,9 @@ namespace FlyingRaijin.Bencode.Read.Parser
 
         private readonly Stream Stream;
 
-        private byte[] pooledBuffer = null;
+        private readonly byte[] pooledBuffer = null;
 
-        private byte[] buffer = new byte[1];
+        private readonly byte[] buffer = new byte[1];
 
         public char LookAheadChar { get; private set; }
 
@@ -75,8 +73,10 @@ namespace FlyingRaijin.Bencode.Read.Parser
         {
             var result = Stream.Read(buffer, 0, numBytes);
 
-            if (result == 0)
+            if ((result == 0) || (numBytes != result))
                 throw ParsingException.Create("Reached End Of Stream.");
+
+            TryPeek();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -98,8 +98,10 @@ namespace FlyingRaijin.Bencode.Read.Parser
         {
             if (Stream != null)
             {
-                //arrayPool.Return(pooledBuffer, true);
                 Stream.Dispose();
+
+                if (pooledBuffer != null)
+                    BytePool.Pool.Return(pooledBuffer, true);                
             }
         }
     }

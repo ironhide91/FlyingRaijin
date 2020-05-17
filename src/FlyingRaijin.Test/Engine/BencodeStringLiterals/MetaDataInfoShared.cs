@@ -60,74 +60,11 @@ namespace FlyingRaijin.Test.Engine.BencodeStringLiterals
             result.Should().BeFalse();
         }
 
-        [Fact]
-        public void CanReadPiecesInfoKey()
-        {
-            var piecesStr = File.ReadAllText("Artifacts\\Pieces\\PerfectPiecesSample1.txt");
-
-            var strBuilder = new StringBuilder();
-            strBuilder.Append("d");
-            strBuilder.Append("6:pieces");
-            strBuilder.Append(piecesStr.Length);
-            strBuilder.Append(":");
-            strBuilder.Append(piecesStr);
-            strBuilder.Append("e");
-
-            var bDictionary = BencodeReader.Read<BDictionary>(strBuilder.ToString());
-            var result = bDictionary.ReadPieces();
-
-            result.Should().NotBeNull();
-            result.Sha1Checksums.Should().NotBeNull();
-            result.Sha1Checksums.Should().HaveCount(1218);
-        }
-
         [Theory]
         [InlineData("d6:ieces5:helloe")]
         public void MissingPiecesInfoKey(string bencode)
         {
             var bDictionary = BencodeReader.Read<BDictionary>(bencode);
-            var result = bDictionary.ReadPieces();
-
-            result.Should().NotBeNull();
-            result.Sha1Checksums.Should().NotBeNull();
-            result.Sha1Checksums.Should().HaveCount(0);
-        }
-
-        [Fact]
-        public void ImperfectPiecesInfoKey()
-        {
-            var piecesStr = File.ReadAllText("Artifacts\\Pieces\\ImperfectPiecesSample1.txt");
-
-            var strBuilder = new StringBuilder();
-            strBuilder.Append("d");
-            strBuilder.Append("6:pieces");
-            strBuilder.Append(piecesStr.Length);
-            strBuilder.Append(":");
-            strBuilder.Append(piecesStr);
-            strBuilder.Append("e");
-
-            var bDictionary = BencodeReader.Read<BDictionary>(strBuilder.ToString());
-            var result = bDictionary.ReadPieces();
-
-            result.Should().NotBeNull();
-            result.Sha1Checksums.Should().NotBeNull();
-            result.Sha1Checksums.Should().HaveCount(0);
-        }
-
-        [Fact]
-        public void Sample()
-        {
-            var piecesStr = File.ReadAllText("D:\\Sample.txt", Encoding.UTF8);
-
-            var strBuilder = new StringBuilder();
-            strBuilder.Append("d");
-            strBuilder.Append("6:pieces");
-            strBuilder.Append(piecesStr.Length);
-            strBuilder.Append(":");
-            strBuilder.Append(piecesStr);
-            strBuilder.Append("e");
-
-            var bDictionary = BencodeReader.Read<BDictionary>(strBuilder.ToString());
             var result = bDictionary.ReadPieces();
 
             result.Should().NotBeNull();
