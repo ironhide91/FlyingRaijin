@@ -1,4 +1,4 @@
-﻿using FlyingRaijin.Bencode.Read.ClrObject;
+﻿using FlyingRaijin.Bencode.BObject;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -20,7 +20,7 @@ namespace FlyingRaijin.Engine.Torrent
             if (result == null)
                 return string.Empty;
 
-            return result.Value;
+            return result.Value.ToString();
         }
 
         private const string InfoMultiFiles = "files";
@@ -69,7 +69,7 @@ namespace FlyingRaijin.Engine.Torrent
             if (result == null)
                 return string.Empty;
 
-            return result.Value;
+            return result.Value.ToString();
         }
 
         private const string InfoMultiFilePathKey = "path";
@@ -82,7 +82,7 @@ namespace FlyingRaijin.Engine.Torrent
                 return string.Empty;
 
             if (list.Value.Count == 1)
-                return ((BString)list.Value.First()).Value;
+                return ((BString)list.Value.First()).Value.ToString();
 
             return string.Join('/', list.Value.Cast<BString>().Select(s => s.Value));
         }

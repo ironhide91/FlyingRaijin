@@ -1,6 +1,4 @@
 ﻿using FluentAssertions;
-using FlyingRaijin.Bencode.Read;
-using FlyingRaijin.Bencode.Read.ClrObject;
 using FlyingRaijin.Engine.Torrent;
 using System.Text;
 using Xunit;

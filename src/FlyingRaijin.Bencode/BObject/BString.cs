@@ -10,6 +10,14 @@ namespace FlyingRaijin.Bencode.BObject
             
         }
 
+        public override bool Equals(object obj)
+        {
+            if (obj is BString && ((BString)obj).Value.Equals(Value))
+                return true;
+
+            return false;
+        }
+
         public override string ToString()
         {
             return Encoding.UTF8.GetString(Value);

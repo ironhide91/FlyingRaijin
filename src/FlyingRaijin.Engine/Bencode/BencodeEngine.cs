@@ -1,9 +1,8 @@
-﻿using FlyingRaijin.Bencode.Read;
-using FlyingRaijin.Bencode.Read.ClrObject;
+﻿using FlyingRaijin.Bencode.BObject;
+using FlyingRaijin.Bencode.Read;
 using FlyingRaijin.Engine.Torrent;
 using System;
 using System.IO;
-using System.Text;
 
 namespace FlyingRaijin.Engine.Bencode
 {
@@ -19,20 +18,38 @@ namespace FlyingRaijin.Engine.Bencode
 
         public static BencodeEngine Instance { get { return lazy.Value; } }
 
-        public SingleFileTorrent ReadsingleFile(Stream stream)
+        public SingleFileTorrent ReadsingleFile(ReadOnlySpan<byte> bytes)
         {
-            var metaData = BencodeReader.Read<BDictionary>(stream);
+            var result = BencodeParser.Parse(bytes);
 
-            var torrent = new SingleFileTorrent(metaData);
+            var torrent = new SingleFileTorrent((BDictionary)result.BObject);
 
             return torrent;
         }
 
-        public MultiFileTorrent ReadMultiFile(Stream stream)
+        public SingleFileTorrent ReadsingleFile(string filePath)
         {
-            var metaData = BencodeReader.Read<BDictionary>(stream);
+            var result = BencodeParser.Parse(File.ReadAllBytes(filePath).AsSpan());
 
-            var torrent = new MultiFileTorrent(metaData);
+            var torrent = new SingleFileTorrent((BDictionary)result.BObject);
+
+            return torrent;
+        }
+
+        public MultiFileTorrent ReadMultiFile(ReadOnlySpan<byte> bytes)
+        {
+            var result = BencodeParser.Parse(bytes);
+
+            var torrent = new MultiFileTorrent((BDictionary)result.BObject);
+
+            return torrent;
+        }
+
+        public MultiFileTorrent ReadMultiFile(string filePath)
+        {
+            var result = BencodeParser.Parse(File.ReadAllBytes(filePath).AsSpan());
+
+            var torrent = new MultiFileTorrent((BDictionary)result.BObject);
 
             return torrent;
         }

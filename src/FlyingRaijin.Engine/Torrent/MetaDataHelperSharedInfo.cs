@@ -1,11 +1,8 @@
-﻿using FlyingRaijin.Bencode.Read.ClrObject;
-using SimpleBase;
-using System;
+﻿using FlyingRaijin.Bencode.BObject;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
 
 namespace FlyingRaijin.Engine.Torrent
 {
@@ -44,18 +41,18 @@ namespace FlyingRaijin.Engine.Torrent
             if (result == null)
                 return Pieces.Empty;
 
-            var isNotMultipleOf20 = (result.UnderlyingBytes.Length % 20) != 0;
+            var isNotMultipleOf20 = (result.Value.Length % 20) != 0;
             if (isNotMultipleOf20)
                 return Pieces.Empty;
 
             //var temp = BitConverter.ToString(result).Replace("-", "");
 
-            int start = 0, end = (result.UnderlyingBytes.Length - 20);
+            int start = 0, end = (result.Value.Length - 20);
             var sha1Checksumns = new List<byte[]>();
 
             while (start <= end)
             {
-                var sha1 = result.UnderlyingBytes.Skip(start).Take(20);
+                var sha1 = result.Value.Skip(start).Take(20);
                 sha1Checksumns.Add(sha1.ToArray());
                 start += 20;
             }

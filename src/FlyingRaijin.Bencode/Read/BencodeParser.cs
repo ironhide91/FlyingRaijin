@@ -1,24 +1,32 @@
 ﻿using FlyingRaijin.Bencode.BObject;
 using System;
-using System.Buffers;
 using System.Collections.Generic;
 
 namespace FlyingRaijin.Bencode.Read
 {
-
     public static partial class BencodeParser
     {
+        public static ParseResult<T> Parse<T>(ReadOnlySpan<byte> bytes) where T : IBObject
+        {
+            var result = Parse(bytes);
+
+            if (result.BObject == null || result.BObject is T)
+                return new ParseResult<T>(result.Error, (T)result.BObject);
+
+            return new ParseResult<T>(ErrorType.Unknown, default);
+        }
+
         public static ParseResult Parse(ReadOnlySpan<byte> bytes)
         {
-            IBObject root = null;
-
+            IBObject root; 
+            
             ErrorType error = ErrorType.None;
 
             int index = -1;
 
             int dictionaryCount = 0;
 
-            int listCount = 0;
+            int listCount = 0;            
 
             // Determine root type
             switch (bytes[++index])
@@ -52,7 +60,7 @@ namespace FlyingRaijin.Bencode.Read
                 // Unkown
                 default:
                     return new ParseResult(ErrorType.Unknown, null);
-            }            
+            }
 
             IBObject currentParent = root;
 

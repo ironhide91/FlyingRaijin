@@ -1,5 +1,4 @@
-﻿using FlyingRaijin.Bencode.Read.ClrObject;
-using SimpleBase;
+﻿using FlyingRaijin.Bencode.BObject;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -10,17 +9,18 @@ namespace FlyingRaijin.Engine.Torrent
 {
     public static partial class MetaDataHelper
     {
-        private static readonly Base16 Base16 = new Base16(Base16Alphabet.UpperCase);
+
+
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static T GetValue<T>(this BDictionary dictionary, string key) where T : IClrObject
+        private static T GetValue<T>(this BDictionary dictionary, string key) where T : IBObject
         {
             T value = default;
 
             try
             {
-                if (dictionary.Value.ContainsKey(key))
-                    value = (T)dictionary.Value[key];
+                if (KnownKeys.ContainsKey(key) && dictionary.Value.ContainsKey(KnownKeys[key]))
+                    value = (T)dictionary.Value[KnownKeys[key]];
             }
             catch (Exception e)
             {
@@ -64,7 +64,7 @@ namespace FlyingRaijin.Engine.Torrent
             if (result == null)
                 return string.Empty;
 
-            return result.Value;
+            return result.Value.ToString();
         }
 
         private const string RootAnnounceListKey = "announce-list";
@@ -90,7 +90,7 @@ namespace FlyingRaijin.Engine.Torrent
                 var trackers = new List<string>();
 
                 foreach (BString tracker in tier.Value)
-                    trackers.Add(tracker.Value);
+                    trackers.Add(tracker.Value.ToString());
 
                 if (trackers.Count > 0)
                     tiers.Add(ImmutableList.CreateRange(trackers));
@@ -122,7 +122,7 @@ namespace FlyingRaijin.Engine.Torrent
             if (result == null)
                 return string.Empty;
 
-            return result.Value;
+            return result.Value.ToString();
         }
 
         private const string RootCreatedByKey = "created by";
@@ -134,7 +134,7 @@ namespace FlyingRaijin.Engine.Torrent
             if (result == null)
                 return string.Empty;
 
-            return result.Value;
+            return result.Value.ToString();
         }
 
         private const string RootEncodingKey = "encoding";
@@ -146,7 +146,7 @@ namespace FlyingRaijin.Engine.Torrent
             if (result == null)
                 return string.Empty;
 
-            return result.Value;
+            return result.Value.ToString();
         }
     }
 }

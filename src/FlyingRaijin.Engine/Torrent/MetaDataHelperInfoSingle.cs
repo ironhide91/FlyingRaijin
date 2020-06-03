@@ -1,4 +1,4 @@
-﻿using FlyingRaijin.Bencode.Read.ClrObject;
+﻿using FlyingRaijin.Bencode.BObject;
 using System.Runtime.CompilerServices;
 
 namespace FlyingRaijin.Engine.Torrent
@@ -14,7 +14,7 @@ namespace FlyingRaijin.Engine.Torrent
             if (result == null)
                 return string.Empty;
 
-            return result.Value;
+            return result.Value.ToString();
         }
 
         private const string InfoSingleLengthKey = "length";
@@ -38,7 +38,7 @@ namespace FlyingRaijin.Engine.Torrent
             if (result == null)
                 return string.Empty;
 
-            return result.Value;
+            return result.Value.ToString();
         }
     }
 }

@@ -3,8 +3,15 @@
     public enum ErrorType
     {
         None,
+        // Integer
+        IntegerMinimumLemgthMustBe3,
         IntegerMustEndWithE,
-        IntegerTrailingZeroAfterZero,
+        IntegerLeadingZero,
+        IntegerNegativeOnly,
+        IntegerNegativeZero,
+        IntegerMultipleNegative,
+        IntegerOutOfInt64Range,
+        // String
         StringInvalid,
         KeyShouldBeString,
         Unknown

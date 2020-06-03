@@ -20,6 +20,17 @@ namespace FlyingRaijin.Bencode.Read
             }
         }
 
+        private static bool IndexWithinBound(this ReadOnlySpan<byte> bytes, int nextIndex)
+        {
+            if (bytes.IsEmpty)
+                return false;
+
+            if (bytes.Length == (nextIndex + 1))
+                return false;
+
+            return true;
+        }
+
         private static bool HasError(this ErrorType error)
         {
             return (error != ErrorType.None);

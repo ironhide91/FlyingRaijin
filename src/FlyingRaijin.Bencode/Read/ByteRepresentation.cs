@@ -10,6 +10,7 @@ namespace FlyingRaijin.Bencode.Read
         private const byte end       = (byte)'e';
         private const byte colon     = (byte)':';
         private const byte zero      = (byte)'0';
+        private const byte minus     = (byte)'-';
 
         private static readonly HashSet<byte> NonZeroIntegerBytes = new HashSet<byte>
         {

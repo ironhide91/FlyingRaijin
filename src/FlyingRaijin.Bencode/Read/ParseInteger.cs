@@ -6,6 +6,9 @@ namespace FlyingRaijin.Bencode.Read
 {
     public static partial class BencodeParser
     {
+        private static int Int64MinValueCharLength = long.MinValue.ToString().Length;
+        private static int Int64MaxValueCharLength = long.MaxValue.ToString().Length;
+
         private static ErrorType ParseInteger(ReadOnlySpan<byte> bytes, ref int index, IBObject parent, IBObject key)
         {
             var error = ParseSingleInteger(bytes, ref index, parent, out IBObject bInteger);
@@ -37,6 +40,11 @@ namespace FlyingRaijin.Bencode.Read
         {
             parsedValue = null;
 
+            // Minimum length for Integer should be 3
+            if (bytes.Length < 3)
+                return ErrorType.IntegerMinimumLemgthMustBe3;            
+
+            // Zero Value
             if ((bytes[++index] == zero) & ((bytes[++index] == end)))
             {
                 parsedValue = new BInteger(parent, 0L);
@@ -46,11 +54,45 @@ namespace FlyingRaijin.Bencode.Read
             --index;
             --index;
 
-            var start = index;
+            var start = -1;
+
+            // Leading Zero is invalid
+            if (bytes[index + 1] == zero)
+            {
+                return ErrorType.IntegerLeadingZero;
+            }
+
+            // Negative character is fine
+            if ((bytes[index + 1] == minus))
+            {
+                index++;
+                start = index - 1;
+            }
+
+            // Next Negative character is invalid
+            if ((bytes[index + 1] == minus))
+            {
+                return ErrorType.IntegerMultipleNegative;
+            }
+
+            // Next Zero is invalid
+            if ((bytes[index + 1] == zero))
+            {
+                return ErrorType.IntegerNegativeZero;
+            }
+
+            // Next End is invalid
+            if ((bytes[index + 1] == end))
+            {
+                return ErrorType.IntegerNegativeOnly;
+            }
+
+            if (start == -1)
+                start = index;
 
             if (NonZeroIntegerBytes.Contains(bytes[++index]))
             {
-                while (PositiveIntegerBytes.Contains(bytes[++index]))
+                while (bytes.IndexWithinBound(index) && PositiveIntegerBytes.Contains(bytes[++index]))
                 {
 
                 }
@@ -59,23 +101,38 @@ namespace FlyingRaijin.Bencode.Read
                 {
                     var intBytes = bytes.SliceExclude(start, index);
 
+                    if (intBytes[0] == minus && (intBytes.Length > Int64MinValueCharLength))
+                    {
+                        return ErrorType.IntegerOutOfInt64Range;
+                    }
+
+                    if (intBytes[0] != minus && intBytes.Length > Int64MaxValueCharLength)
+                    {
+                        return ErrorType.IntegerOutOfInt64Range;
+                    }
+
                     var buffer = ArrayPool<char>.Shared.Rent(intBytes.Length);
 
                     intBytes.ToChars(buffer, intBytes.Length);
 
-                    var value = long.Parse(buffer);
+                    long value;
 
-                    ArrayPool<char>.Shared.Return(buffer, true);
+                    if (long.TryParse(buffer, out value))
+                    {
+                        ArrayPool<char>.Shared.Return(buffer, true);
 
-                    parsedValue = new BInteger(parent, value);
+                        parsedValue = new BInteger(parent, value);
 
-                    return ErrorType.None;
+                        return ErrorType.None;
+                    }
+
+                    return ErrorType.IntegerOutOfInt64Range;
                 }
 
                 return ErrorType.IntegerMustEndWithE;
             }
 
-            return ErrorType.IntegerTrailingZeroAfterZero;
+            return ErrorType.IntegerLeadingZero;
         }
     }
 }
