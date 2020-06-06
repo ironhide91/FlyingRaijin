@@ -9,9 +9,6 @@ namespace FlyingRaijin.Engine.Torrent
 {
     public static partial class MetaDataHelper
     {
-
-
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static T GetValue<T>(this BDictionary dictionary, string key) where T : IBObject
         {
@@ -19,8 +16,8 @@ namespace FlyingRaijin.Engine.Torrent
 
             try
             {
-                if (KnownKeys.ContainsKey(key) && dictionary.Value.ContainsKey(KnownKeys[key]))
-                    value = (T)dictionary.Value[KnownKeys[key]];
+                if (dictionary.ContainsKey(key))
+                    value = (T)dictionary[key];
             }
             catch (Exception e)
             {
@@ -64,7 +61,7 @@ namespace FlyingRaijin.Engine.Torrent
             if (result == null)
                 return string.Empty;
 
-            return result.Value.ToString();
+            return result.ToString();;
         }
 
         private const string RootAnnounceListKey = "announce-list";
@@ -90,7 +87,7 @@ namespace FlyingRaijin.Engine.Torrent
                 var trackers = new List<string>();
 
                 foreach (BString tracker in tier.Value)
-                    trackers.Add(tracker.Value.ToString());
+                    trackers.Add(tracker.ToString());
 
                 if (trackers.Count > 0)
                     tiers.Add(ImmutableList.CreateRange(trackers));
@@ -122,7 +119,7 @@ namespace FlyingRaijin.Engine.Torrent
             if (result == null)
                 return string.Empty;
 
-            return result.Value.ToString();
+            return result.ToString();;
         }
 
         private const string RootCreatedByKey = "created by";
@@ -134,7 +131,7 @@ namespace FlyingRaijin.Engine.Torrent
             if (result == null)
                 return string.Empty;
 
-            return result.Value.ToString();
+            return result.ToString();;
         }
 
         private const string RootEncodingKey = "encoding";
@@ -146,7 +143,7 @@ namespace FlyingRaijin.Engine.Torrent
             if (result == null)
                 return string.Empty;
 
-            return result.Value.ToString();
+            return result.ToString();;
         }
     }
 }

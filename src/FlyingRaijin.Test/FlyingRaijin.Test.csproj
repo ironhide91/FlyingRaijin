@@ -20,12 +20,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Engine\**" />
-    <EmbeddedResource Remove="Engine\**" />
-    <None Remove="Engine\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Compile Remove="NewTest.cs" />
   </ItemGroup>
 

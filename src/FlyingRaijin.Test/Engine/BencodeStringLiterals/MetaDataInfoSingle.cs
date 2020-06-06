@@ -1,8 +1,7 @@
 ﻿using FluentAssertions;
+using FlyingRaijin.Bencode.BObject;
 using FlyingRaijin.Bencode.Read;
-using FlyingRaijin.Bencode.Read.ClrObject;
 using FlyingRaijin.Engine.Torrent;
-using System.Text;
 using Xunit;
 
 namespace FlyingRaijin.Test.Engine.BencodeStringLiterals
@@ -13,62 +12,62 @@ namespace FlyingRaijin.Test.Engine.BencodeStringLiterals
         [InlineData("d4:name10:ironhide91e")]
         public void CanReadNameInfoSingleKey(string bencode)
         {
-            var bDictionary = BencodeReader.Read<BDictionary>(bencode);
-            var result = bDictionary.ReadSingleName();
+            var result = BencodeParser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
+            var temp = result.BObject.ReadSingleName();
 
-            result.Should().NotBeNull();
-            result.Should().Be("ironhide91");
+            temp.Should().NotBeNull();
+            temp.Should().Be("ironhide91");
         }
 
         [Theory]
         [InlineData("d3:nam10:ironhide91e")]
         public void MissingNameInfoSingleKey(string bencode)
         {
-            var bDictionary = BencodeReader.Read<BDictionary>(bencode);
-            var result = bDictionary.ReadSingleName();
+            var result = BencodeParser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
+            var temp = result.BObject.ReadSingleName();
 
-            result.Should().BeEmpty();
+            temp.Should().BeEmpty();
         }
 
         [Theory]
         [InlineData("d6:lengthi512ee")]
         public void CanReadLengthInfoSingleKey(string bencode)
         {
-            var bDictionary = BencodeReader.Read<BDictionary>(bencode);
-            var result = bDictionary.ReadSingleLength();
+            var result = BencodeParser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
+            var temp = result.BObject.ReadSingleLength();
 
-            result.Should().Be(512L);
+            temp.Should().Be(512L);
         }
 
         [Theory]
         [InlineData("d5:engthi512ee")]
         public void MissingLengthInfoSingleKey(string bencode)
         {
-            var bDictionary = BencodeReader.Read<BDictionary>(bencode);
-            var result = bDictionary.ReadSingleLength();
+            var result = BencodeParser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
+            var temp = result.BObject.ReadSingleLength();
 
-            result.Should().Be(0L);
+            temp.Should().Be(0L);
         }
 
         [Theory]
         [InlineData("d6:md5sum32:79054025255fb1a26e4bc422aef54eb4e")]
         public void CanReadMd5ChecksumInfoSingleKey(string bencode)
         {
-            var bDictionary = BencodeReader.Read<BDictionary>(bencode);
-            var result = bDictionary.ReadSingleMD5Checksum();
+            var result = BencodeParser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
+            var temp = result.BObject.ReadSingleMD5Checksum();
 
-            result.Should().NotBeNull();
-            result.Should().Be("79054025255fb1a26e4bc422aef54eb4");
+            temp.Should().NotBeNull();
+            temp.Should().Be("79054025255fb1a26e4bc422aef54eb4");
         }
 
         [Theory]
         [InlineData("d5:d5sum32:79054025255fb1a26e4bc422aef54eb4e")]
         public void MissingMd5ChecksumInfoSingleKey(string bencode)
         {
-            var bDictionary = BencodeReader.Read<BDictionary>(bencode);
-            var result = bDictionary.ReadSingleMD5Checksum();
+            var result = BencodeParser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
+            var temp = result.BObject.ReadSingleMD5Checksum();
 
-            result.Should().BeEmpty();
+            temp.Should().BeEmpty();
         }
     }
 }

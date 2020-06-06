@@ -1,7 +1,6 @@
 using FluentAssertions;
 using FlyingRaijin.Bencode.BObject;
 using FlyingRaijin.Bencode.Read;
-using System;
 using Xunit;
 
 namespace FlyingRaijin.Test.Bencode.Read

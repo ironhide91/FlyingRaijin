@@ -1,7 +1,7 @@
 ﻿using FluentAssertions;
 using FlyingRaijin.Engine.Bencode;
+using System;
 using System.IO;
-using System.Text;
 using Xunit;
 
 namespace FlyingRaijin.Test.Engine.TorrentFiles
@@ -12,12 +12,9 @@ namespace FlyingRaijin.Test.Engine.TorrentFiles
         [InlineData("Artifacts\\Torrents\\linuxmint-18-cinnamon-64bit.torrent")]
         public void CanReadInfoKey(string filePath)
         {
-            using (var stream = new FileStream(filePath, FileMode.Open))
-            {
-                var torrent = BencodeEngine.Instance.ReadsingleFile(stream);
+            var torrent = BencodeEngine.Instance.ReadsingleFile(File.ReadAllBytes(filePath).AsSpan());
 
-                torrent.Should().NotBeNull();
-            }
+            torrent.Should().NotBeNull();
         }
     }
 }
