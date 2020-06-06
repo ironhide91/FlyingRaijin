@@ -103,6 +103,7 @@ namespace FlyingRaijin.Bencode.Read
                     case end:
                         if (currentParent is BDictionary)
                         {
+                            (currentParent as BDictionary).SyncInternalStringDictionary();
                             dictionaryCount--;
                             if (currentParent.Parent != null)
                                 currentParent = currentParent.Parent;

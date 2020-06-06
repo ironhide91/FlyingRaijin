@@ -1,40 +1,42 @@
 ﻿using FlyingRaijin.Bencode.Read;
-using FlyingRaijin.Bencode.Read.ClrObject;
+using FlyingRaijin.Bencode.BObject;
 using System.Linq;
 using Xunit;
+using FluentAssertions;
 
 namespace FlyingRaijin.Test.Bencode.Read
 {
     public class Dictionary
     {
         [Theory]
-        [InlineData(@"d8:announce70:http://linuxtracker.org:2710/00000000000000000000000000000000/announce13:announce-listll70:http://linuxtracker.org:2710/00000000000000000000000000000000/announceel42:http://torrents.linuxmint.com/announce.phpee10:created by25:Transmission/2.84 (14307)13:creation datei1467279331e8:encoding5:UTF-84:infod6:lengthi1697906688e4:name31:linuxmint-18-cinnamon-64bit.iso12:piece lengthi1048576e6:pieces4:test7:privatei0eee")]
-        public void Real(string bencode)
-        {
-            var bDictionary = BencodeReader.Read<BDictionary>(bencode);
-        }
-
-        [Theory]
         [InlineData("de")]
         public void CanParseEmpty(string bencode)
         {
-            var bDictionary = BencodeReader.Read<BDictionary>(bencode);
+            var result = BencodeParser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
 
-            Assert.Empty(bDictionary.Value);
+            result.Should().NotBeNull();
+            result.Error.Should().Be(ErrorType.None);
+            result.BObject.Should().BeOfType<BDictionary>();
+            result.BObject.Value.Count.Should().Be(0);
         }
 
         [Theory]
         [InlineData("d4:spam3:egge")]
         public void Case1(string bencode)
         {
-            var bDictionary = BencodeReader.Read<BDictionary>(bencode);
+            var result = BencodeParser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
 
-            Assert.Single(bDictionary.Value);
-            Assert.True(bDictionary.Value.ContainsKey("spam"));
+            result.Should().NotBeNull();
+            result.Error.Should().Be(ErrorType.None);
+            result.BObject.Should().BeOfType<BDictionary>();
+            result.BObject.Value.Count.Should().Be(1);
 
-            var value = (BString)bDictionary.Value["spam"];
-            Assert.Equal(3, value.Length);
-            Assert.Equal("egg", value.Value);
+            var dict = result.BObject;
+            dict.ContainsKey("spam").Should().BeTrue();
+
+            var value = (BString)dict["spam"];
+            value.Value.Length.Should().Be(3);
+            value.ToString().Should().Be("egg");
         }
 
 
@@ -42,88 +44,103 @@ namespace FlyingRaijin.Test.Bencode.Read
         [InlineData("d4:spam3:egg3:cow3:mooe")]
         public void Case2(string bencode)
         {
-            var bDictionary = BencodeReader.Read<BDictionary>(bencode);
+            var result = BencodeParser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
 
-            Assert.Equal(2, bDictionary.Value.Count);
-            Assert.True(bDictionary.Value.ContainsKey("spam"));
-            Assert.True(bDictionary.Value.ContainsKey("cow"));
+            result.Should().NotBeNull();
+            result.Error.Should().Be(ErrorType.None);
+            result.BObject.Should().BeOfType<BDictionary>();
+            result.BObject.Value.Count.Should().Be(2);
 
-            var value1 = (BString)bDictionary.Value["spam"];
-            Assert.Equal(3, value1.Length);
-            Assert.Equal("egg", value1.Value);
+            var dict = result.BObject;
 
-            var value2 = (BString)bDictionary.Value["cow"];
-            Assert.Equal(3, value2.Length);
-            Assert.Equal("moo", value2.Value);
+            dict.ContainsKey("spam").Should().BeTrue();
+            var value1 = (BString)dict["spam"];
+            value1.Value.Length.Should().Be(3);
+            value1.ToString().Should().Be("egg");
+
+            dict.ContainsKey("cow").Should().BeTrue();
+            var value2 = (BString)dict["cow"];
+            value2.Value.Length.Should().Be(3);
+            value2.ToString().Should().Be("moo");
         }
 
         [Theory]
         [InlineData("d4:spam3:egg3:cow3:moo3:inti99e6:numberi753ee")]
         public void Case3(string bencode)
         {
-            var bDictionary = BencodeReader.Read<BDictionary>(bencode);
+            var result = BencodeParser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
 
-            Assert.Equal(4, bDictionary.Value.Count);
-            Assert.True(bDictionary.Value.ContainsKey("spam"));
-            Assert.True(bDictionary.Value.ContainsKey("cow"));
-            Assert.True(bDictionary.Value.ContainsKey("int"));
-            Assert.True(bDictionary.Value.ContainsKey("number"));
+            result.Should().NotBeNull();
+            result.Error.Should().Be(ErrorType.None);
+            result.BObject.Should().BeOfType<BDictionary>();
+            result.BObject.Value.Count.Should().Be(4);
 
-            var value1 = (BString)bDictionary.Value["spam"];
-            Assert.Equal(3, value1.Length);
-            Assert.Equal("egg", value1.Value);
+            var dict = result.BObject;
 
-            var value2 = (BString)bDictionary.Value["cow"];
-            Assert.Equal(3, value2.Length);
-            Assert.Equal("moo", value2.Value);
+            dict.ContainsKey("spam").Should().BeTrue();
+            var value1 = (BString)dict["spam"];
+            value1.Value.Length.Should().Be(3);
+            value1.ToString().Should().Be("egg");
 
-            var value3 = (BInteger)bDictionary.Value["int"];
-            Assert.Equal(99L, value3.Value);
+            dict.ContainsKey("cow").Should().BeTrue();
+            var value2 = (BString)dict["cow"];
+            value2.Value.Length.Should().Be(3);
+            value2.ToString().Should().Be("moo");
 
-            var value4 = (BInteger)bDictionary.Value["number"];
-            Assert.Equal(753L, value4.Value);
+            dict.ContainsKey("int").Should().BeTrue();
+            var value3 = (BInteger)dict["int"];
+            value3.Value.Should().Be(99L);
+
+            dict.ContainsKey("number").Should().BeTrue();
+            var value4 = (BInteger)dict["number"];
+            value4.Value.Should().Be(753L);
         }
 
         [Theory]
         [InlineData("d4:spam3:egg3:cow3:moo3:inti99e6:numberi753e4:listl5:rahul5:bipini123456789eee")]
         public void Case4(string bencode)
         {
-            var bDictionary = BencodeReader.Read<BDictionary>(bencode);
+            var result = BencodeParser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
 
-            Assert.Equal(5, bDictionary.Value.Count);
-            Assert.True(bDictionary.Value.ContainsKey("spam"));
-            Assert.True(bDictionary.Value.ContainsKey("cow"));
-            Assert.True(bDictionary.Value.ContainsKey("int"));
-            Assert.True(bDictionary.Value.ContainsKey("number"));
-            Assert.True(bDictionary.Value.ContainsKey("list"));
+            result.Should().NotBeNull();
+            result.Error.Should().Be(ErrorType.None);
+            result.BObject.Should().BeOfType<BDictionary>();
+            result.BObject.Value.Count.Should().Be(5);
 
-            var value1 = (BString)bDictionary.Value["spam"];
-            Assert.Equal(3, value1.Length);
-            Assert.Equal("egg", value1.Value);
+            var dict = result.BObject;
 
-            var value2 = (BString)bDictionary.Value["cow"];
-            Assert.Equal(3, value2.Length);
-            Assert.Equal("moo", value2.Value);
+            dict.ContainsKey("spam").Should().BeTrue();
+            var value1 = (BString)dict["spam"];
+            value1.Value.Length.Should().Be(3);
+            value1.ToString().Should().Be("egg");
 
-            var value3 = (BInteger)bDictionary.Value["int"];
-            Assert.Equal(99L, value3.Value);
+            dict.ContainsKey("cow").Should().BeTrue();
+            var value2 = (BString)dict["cow"];
+            value2.Value.Length.Should().Be(3);
+            value2.ToString().Should().Be("moo");
 
-            var value4 = (BInteger)bDictionary.Value["number"];
-            Assert.Equal(753L, value4.Value);
+            dict.ContainsKey("int").Should().BeTrue();
+            var value3 = (BInteger)dict["int"];
+            value3.Value.Should().Be(99L);
 
-            var value5 = (BList)bDictionary.Value["list"];
-            Assert.Equal(3, value5.Value.Count);
+            dict.ContainsKey("number").Should().BeTrue();
+            var value4 = (BInteger)dict["number"];
+            value4.Value.Should().Be(753L);
 
-            var value50 = (BString)value5.Value[0];
-            Assert.Equal(5, value50.Length);
-            Assert.Equal("rahul", value50.Value);
+            dict.ContainsKey("list").Should().BeTrue();
+            var value5 = (BList)dict["list"];
+            value5.Value.Count.Should().Be(3);
+
+            var value50 = (BString)value5.Value.ElementAt(0);
+            value50.Value.Length.Should().Be(5);
+            value50.ToString().Should().Be("rahul");
 
             var value51 = (BString)value5.Value.ElementAt(1);
-            Assert.Equal(5, value51.Length);
-            Assert.Equal("bipin", value51.Value);
+            value51.Value.Length.Should().Be(5);
+            value51.ToString().Should().Be("bipin");
 
             var value52 = (BInteger)value5.Value.ElementAt(2);
-            Assert.Equal(123456789L, value52.Value);
+            value52.Value.Should().Be(123456789L);
         }
     }
 }
