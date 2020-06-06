@@ -78,7 +78,7 @@ namespace FlyingRaijin.Test.Bencode.Read
             var bnumber = BencodeParser.Parse<BInteger>(bencode.GetBytes());
 
             bnumber.Should().NotBeNull();
-            bnumber.Error.Should().Be(ErrorType.IntegerLeadingZero);
+            bnumber.Error.Should().Be(ErrorType.IntegerInvalid);
             bnumber.BObject.Should().BeNull();
         }
 
@@ -88,7 +88,7 @@ namespace FlyingRaijin.Test.Bencode.Read
             var bnumber = BencodeParser.Parse<BInteger>("i-0e".GetBytes());
 
             bnumber.Should().NotBeNull();
-            bnumber.Error.Should().Be(ErrorType.IntegerNegativeZero);
+            bnumber.Error.Should().Be(ErrorType.IntegerInvalid);
             bnumber.BObject.Should().BeNull();
         }
 
@@ -102,7 +102,7 @@ namespace FlyingRaijin.Test.Bencode.Read
             var bnumber = BencodeParser.Parse<BInteger>(bencode.GetBytes());
 
             bnumber.Should().NotBeNull();
-            bnumber.Error.Should().Be(ErrorType.IntegerMinimumLemgthMustBe3);
+            bnumber.Error.Should().Be(ErrorType.IntegerInvalid);
             bnumber.BObject.Should().BeNull();
         }
 
@@ -116,7 +116,7 @@ namespace FlyingRaijin.Test.Bencode.Read
             var bnumber = BencodeParser.Parse<BInteger>(bencode.GetBytes());
 
             bnumber.Should().NotBeNull();
-            bnumber.Error.Should().Be(ErrorType.IntegerMustEndWithE);
+            bnumber.Error.Should().Be(ErrorType.IntegerInvalid);
             bnumber.BObject.Should().BeNull();
         }
 
@@ -140,7 +140,7 @@ namespace FlyingRaijin.Test.Bencode.Read
             var bnumber = BencodeParser.Parse<BInteger>("i-e".GetBytes());
 
             bnumber.Should().NotBeNull();
-            bnumber.Error.Should().Be(ErrorType.IntegerNegativeOnly);
+            bnumber.Error.Should().Be(ErrorType.IntegerInvalid);
             bnumber.BObject.Should().BeNull();
         }
 
@@ -154,7 +154,7 @@ namespace FlyingRaijin.Test.Bencode.Read
             var bnumber = BencodeParser.Parse<BInteger>(bencode.GetBytes());
 
             bnumber.Should().NotBeNull();
-            bnumber.Error.Should().Be(ErrorType.IntegerMultipleNegative);
+            bnumber.Error.Should().Be(ErrorType.IntegerInvalid);
             bnumber.BObject.Should().BeNull();
         }
 

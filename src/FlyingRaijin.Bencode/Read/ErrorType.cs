@@ -3,17 +3,14 @@
     public enum ErrorType
     {
         None,
+        Unknown,
         // Integer
-        IntegerMinimumLemgthMustBe3,
-        IntegerMustEndWithE,
-        IntegerLeadingZero,
-        IntegerNegativeOnly,
-        IntegerNegativeZero,
-        IntegerMultipleNegative,
+        IntegerInvalid,
         IntegerOutOfInt64Range,
         // String
+        StringLessCharsThanSpecified,
+        StringInvalidStringLength,
         StringInvalid,
-        KeyShouldBeString,
-        Unknown
+        KeyShouldBeString        
     }
 }

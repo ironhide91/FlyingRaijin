@@ -42,7 +42,7 @@ namespace FlyingRaijin.Bencode.Read
 
             // Minimum length for Integer should be 3
             if (bytes.Length < 3)
-                return ErrorType.IntegerMinimumLemgthMustBe3;            
+                return ErrorType.IntegerInvalid;
 
             // Zero Value
             if ((bytes[++index] == zero) & ((bytes[++index] == end)))
@@ -54,41 +54,27 @@ namespace FlyingRaijin.Bencode.Read
             --index;
             --index;
 
-            var start = -1;
-
-            // Leading Zero is invalid
-            if (bytes[index + 1] == zero)
+            // "i-e" is invalid
+            if ((bytes[++index] == minus) & ((bytes[++index] == end)))
             {
-                return ErrorType.IntegerLeadingZero;
+                parsedValue = new BInteger(parent, 0L);
+                return ErrorType.IntegerInvalid;
             }
 
-            // Negative character is fine
-            if ((bytes[index + 1] == minus))
+            --index;
+            --index;
+
+            // "i-0*" is invalid
+            if ((bytes[++index] == minus) & ((bytes[++index] == zero)))
             {
-                index++;
-                start = index - 1;
+                parsedValue = new BInteger(parent, 0L);
+                return ErrorType.IntegerInvalid;
             }
 
-            // Next Negative character is invalid
-            if ((bytes[index + 1] == minus))
-            {
-                return ErrorType.IntegerMultipleNegative;
-            }
+            --index;
+            --index;
 
-            // Next Zero is invalid
-            if ((bytes[index + 1] == zero))
-            {
-                return ErrorType.IntegerNegativeZero;
-            }
-
-            // Next End is invalid
-            if ((bytes[index + 1] == end))
-            {
-                return ErrorType.IntegerNegativeOnly;
-            }
-
-            if (start == -1)
-                start = index;
+            var start = index;
 
             if (NonZeroIntegerBytes.Contains(bytes[++index]))
             {
@@ -129,10 +115,10 @@ namespace FlyingRaijin.Bencode.Read
                     return ErrorType.IntegerOutOfInt64Range;
                 }
 
-                return ErrorType.IntegerMustEndWithE;
+                return ErrorType.IntegerInvalid;
             }
 
-            return ErrorType.IntegerLeadingZero;
+            return ErrorType.IntegerInvalid;
         }
     }
 }

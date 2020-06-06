@@ -20,6 +20,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Engine\**" />
+    <EmbeddedResource Remove="Engine\**" />
+    <None Remove="Engine\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Bencode\Read\Dictionary.cs" />
+    <Compile Remove="Bencode\Read\List.cs" />
+    <Compile Remove="NewTest.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="5.10.3" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.6.1" />
     <PackageReference Include="coverlet.collector" Version="1.2.1">
@@ -45,10 +57,6 @@
     <None Update="Artifacts\Torrents\Slackware64-14.1-install-dvd.torrent">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Artifacts\Torrents\" />
   </ItemGroup>
 
 </Project>

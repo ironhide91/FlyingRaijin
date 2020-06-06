@@ -18,8 +18,11 @@ namespace FlyingRaijin.Bencode.Read
 
         public static ParseResult Parse(ReadOnlySpan<byte> bytes)
         {
-            IBObject root; 
-            
+            if (bytes.Length == 0)
+                return new ParseResult(ErrorType.Unknown, null);
+
+            IBObject root;
+
             ErrorType error = ErrorType.None;
 
             int index = -1;

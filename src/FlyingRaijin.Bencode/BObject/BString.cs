@@ -10,6 +10,11 @@ namespace FlyingRaijin.Bencode.BObject
             
         }
 
+        public override int GetHashCode()
+        {
+            return Value.GetHashCode();
+        }
+
         public override bool Equals(object obj)
         {
             if (obj is BString && ((BString)obj).Value.Equals(Value))
