@@ -11,6 +11,10 @@
         StringLessCharsThanSpecified,
         StringInvalidStringLength,
         StringInvalid,
-        KeyShouldBeString        
+        KeyShouldBeString,
+        // List
+        ListInvalid,
+        // Dictionary
+        DictionaryInvalid
     }
 }

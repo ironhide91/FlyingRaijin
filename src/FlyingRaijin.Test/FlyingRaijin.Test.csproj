@@ -27,7 +27,6 @@
 
   <ItemGroup>
     <Compile Remove="Bencode\Read\Dictionary.cs" />
-    <Compile Remove="Bencode\Read\List.cs" />
     <Compile Remove="NewTest.cs" />
   </ItemGroup>
 

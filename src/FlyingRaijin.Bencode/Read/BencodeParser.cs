@@ -128,6 +128,12 @@ namespace FlyingRaijin.Bencode.Read
                 }
             }
 
+            if (dictionaryCount != 0)
+                return new ParseResult(ErrorType.DictionaryInvalid, null);
+
+            if (listCount != 0)
+                return new ParseResult(ErrorType.ListInvalid, null);
+
             return new ParseResult(error, currentParent);
         }
 
