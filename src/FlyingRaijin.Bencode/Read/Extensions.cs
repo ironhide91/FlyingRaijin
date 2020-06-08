@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 
 namespace FlyingRaijin.Bencode.Read
 {
-    public static partial class BencodeParser
+    public static partial class Parser
     {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static ReadOnlySpan<byte> SliceExclude(this ReadOnlySpan<byte> bytes, int start, int end)
         {
             if (start == end)
@@ -12,6 +14,7 @@ namespace FlyingRaijin.Bencode.Read
             return bytes.Slice((start + 1), (end - start - 1));
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void ToChars(this ReadOnlySpan<byte> bytes, char[] chars, int length)
         {
             for (int i = 0; i < length; i++)
@@ -20,6 +23,7 @@ namespace FlyingRaijin.Bencode.Read
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static bool IndexWithinBound(this ReadOnlySpan<byte> bytes, int nextIndex)
         {
             if (bytes.IsEmpty)
@@ -31,6 +35,7 @@ namespace FlyingRaijin.Bencode.Read
             return true;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static bool HasError(this ErrorType error)
         {
             return (error != ErrorType.None);

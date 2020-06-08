@@ -21,7 +21,7 @@ namespace FlyingRaijin.Test.Bencode.Read
             var length = int.Parse(parts[0]);
             var value = parts[1];
 
-            var result = BencodeParser.Parse<BString>(bencode.AsReadOnlyByteSpan());
+            var result = Parser.Parse<BString>(bencode.AsReadOnlyByteSpan());
 
             result.Should().NotBeNull();
             result.Error.Should().Be(ErrorType.None);
@@ -35,7 +35,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         [Fact]
         public void CanParseEmptyString()
         {
-            var result = BencodeParser.Parse<BString>("0:".AsReadOnlyByteSpan());
+            var result = Parser.Parse<BString>("0:".AsReadOnlyByteSpan());
 
             result.Should().NotBeNull();
             result.Error.Should().Be(ErrorType.None);
@@ -52,7 +52,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         [InlineData("100:spam")]
         public void InvalidLessCharsThanSpecified(string bencode)
         {
-            var result = BencodeParser.Parse<BString>(bencode.AsReadOnlyByteSpan());
+            var result = Parser.Parse<BString>(bencode.AsReadOnlyByteSpan());
 
             result.Should().NotBeNull();
             result.Error.Should().Be(ErrorType.StringLessCharsThanSpecified);
@@ -69,7 +69,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         [InlineData("4|spam")]
         public void InvalidMissingDelimiter(string bencode)
         {
-            var result = BencodeParser.Parse<BString>(bencode.AsReadOnlyByteSpan());
+            var result = Parser.Parse<BString>(bencode.AsReadOnlyByteSpan());
 
             result.Should().NotBeNull();
             result.Error.Should().Be(ErrorType.StringInvalid);
@@ -87,7 +87,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         [InlineData("#spam")]
         public void InvalidNonDigitFirstChar(string bencode)
         {
-            var result = BencodeParser.Parse<BString>(bencode.AsReadOnlyByteSpan());
+            var result = Parser.Parse<BString>(bencode.AsReadOnlyByteSpan());
 
             result.Should().NotBeNull();
             result.Error.Should().Be(ErrorType.Unknown);
@@ -99,7 +99,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         [InlineData("4")]
         public void InvalidLessThanMinimumLength(string bencode)
         {
-            var result = BencodeParser.Parse<BString>(bencode.AsReadOnlyByteSpan());
+            var result = Parser.Parse<BString>(bencode.AsReadOnlyByteSpan());
 
             result.Should().NotBeNull();
             result.Error.Should().Be(ErrorType.StringInvalid);
@@ -113,7 +113,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         [InlineData("12345678901234:spam")]
         public void InvalidLengthAboveMaxDigits10(string bencode)
         {
-            var result = BencodeParser.Parse<BString>(bencode.AsReadOnlyByteSpan());
+            var result = Parser.Parse<BString>(bencode.AsReadOnlyByteSpan());
 
             result.Should().NotBeNull();
             result.Error.Should().Be(ErrorType.StringInvalidStringLength);
@@ -132,7 +132,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         [InlineData("1234567890:spam")]
         public void InvalidLengthAtOrBelowMaxDigits10(string bencode)
         {
-            var result = BencodeParser.Parse<BString>(bencode.AsReadOnlyByteSpan());
+            var result = Parser.Parse<BString>(bencode.AsReadOnlyByteSpan());
 
             result.Should().NotBeNull();
             result.Error.Should().Be(ErrorType.StringLessCharsThanSpecified);
@@ -144,7 +144,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         {
             var bencode = "2147483648:spam";
 
-            var result = BencodeParser.Parse<BString>(bencode.AsReadOnlyByteSpan());
+            var result = Parser.Parse<BString>(bencode.AsReadOnlyByteSpan());
 
             result.Should().NotBeNull();
             result.Error.Should().Be(ErrorType.StringInvalidStringLength);
@@ -156,7 +156,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         {
             var bencode = "2147483647:spam";
 
-            var result = BencodeParser.Parse<BString>(bencode.AsReadOnlyByteSpan());
+            var result = Parser.Parse<BString>(bencode.AsReadOnlyByteSpan());
 
             result.Should().NotBeNull();
             result.Error.Should().Be(ErrorType.StringInvalidStringLength);
@@ -170,7 +170,7 @@ namespace FlyingRaijin.Test.Bencode.Read
             var length = Encoding.UTF8.GetBytes(unicodeStr).Length;
             var utf8Str = Encoding.UTF8.GetString(Encoding.UTF8.GetBytes($"{length}:{unicodeStr}"));
 
-            var result = BencodeParser.Parse<BString>(utf8Str.AsReadOnlyByteSpan());
+            var result = Parser.Parse<BString>(utf8Str.AsReadOnlyByteSpan());
 
             result.Should().NotBeNull();
             result.Error.Should().Be(ErrorType.None);
@@ -185,7 +185,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         [InlineData("3abc:abc")]
         public void InvalidLengthString(string bencode)
         {
-            var result = BencodeParser.Parse<BString>(bencode.AsReadOnlyByteSpan());
+            var result = Parser.Parse<BString>(bencode.AsReadOnlyByteSpan());
 
             result.Should().NotBeNull();
             result.Error.Should().Be(ErrorType.StringInvalid);
@@ -197,7 +197,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         [InlineData("0")]
         public void InvalidBelowMinimumLength(string bencode)
         {
-            var result = BencodeParser.Parse<BString>(bencode.AsReadOnlyByteSpan());
+            var result = Parser.Parse<BString>(bencode.AsReadOnlyByteSpan());
 
             result.Should().NotBeNull();
             result.Error.Should().NotBe(ErrorType.None);

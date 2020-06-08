@@ -2,13 +2,15 @@
 using System;
 using System.Buffers;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace FlyingRaijin.Bencode.Read
 {
-    public static partial class BencodeParser
+    public static partial class Parser
     {
         private static readonly byte[] EmptyStringBytes = Enumerable.Empty<byte>().ToArray();
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static ErrorType ParseString(ReadOnlySpan<byte> bytes, ref int index, IBObject parent, ref bool expectingKey, ref IBObject key)
         {
             var error = ParseSingleString(bytes, ref index, parent, out IBObject bString);
@@ -46,6 +48,7 @@ namespace FlyingRaijin.Bencode.Read
             return ErrorType.Unknown;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]        
         private static ErrorType ParseSingleString(ReadOnlySpan<byte> bytes, ref int index, IBObject parent, out IBObject parsedValue)
         {
             parsedValue = null;

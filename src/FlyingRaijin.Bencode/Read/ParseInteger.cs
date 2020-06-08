@@ -1,14 +1,16 @@
 ﻿using FlyingRaijin.Bencode.BObject;
 using System;
 using System.Buffers;
+using System.Runtime.CompilerServices;
 
 namespace FlyingRaijin.Bencode.Read
-{
-    public static partial class BencodeParser
+{    
+    public static partial class Parser
     {
         private static int Int64MinValueCharLength = long.MinValue.ToString().Length;
         private static int Int64MaxValueCharLength = long.MaxValue.ToString().Length;
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static ErrorType ParseInteger(ReadOnlySpan<byte> bytes, ref int index, IBObject parent, IBObject key)
         {
             var error = ParseSingleInteger(bytes, ref index, parent, out IBObject bInteger);
@@ -36,6 +38,7 @@ namespace FlyingRaijin.Bencode.Read
             return ErrorType.Unknown;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static ErrorType ParseSingleInteger(ReadOnlySpan<byte> bytes, ref int index, IBObject parent, out IBObject parsedValue)
         {
             parsedValue = null;

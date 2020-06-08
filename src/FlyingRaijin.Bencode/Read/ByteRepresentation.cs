@@ -2,7 +2,7 @@
 
 namespace FlyingRaijin.Bencode.Read
 {
-    public static partial class BencodeParser
+    public static partial class Parser
     {
         private const byte dictStart = (byte)'d';
         private const byte listStart = (byte)'l';

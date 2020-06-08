@@ -1,10 +1,11 @@
 ﻿using FlyingRaijin.Bencode.BObject;
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace FlyingRaijin.Bencode.Read
 {
-    public static partial class BencodeParser
+    public static partial class Parser
     {
         public static ParseResult<T> Parse<T>(ReadOnlySpan<byte> bytes) where T : IBObject
         {
@@ -16,6 +17,7 @@ namespace FlyingRaijin.Bencode.Read
             return new ParseResult<T>(ErrorType.Unknown, default);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ParseResult Parse(ReadOnlySpan<byte> bytes)
         {
             if (bytes.Length == 0)

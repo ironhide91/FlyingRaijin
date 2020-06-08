@@ -13,7 +13,7 @@ namespace FlyingRaijin.Test.Engine.BencodeStringLiterals
         [InlineData("d4:infodee")]
         public void CanReadInfoKey(string bencode)
         {
-            var result = BencodeParser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
+            var result = Parser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
             var temp = result.BObject.ReadInfo();
 
             result.Should().NotBeNull();
@@ -23,7 +23,7 @@ namespace FlyingRaijin.Test.Engine.BencodeStringLiterals
         [InlineData("d3:nfo6:samplee")]
         public void MissingInfoKey(string bencode)
         {
-            var result = BencodeParser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
+            var result = Parser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
             var temp = result.BObject.ReadInfo();
 
             temp.Should().BeNull();
@@ -33,7 +33,7 @@ namespace FlyingRaijin.Test.Engine.BencodeStringLiterals
         [InlineData("d8:announce10:sample.come")]
         public void CanReadAnnounceUrlKey(string bencode)
         {
-            var result = BencodeParser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
+            var result = Parser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
             var temp = result.BObject.ReadAnnounceUrl();
 
             temp.Should().NotBeNull();
@@ -44,7 +44,7 @@ namespace FlyingRaijin.Test.Engine.BencodeStringLiterals
         [InlineData("d7:nnounce10:sample.come")]
         public void MissingAnnounceUrlKey(string bencode)
         {
-            var result = BencodeParser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
+            var result = Parser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
             var info = result.BObject.ReadAnnounceUrl();
 
             info.Should().BeEmpty();
@@ -54,7 +54,7 @@ namespace FlyingRaijin.Test.Engine.BencodeStringLiterals
         [InlineData("d13:announce-listll9:tracker119:tracker129:tracker13eee")]
         public void CanReadAnnounceListKeySingle(string bencode)
         {
-            var result = BencodeParser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
+            var result = Parser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
             var temp = result.BObject.ReadAnnounceList();
 
             temp.Should().NotBeNull();
@@ -70,7 +70,7 @@ namespace FlyingRaijin.Test.Engine.BencodeStringLiterals
         [InlineData("d13:announce-listll9:tracker119:tracker129:tracker13el9:tracker219:tracker22eee")]
         public void CanReadAnnounceListKeyMulti(string bencode)
         {
-            var result = BencodeParser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
+            var result = Parser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
             var temp = result.BObject.ReadAnnounceList();
 
             temp.Should().NotBeNull();
@@ -89,7 +89,7 @@ namespace FlyingRaijin.Test.Engine.BencodeStringLiterals
         [InlineData("d12:announcelistll9:tracker119:tracker129:tracker13eee")]
         public void MissingAnnounceListKey(string bencode)
         {
-            var result = BencodeParser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
+            var result = Parser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
             var temp = result.BObject.ReadAnnounceList();
 
             temp.Should().NotBeNull();
@@ -101,7 +101,7 @@ namespace FlyingRaijin.Test.Engine.BencodeStringLiterals
         [InlineData("d13:announce-listlll7:trackere9:tracker129:tracker13el9:tracker219:tracker22eee")]
         public void ThreeLeveNestedAnnounceList(string bencode)
         {
-            var result = BencodeParser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
+            var result = Parser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
             var temp = result.BObject.ReadAnnounceList();
 
             temp.Should().NotBeNull();
@@ -113,7 +113,7 @@ namespace FlyingRaijin.Test.Engine.BencodeStringLiterals
         [InlineData("d13:creation datei669051030ee")]
         public void CanReadCreationDateKey(string bencode)
         {
-            var result = BencodeParser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
+            var result = Parser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
             var temp = result.BObject.ReadCreationDate();
 
             temp.Should().Be(669051030L);
@@ -123,7 +123,7 @@ namespace FlyingRaijin.Test.Engine.BencodeStringLiterals
         [InlineData("d12:creationdatei669051030ee")]
         public void MissingCreationDateKey(string bencode)
         {
-            var result = BencodeParser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
+            var result = Parser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
             var temp = result.BObject.ReadCreationDate();
 
             temp.Should().Be(0L);
@@ -133,7 +133,7 @@ namespace FlyingRaijin.Test.Engine.BencodeStringLiterals
         [InlineData("d7:comment5:helloe")]
         public void CanReadCommentKey(string bencode)
         {
-            var result = BencodeParser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
+            var result = Parser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
             var temp = result.BObject.ReadComment();
 
             temp.Should().NotBeNull();
@@ -144,7 +144,7 @@ namespace FlyingRaijin.Test.Engine.BencodeStringLiterals
         [InlineData("d6:omment5:helloe")]
         public void MissingCommentKey(string bencode)
         {
-            var result = BencodeParser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
+            var result = Parser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
             var temp = result.BObject.ReadComment();
 
             temp.Should().BeEmpty();
@@ -154,7 +154,7 @@ namespace FlyingRaijin.Test.Engine.BencodeStringLiterals
         [InlineData("d10:created by4:alexe")]
         public void CanReadCreatedByKey(string bencode)
         {
-            var result = BencodeParser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
+            var result = Parser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
             var temp = result.BObject.ReadCreatedBy();
 
             temp.Should().NotBeNull();
@@ -165,7 +165,7 @@ namespace FlyingRaijin.Test.Engine.BencodeStringLiterals
         [InlineData("d9:reated by4:alexe")]
         public void MissingCreatedByKey(string bencode)
         {
-            var result = BencodeParser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
+            var result = Parser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
             var temp = result.BObject.ReadCreatedBy();
 
             temp.Should().BeEmpty();
@@ -175,7 +175,7 @@ namespace FlyingRaijin.Test.Engine.BencodeStringLiterals
         [InlineData("d8:encoding5:UTF-8e")]
         public void CanReadEncodingKey(string bencode)
         {
-            var result = BencodeParser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
+            var result = Parser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
             var temp = result.BObject.ReadEncoding();
 
             temp.Should().NotBeNull();
@@ -186,7 +186,7 @@ namespace FlyingRaijin.Test.Engine.BencodeStringLiterals
         [InlineData("d7:ncoding5:UTF-8e")]
         public void MissingEncodingKey(string bencode)
         {
-            var result = BencodeParser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
+            var result = Parser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
             var temp = result.BObject.ReadEncoding();
 
             temp.Should().BeEmpty();
