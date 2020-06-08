@@ -1,9 +1,4 @@
-﻿using FlyingRaijin.Bencode.Read.ClrObject;
-using FlyingRaijin.Bencode.Read;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Text;
+﻿using System;
 
 namespace FlyingRaijin.Engine.Torrent
 {

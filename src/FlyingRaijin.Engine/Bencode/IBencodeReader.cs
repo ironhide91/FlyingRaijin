@@ -1,12 +1,16 @@
 ﻿using FlyingRaijin.Engine.Torrent;
-using System.IO;
+using System;
 
 namespace FlyingRaijin.Engine.Bencode
 {
     public interface IBencodeReader
     {
-        SingleFileTorrent ReadsingleFile(Stream stream);
+        SingleFileTorrent ReadsingleFile(ReadOnlySpan<byte> bytes);
 
-        MultiFileTorrent ReadMultiFile(Stream stream);
+        SingleFileTorrent ReadsingleFile(string filePath);
+
+        MultiFileTorrent ReadMultiFile(ReadOnlySpan<byte> bytes);
+
+        MultiFileTorrent ReadMultiFile(string filePath);
     }
 }

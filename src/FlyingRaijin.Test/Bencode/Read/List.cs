@@ -1,8 +1,6 @@
 using FluentAssertions;
+using FlyingRaijin.Bencode.BObject;
 using FlyingRaijin.Bencode.Read;
-using FlyingRaijin.Bencode.Read.ClrObject;
-using FlyingRaijin.Bencode.Read.Exceptions;
-using System;
 using Xunit;
 
 namespace FlyingRaijin.Test.Bencode.Read
@@ -13,103 +11,110 @@ namespace FlyingRaijin.Test.Bencode.Read
         [InlineData("l4:spame")]
         public void CanParseSimple1(string bencode)
         {
-            var bList = BencodeReader.Read<BList>(bencode);
+            var result = Parser.Parse<BList>(bencode.AsReadOnlyByteSpan());
 
-            Assert.Single(bList.Value);
-            bList.Value[0].Should().BeOfType<BString>();
+            result.Should().NotBeNull();
+            result.Error.Should().Be(ErrorType.None);
+            result.BObject.Should().BeOfType<BList>();
+            result.BObject.Value.Count.Should().Be(1);
 
-            var stringElement = (BString)bList.Value[0];
-            Assert.Equal(4, stringElement.Length);
-            Assert.Equal("spam", stringElement.Value);
+            result.BObject.Value[0].Should().BeOfType<BString>();
+            
+            var stringElement = (BString)result.BObject.Value[0];
+            stringElement.Value.Length.Should().Be(4);
+            stringElement.ToString().Should().Be("spam");
         }
 
         [Theory]
         [InlineData("l4:spami42ee")]
         public void CanParseSimple2(string bencode)
         {
-            var bList = BencodeReader.Read<BList>(bencode);
+            var result = Parser.Parse<BList>(bencode.AsReadOnlyByteSpan());
 
-            Assert.Equal(2, bList.Value.Count);
+            result.Should().NotBeNull();
+            result.Error.Should().Be(ErrorType.None);
+            result.BObject.Should().BeOfType<BList>();
+            result.BObject.Value.Count.Should().Be(2);
 
             // element 1
-            bList.Value[0].Should().BeOfType<BString>(); 
-            var stringElement = (BString)bList.Value[0];
-            Assert.Equal(4, stringElement.Length);
-            Assert.Equal("spam", stringElement.Value);
+            result.BObject.Value[0].Should().BeOfType<BString>();
+            var stringElement = (BString)result.BObject.Value[0];
+            stringElement.Value.Length.Should().Be(4);
+            stringElement.ToString().Should().Be("spam");
 
             // element 2
-            bList.Value[1].Should().BeOfType<BInteger>(); 
-            var integerElement = (BInteger)bList.Value[1];
-            Assert.Equal(42, integerElement.Value);
+            result.BObject.Value[1].Should().BeOfType<BInteger>();
+            var integerElement = (BInteger)result.BObject.Value[1];
+            integerElement.Value.Should().Be(42);
         }
 
         [Theory]
-        [InlineData("l5:Hello6:World!li123ei456eeetesting")]
+        [InlineData("l5:Hello6:World!li123ei456eee")]
         public void CanParseNested1(string bencode)
         {
-            var bList = BencodeReader.Read<BList>(bencode);
+            var result = Parser.Parse<BList>(bencode.AsReadOnlyByteSpan());
 
-            Assert.Equal(3, bList.Value.Count);
+            result.Should().NotBeNull();
+            result.Error.Should().Be(ErrorType.None);
+            result.BObject.Should().BeOfType<BList>();
+            result.BObject.Value.Count.Should().Be(3);
 
             // element 1
-            bList.Value[0].Should().BeOfType<BString>();
-            var element1 = (BString)bList.Value[0];
-            Assert.Equal(5, element1.Length);
-            Assert.Equal("Hello", element1.Value);
+            result.BObject.Value[0].Should().BeOfType<BString>();
+            var element1 = (BString)result.BObject.Value[0];
+            element1.Value.Length.Should().Be(5);
+            element1.ToString().Should().Be("Hello");
 
             // element 2
-            bList.Value[1].Should().BeOfType<BString>();
-            var element2 = (BString)bList.Value[1];
-            Assert.Equal(6, element2.Length);
-            Assert.Equal("World!", element2.Value);
+            result.BObject.Value[1].Should().BeOfType<BString>();
+            var element2 = (BString)result.BObject.Value[1];
+            element2.Value.Length.Should().Be(6);
+            element2.ToString().Should().Be("World!");
 
             // element 3
-            bList.Value[2].Should().BeOfType<BList>();
-            var element3 = (BList)bList.Value[2];
-            Assert.Equal(2, element3.Value.Count);
-
-            // element 3.0
-            element3.Value[0].Should().BeOfType<BInteger>();
-            var element31 = (BInteger)element3.Value[0];
-            Assert.Equal(123, element31.Value);
+            result.BObject.Value[2].Should().BeOfType<BList>();
+            var element3 = (BList)result.BObject.Value[2];
+            element3.Value.Count.Should().Be(2);
 
             // element 3.1
+            element3.Value[0].Should().BeOfType<BInteger>();
+            var element31 = (BInteger)element3.Value[0];
+            element31.Value.Should().Be(123);
+
+            // element 3.2
             element3.Value[1].Should().BeOfType<BInteger>();
             var element32 = (BInteger)element3.Value[1];
-            Assert.Equal(456, element32.Value);
+            element32.Value.Should().Be(456);
         }
 
         [Theory]
         [InlineData("le")]
         public void CanParseEmptyList(string bencode)
         {
-            var bList = BencodeReader.Read<BList>(bencode);
+            var result = Parser.Parse<BList>(bencode.AsReadOnlyByteSpan());
 
-            Assert.Empty(bList.Value);
+            result.Should().NotBeNull();
+            result.Error.Should().Be(ErrorType.None);
+            result.BObject.Should().BeOfType<BList>();
+            result.BObject.Value.Count.Should().Be(0);
         }
 
         [Theory]
         [InlineData("")]
         [InlineData("l")]
-        public void BelowMinimumLength2_ThrowsInvalidBencodeException(string bencode)
-        {
-            Action action = () => BencodeReader.Read<BList>(bencode);
-
-            action.Should().Throw<ParsingException>();
-        }
-
-        [Theory]
         [InlineData("4")]
         [InlineData("a")]
         [InlineData(":")]
         [InlineData("-")]
         [InlineData(".")]
         [InlineData("e")]
-        public void BelowMinimumLength2_WhenStreamLengthNotSupported_ThrowsInvalidBencodeException(string bencode)
+        public void InvalidBelowMinimumLength2(string bencode)
         {
-            Action action = () => BencodeReader.Read<BList>(bencode);
+            var result = Parser.Parse<BList>(bencode.AsReadOnlyByteSpan());
 
-            action.Should().Throw<ParsingException>();
+            result.Should().NotBeNull();
+            result.Error.Should().NotBe(ErrorType.None);
+            result.BObject.Should().BeNull();
         }
 
         [Theory]
@@ -119,22 +124,26 @@ namespace FlyingRaijin.Test.Bencode.Read
         [InlineData("4e")]
         [InlineData("-e")]
         [InlineData(".e")]
-        public void InvalidFirstChar_ThrowsInvalidBencodeException(string bencode)
+        public void InvalidFirstChar(string bencode)
         {
-            Action action = () => BencodeReader.Read<BList>(bencode);
+            var result = Parser.Parse<BList>(bencode.AsReadOnlyByteSpan());
 
-            action.Should().Throw<ParsingException>();
+            result.Should().NotBeNull();
+            result.Error.Should().NotBe(ErrorType.None);
+            result.BObject.Should().BeNull();
         }
 
         [Theory]
         [InlineData("l4:spam")]
         [InlineData("l ")]
         [InlineData("l:")]
-        public void MissingEndChar_ThrowsInvalidBencodeException(string bencode)
+        public void InvalidMissingEndChar(string bencode)
         {
-            Action action = () => BencodeReader.Read<BList>(bencode);
+            var result = Parser.Parse<BList>(bencode.AsReadOnlyByteSpan());
 
-            action.Should().Throw<ParsingException>();
+            result.Should().NotBeNull();
+            result.Error.Should().NotBe(ErrorType.None);
+            result.BObject.Should().BeNull();
         }
     }
 }

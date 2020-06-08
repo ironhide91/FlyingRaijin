@@ -1,5 +1,4 @@
-﻿using FlyingRaijin.Bencode.Read.ClrObject;
-using System.Collections.Immutable;
+﻿using FlyingRaijin.Bencode.BObject;
 
 namespace FlyingRaijin.Engine.Torrent
 {
