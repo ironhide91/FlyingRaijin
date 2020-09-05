@@ -28,9 +28,9 @@ namespace FlyingRaijin.Bencode.Read
                 }
                 else
                 {
-                    if (key is BString)
+                    if (key is BString @string)
                     {
-                        (parent as BDictionary).Value.Add((BString)key, bString);
+                        (parent as BDictionary).Value.Add(@string, bString);
                         expectingKey = true;
                         return ErrorType.None;
                     }
@@ -116,9 +116,7 @@ namespace FlyingRaijin.Bencode.Read
 
                 strLenghtBytes.ToChars(buffer, strLenghtBytes.Length);
 
-                int stringLength;
-
-                if (!int.TryParse(buffer, out stringLength))
+                if (!int.TryParse(buffer, out int stringLength))
                 {
                     ArrayPool<char>.Shared.Return(buffer, true);
                     return ErrorType.StringInvalidStringLength;

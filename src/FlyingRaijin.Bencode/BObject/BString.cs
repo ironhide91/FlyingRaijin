@@ -17,7 +17,7 @@ namespace FlyingRaijin.Bencode.BObject
 
         public override bool Equals(object obj)
         {
-            if (obj is BString && ((BString)obj).Value.Equals(Value))
+            if (obj is BString @string && @string.Value.Equals(Value))
                 return true;
 
             return false;

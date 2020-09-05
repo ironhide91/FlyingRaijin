@@ -4,6 +4,8 @@ namespace FlyingRaijin.Bencode.BObject
 {
     public class BDictionary : BObject<IDictionary<BString, IBObject>>
     {
+        private readonly Dictionary<string, IBObject> dict = new Dictionary<string, IBObject>();
+
         public BDictionary(IBObject parent, IDictionary<BString, IBObject> value) : base(parent, value)
         {
 
@@ -34,8 +36,6 @@ namespace FlyingRaijin.Bencode.BObject
 
             foreach (var item in Value)
                 dict.Add(item.Key.ToString(), item.Value);
-        }       
-
-        private Dictionary<string, IBObject> dict = new Dictionary<string, IBObject>();
+        }        
     }
 }

@@ -7,8 +7,8 @@ namespace FlyingRaijin.Bencode.Read
 {    
     public static partial class Parser
     {
-        private static int Int64MinValueCharLength = long.MinValue.ToString().Length;
-        private static int Int64MaxValueCharLength = long.MaxValue.ToString().Length;
+        private static readonly int Int64MinValueCharLength = long.MinValue.ToString().Length;
+        private static readonly int Int64MaxValueCharLength = long.MaxValue.ToString().Length;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static ErrorType ParseInteger(ReadOnlySpan<byte> bytes, ref int index, IBObject parent, IBObject key)
@@ -20,9 +20,9 @@ namespace FlyingRaijin.Bencode.Read
 
             if (parent is BDictionary)
             {
-                if (key is BString)
+                if (key is BString @string)
                 {
-                    (parent as BDictionary).Value.Add((BString)key, bInteger);
+                    (parent as BDictionary).Value.Add(@string, bInteger);
                     return ErrorType.None;
                 }
 
@@ -104,9 +104,7 @@ namespace FlyingRaijin.Bencode.Read
 
                     intBytes.ToChars(buffer, intBytes.Length);
 
-                    long value;
-
-                    if (long.TryParse(buffer, out value))
+                    if (long.TryParse(buffer, out long value))
                     {
                         ArrayPool<char>.Shared.Return(buffer, true);
 

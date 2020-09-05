@@ -62,7 +62,7 @@ namespace FlyingRaijin.Bencode.Read
                     if (error.HasError())
                         return new ParseResult(error, null);
                     return new ParseResult(error, root);
-                // Unkown
+                // Unknown
                 default:
                     return new ParseResult(ErrorType.Unknown, null);
             }
@@ -140,6 +140,7 @@ namespace FlyingRaijin.Bencode.Read
             return new ParseResult(error, currentParent);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void SetExpectingKeyFlag(ref int dictionaryCount, ref bool expectingKey)
         {
             if (dictionaryCount > 0)

@@ -15,9 +15,9 @@ namespace FlyingRaijin.Bencode.Read
 
             if (parent is BDictionary)
             {
-                if (key is BString)
+                if (key is BString @string)
                 {
-                    (parent as BDictionary).Value.Add((BString)key, bList);
+                    (parent as BDictionary).Value.Add(@string, bList);
                     parent = bList;
                     return ErrorType.None;
                 }
