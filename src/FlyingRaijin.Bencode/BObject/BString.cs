@@ -3,7 +3,7 @@ using System.Text;
 
 namespace FlyingRaijin.Bencode.BObject
 {
-    public class BString : BObject<byte[]>
+    public sealed class BString : BObject<byte[]>
     {
         public BString(IBObject parent, byte[] value) : base(parent, value)
         {
