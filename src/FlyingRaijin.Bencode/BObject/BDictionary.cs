@@ -2,7 +2,7 @@
 
 namespace FlyingRaijin.Bencode.BObject
 {
-    public class BDictionary : BObject<IDictionary<BString, IBObject>>
+    public sealed class BDictionary : BObject<IDictionary<BString, IBObject>>
     {
         private readonly Dictionary<string, IBObject> dict = new Dictionary<string, IBObject>();
 

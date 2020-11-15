@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <AssemblyName>FlyingRaijin.Engine</AssemblyName>
+    <OutputType>Library</OutputType>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -10,7 +11,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Akka" Version="1.4.10" />
+    <PackageReference Include="Akka.Remote" Version="1.4.10" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\FlyingRaijin.Bencode\FlyingRaijin.Bencode.csproj" />
+    <ProjectReference Include="..\FlyingRaijin.Messages\FlyingRaijin.Messages.csproj" />
   </ItemGroup>
 
 </Project>
