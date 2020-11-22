@@ -215,7 +215,7 @@ namespace FlyingRaijin.Bencode.Read
             {
                 error = ErrorType.StringInvalid;
                 return;
-            }
+            }            
 
             int end = (index - 1);
             var length = (end - start + 1);
@@ -246,7 +246,7 @@ namespace FlyingRaijin.Bencode.Read
                 return;
             }
 
-            var strStart = ++index;            
+            ++index;
 
             buffer = ArrayPool<char>.Shared.Rent(Encoding.UTF8.GetMaxCharCount(bytes.Length - index));
             Span<char> charSpan = buffer;
