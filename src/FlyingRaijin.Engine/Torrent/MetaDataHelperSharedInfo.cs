@@ -1,4 +1,5 @@
 ﻿using FlyingRaijin.Bencode.BObject;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -45,15 +46,15 @@ namespace FlyingRaijin.Engine.Torrent
             if (isNotMultipleOf20)
                 return Pieces.Empty;
 
-            //var temp = BitConverter.ToString(result).Replace("-", "");
+            int start = 0;
+            int end   = (result.Value.Length - 20);
 
-            int start = 0, end = (result.Value.Length - 20);
-            var sha1Checksumns = new List<byte[]>();
+            var sha1Checksumns = new List<ReadOnlyMemory<byte>>();
 
             while (start <= end)
             {
-                var sha1 = result.StringValue.Skip(start).Take(20);
-                //sha1Checksumns.Add(sha1.ToArray());
+                var sha1 = result.Value.Slice(start, 20);
+                sha1Checksumns.Add(sha1);
                 start += 20;
             }
 
