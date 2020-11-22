@@ -142,5 +142,41 @@ namespace FlyingRaijin.Test.Bencode.Read
             var value52 = (BInteger)value5.Value.ElementAt(2);
             value52.Value.Should().Be(123456789L);
         }
+
+        [Fact]
+        public void Case5()
+        {
+            var bencode = "d8:completei2e10:incompletei1e8:intervali1800e12:min intervali1800e5:peers18:¸:Ñ‘=gÄOìej¸”}¾Ûe";
+
+            var result = Parser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
+
+            result.Should().NotBeNull();
+            result.Error.Should().Be(ErrorType.None);
+            result.BObject.Should().BeOfType<BDictionary>();
+            result.BObject.Value.Count.Should().Be(5);
+
+            var dict = result.BObject;
+
+            dict.ContainsKey("complete").Should().BeTrue();
+            var value1 = (BInteger)dict["complete"];
+            value1.Value.Should().Be(2);
+
+            dict.ContainsKey("incomplete").Should().BeTrue();
+            var value2 = (BInteger)dict["incomplete"];
+            value2.Value.Should().Be(1);
+
+            dict.ContainsKey("interval").Should().BeTrue();
+            var value3 = (BInteger)dict["interval"];
+            value3.Value.Should().Be(1800);
+
+            dict.ContainsKey("min interval").Should().BeTrue();
+            var value4 = (BInteger)dict["min interval"];
+            value4.Value.Should().Be(1800);
+
+            dict.ContainsKey("peers").Should().BeTrue();
+            var value5 = (BString)dict["peers"];
+            value5.StringValue.Length.Should().Be(18);
+            value5.StringValue.Should().Be("¸:Ñ‘=gÄOìej¸”}¾Û");
+        }
     }
 }

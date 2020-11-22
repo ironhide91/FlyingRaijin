@@ -20,7 +20,7 @@ namespace FlyingRaijin.Engine.Torrent
             if (result == null)
                 return string.Empty;
 
-            return result.ToString();;
+            return result.StringValue;
         }
 
         private const string InfoMultiFiles = "files";
@@ -69,7 +69,7 @@ namespace FlyingRaijin.Engine.Torrent
             if (result == null)
                 return string.Empty;
 
-            return result.ToString();;
+            return result.StringValue;
         }
 
         private const string InfoMultiFilePathKey = "path";
@@ -82,9 +82,9 @@ namespace FlyingRaijin.Engine.Torrent
                 return string.Empty;
 
             if (list.Value.Count == 1)
-                return ((BString)list.Value.First()).ToString();;
+                return ((BString)list.Value.First()).StringValue;
 
-            return string.Join('/', list.Value.Cast<BString>().Select(s => s.ToString()));
+            return string.Join('/', list.Value.Cast<BString>().Select(s => s.StringValue));
         }
     }
 }

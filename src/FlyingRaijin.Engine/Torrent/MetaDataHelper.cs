@@ -14,15 +14,11 @@ namespace FlyingRaijin.Engine.Torrent
         {
             T value = default;
 
-            try
-            {
-                if (dictionary.ContainsKey(key))
-                    value = (T)dictionary[key];
-            }
-            catch (Exception e)
-            {
-                e.ToString();
-            }
+            if (dictionary == null || key == null)
+                return value;
+            
+            if (dictionary.ContainsKey(key))
+                value = (T)dictionary[key];
 
             return value;
         }
@@ -61,7 +57,7 @@ namespace FlyingRaijin.Engine.Torrent
             if (result == null)
                 return string.Empty;
 
-            return result.ToString();;
+            return result.StringValue;
         }
 
         private const string RootAnnounceListKey = "announce-list";
@@ -119,7 +115,7 @@ namespace FlyingRaijin.Engine.Torrent
             if (result == null)
                 return string.Empty;
 
-            return result.ToString();;
+            return result.StringValue;
         }
 
         private const string RootCreatedByKey = "created by";
@@ -131,7 +127,7 @@ namespace FlyingRaijin.Engine.Torrent
             if (result == null)
                 return string.Empty;
 
-            return result.ToString();;
+            return result.StringValue;
         }
 
         private const string RootEncodingKey = "encoding";
@@ -143,7 +139,7 @@ namespace FlyingRaijin.Engine.Torrent
             if (result == null)
                 return string.Empty;
 
-            return result.ToString();;
+            return result.StringValue;
         }
     }
 }

@@ -27,9 +27,9 @@ namespace FlyingRaijin.Test.Bencode.Read
             result.Error.Should().Be(ErrorType.None);
             result.BObject.Should().NotBeNull();
             result.BObject.Should().BeOfType<BString>();
-            result.BObject.Value.Should().NotBeNull();
-            result.BObject.Value.Length.Should().Be(length);
-            result.BObject.ToString().Should().Be(value);
+            result.BObject.StringValue.Should().NotBeNull();
+            result.BObject.StringValue.Length.Should().Be(length);
+            result.BObject.StringValue.Should().Be(value);
         }
 
         [Fact]
@@ -41,9 +41,9 @@ namespace FlyingRaijin.Test.Bencode.Read
             result.Error.Should().Be(ErrorType.None);
             result.BObject.Should().NotBeNull();
             result.BObject.Should().BeOfType<BString>();
-            result.BObject.Value.Should().NotBeNull();
-            result.BObject.Value.Length.Should().Be(0);
-            result.BObject.ToString().Should().Be(string.Empty);
+            result.BObject.StringValue.Should().NotBeNull();
+            result.BObject.StringValue.Length.Should().Be(0);
+            result.BObject.StringValue.Should().Be(string.Empty);
         }
 
         [Theory]
@@ -167,15 +167,15 @@ namespace FlyingRaijin.Test.Bencode.Read
         public void CanParseUnicode()
         {
             var unicodeStr = "$€£¥¢₹₨₱₩฿₫₪©®℗™℠αβγδεζηθικλμνξοπρστυφχψωΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ";
-            var length = Encoding.UTF8.GetBytes(unicodeStr).Length;
+            var length = Encoding.UTF8.GetCharCount(unicodeStr.AsReadOnlyByteSpan());
             var utf8Str = Encoding.UTF8.GetString(Encoding.UTF8.GetBytes($"{length}:{unicodeStr}"));
 
             var result = Parser.Parse<BString>(utf8Str.AsReadOnlyByteSpan());
 
             result.Should().NotBeNull();
             result.Error.Should().Be(ErrorType.None);
-            result.BObject.Value.Length.Should().Be(length);
-            result.BObject.ToString().Should().Be(unicodeStr);
+            result.BObject.StringValue.Length.Should().Be(length);
+            result.BObject.StringValue.Should().Be(unicodeStr);
         }
 
         [Theory]

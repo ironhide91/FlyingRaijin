@@ -14,7 +14,7 @@ namespace FlyingRaijin.Controller.Actors
 
         private void NewTorrentRequestHandler(NewTorrentRequest request)
         {
-            Sender.Tell(new NewTorrentRequest("alex"));
+            Sender.Tell(new NewTorrentRequest(request.FilePath));
             var engine = Context.ActorSelection("akka.tcp://Engine@localhost:8085/user/NewTorrentEngineActor");
             engine.Tell(request);
         }

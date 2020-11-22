@@ -1,13 +1,17 @@
-﻿using System.Security.Cryptography.X509Certificates;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 
 namespace FlyingRaijin.Bencode.BObject
 {
-    public sealed class BString : BObject<byte[]>
+    public sealed class BString : BObject<ReadOnlyMemory<byte>>
     {
-        public BString(IBObject parent, byte[] value) : base(parent, value)
+        public readonly string StringValue;
+
+        public BString(IBObject parent, ReadOnlyMemory<byte> value) : base(parent, value)
         {
-            
+            StringValue = Encoding.UTF8.GetString(value.Span);
         }
 
         public override int GetHashCode()
@@ -25,7 +29,7 @@ namespace FlyingRaijin.Bencode.BObject
 
         public override string ToString()
         {
-            return Encoding.UTF8.GetString(Value);
-        }
+            return StringValue;
+        }        
     }
 }
