@@ -52,8 +52,8 @@ namespace FlyingRaijin.Engine.Torrent
 
             while (start <= end)
             {
-                var sha1 = result.Value.Skip(start).Take(20);
-                sha1Checksumns.Add(sha1.ToArray());
+                var sha1 = result.StringValue.Skip(start).Take(20);
+                //sha1Checksumns.Add(sha1.ToArray());
                 start += 20;
             }
 

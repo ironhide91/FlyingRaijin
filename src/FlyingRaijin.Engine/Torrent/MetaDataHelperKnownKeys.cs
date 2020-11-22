@@ -1,4 +1,5 @@
 ﻿using FlyingRaijin.Bencode.BObject;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text;
@@ -28,7 +29,7 @@ namespace FlyingRaijin.Engine.Torrent
                     { InfoMultiFiles, new BString(null, InfoMultiFiles.ToBytes()) },                    
                 });
 
-        public static byte[] ToBytes(this string str)
+        public static ReadOnlyMemory<byte> ToBytes(this string str)
         {
             return Encoding.UTF8.GetBytes(str);
         }

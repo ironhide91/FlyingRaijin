@@ -3,6 +3,7 @@ using System;
 using System.Buffers;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text;
 
 namespace FlyingRaijin.Bencode.Read
 {
@@ -10,10 +11,19 @@ namespace FlyingRaijin.Bencode.Read
     {
         private static readonly byte[] EmptyStringBytes = Enumerable.Empty<byte>().ToArray();
 
+        private const string InfoPiecesKey = "pieces";
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static ErrorType ParseString(ReadOnlySpan<byte> bytes, ref int index, IBObject parent, ref bool expectingKey, ref IBObject key)
+        private static ErrorType ParseString(
+            ReadOnlySpan<byte> bytes,
+            IBObject parent,
+            ref int index,            
+            ref bool expectingKey,
+            ref IBObject key)
         {
-            var error = ParseSingleString(bytes, ref index, parent, out IBObject bString);
+            bool isPiecesKey = ((key != null) && ((BString)key).StringValue.Equals(InfoPiecesKey));
+
+            var error = ParseSingleString(bytes, parent, isPiecesKey, ref index, out IBObject bString);
 
             if (error.HasError())
                 return error;
@@ -49,7 +59,12 @@ namespace FlyingRaijin.Bencode.Read
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]        
-        private static ErrorType ParseSingleString(ReadOnlySpan<byte> bytes, ref int index, IBObject parent, out IBObject parsedValue)
+        private static ErrorType ParseSingleString(
+            ReadOnlySpan<byte> bytes,
+            IBObject parent,
+            bool isPieces,
+            ref int index,            
+            out IBObject parsedValue)
         {
             parsedValue = null;
 
@@ -57,94 +72,199 @@ namespace FlyingRaijin.Bencode.Read
             if (bytes.Length < 2)
                 return ErrorType.StringInvalid;
 
-#pragma warning disable IDE0059 // Unnecessary assignment of a value
-            int start = -1;
-#pragma warning restore IDE0059 // Unnecessary assignment of a value
+            ErrorType error = ErrorType.None;
 
             // string Length <= 9
             if (bytes[(index + 1)] == colon)
-            {
+            {                
                 var stringLength = bytes[index].ToInt();
 
-                if ((stringLength == 0) && (bytes.Length == 2))
-                {
-                    parsedValue = new BString(parent, EmptyStringBytes);
-                    return ErrorType.None;
-                }
-
-                if ((stringLength == 1) && (bytes.Length == 3))
-                {
-                    parsedValue = new BString(parent, bytes.Slice(2, 1).ToArray());
-                    return ErrorType.None;
-                }
-
+                ++index;
                 ++index;
 
-                ++index;
-
-                start = index;
-
-                index += (stringLength - 1);
-
-                if (index > (bytes.Length - 1))
+                if (stringLength <= 9)
                 {
-                    return ErrorType.StringLessCharsThanSpecified;
-                }
+                    // empty string
+                    if ((stringLength == 0) && (bytes.Length == 2))
+                    {
+                        parsedValue = new BString(parent, EmptyStringBytes);
+                        return error;
+                    }
 
-                parsedValue = new BString(parent, bytes.Slice(start, stringLength).ToArray());
-
-                return ErrorType.None;
+                    // non empty string
+                    ParseSingleStringLengthLtOrEqualTo9(bytes, parent, stringLength, ref index, out parsedValue, out error);
+                    return error;
+                }                
             }
 
             // string Length > 9
-            start = index;
+            if (isPieces)
+            {
+                ParseSingleStringLengthGt9Pieces(bytes, parent, ref index, out parsedValue, out error);
+                return error;
+            }
+
+            ParseSingleStringLengthGt9NonPieces(bytes, parent, ref index, out parsedValue, out error);
+            return error;          
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void ParseSingleStringLengthLtOrEqualTo9(
+            ReadOnlySpan<byte> bytes,
+            IBObject parent,
+            int stringLength,
+            ref int index,
+            out IBObject parsedValue,
+            out ErrorType error)
+        {
+            parsedValue = null;
+
+            error = ErrorType.None;
+            
+            if ((stringLength == 1) && (bytes.Length == 3))
+            {
+                parsedValue = new BString(parent, bytes.Slice(2, 1).ToArray());                    
+                return;
+            }            
+
+            if ((index + stringLength - 1) > (bytes.Length - 1))
+            {
+                error = ErrorType.StringLessCharsThanSpecified;
+                return;
+            }
+
+            parsedValue = new BString(parent, bytes.Slice(index, stringLength).ToArray());
+
+            index += (stringLength - 1);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void ParseSingleStringLengthGt9Pieces(
+            ReadOnlySpan<byte> bytes,
+            IBObject parent,
+            ref int index,
+            out IBObject parsedValue,
+            out ErrorType error)
+        {
+            parsedValue = null;
+
+            error = ErrorType.None;
+
+            var start = index;
 
             while (PositiveIntegerBytes.Contains(bytes[++index]))
             {
 
             }
 
+            if (bytes[index] != colon)
+                error = ErrorType.StringInvalid;
+
             int end = (index - 1);
 
-            if (bytes[index] == colon)
+            var length = (end - start + 1);
+
+            var strLenghtBytes = bytes.Slice(start, length);
+
+            var buffer = ArrayPool<char>.Shared.Rent(length);
+
+            strLenghtBytes.ToChars(buffer, strLenghtBytes.Length);
+
+            if (!int.TryParse(buffer, out int stringLength))
             {
-                var length = (end - start + 1);
-
-                var strLenghtBytes = bytes.Slice(start, length);
-
-                var buffer = ArrayPool<char>.Shared.Rent(length);
-
-                strLenghtBytes.ToChars(buffer, strLenghtBytes.Length);
-
-                if (!int.TryParse(buffer, out int stringLength))
-                {
-                    ArrayPool<char>.Shared.Return(buffer, true);
-                    return ErrorType.StringInvalidStringLength;
-                }
-
                 ArrayPool<char>.Shared.Return(buffer, true);
-
-                var strStart = ++index;
-
-                index += (stringLength - 1);
-
-                if (index < 0)
-                {
-                    return ErrorType.StringInvalidStringLength;
-                }
-
-                if (index > (bytes.Length - 1))
-                {
-                    return ErrorType.StringLessCharsThanSpecified;
-                }
-
-                parsedValue = new BString(parent, bytes.Slice(strStart, stringLength).ToArray());
-
-                return ErrorType.None;
+                error = ErrorType.StringInvalidStringLength;
+                return;
             }
 
-            return ErrorType.StringInvalid;
+            ArrayPool<char>.Shared.Return(buffer, true);
+
+            var strStart = ++index;
+
+            index += (stringLength - 1);
+
+            if (index > (bytes.Length - 1))
+            {
+                error = ErrorType.StringLessCharsThanSpecified;
+                return;
+            }
+
+            parsedValue = new BString(parent, bytes.Slice(strStart, stringLength).ToArray());
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void ParseSingleStringLengthGt9NonPieces(
+            ReadOnlySpan<byte> bytes,
+            IBObject parent,
+            ref int index,
+            out IBObject parsedValue,
+            out ErrorType error)
+        {
+            parsedValue = null;
+
+            error = ErrorType.None;
+
+            var start = index;
+
+            while (PositiveIntegerBytes.Contains(bytes[++index]))
+            {
+
+            }
+
+            if (bytes[index] != colon)
+            {
+                error = ErrorType.StringInvalid;
+                return;
+            }
+
+            int end = (index - 1);
+            var length = (end - start + 1);
+            var strLenghtBytes = bytes.Slice(start, length);
+
+            var buffer = ArrayPool<char>.Shared.Rent(length);
+
+            strLenghtBytes.ToChars(buffer, strLenghtBytes.Length);
+
+            if (!int.TryParse(buffer, out int stringLength))
+            {
+                ArrayPool<char>.Shared.Return(buffer, true);
+                error = ErrorType.StringInvalidStringLength;
+                return;
+            }
+
+            ArrayPool<char>.Shared.Return(buffer, true);
+
+            if (stringLength >= int.MaxValue)
+            {
+                error = ErrorType.StringInvalidStringLength;
+                return;
+            }
+
+            if (stringLength > bytes.Length)
+            {
+                error = ErrorType.StringLessCharsThanSpecified;
+                return;
+            }
+
+            var strStart = ++index;            
+
+            buffer = ArrayPool<char>.Shared.Rent(Encoding.UTF8.GetMaxCharCount(bytes.Length - index));
+            Span<char> charSpan = buffer;
+            Encoding.UTF8.GetChars(bytes.Slice(index), charSpan);
+            var value = charSpan.Slice(0, stringLength);            
+
+            var bytesRead = Encoding.UTF8.GetByteCount(value);
+            var byteBuffer = ArrayPool<byte>.Shared.Rent(bytesRead);
+            Span<byte> byteSpan = byteBuffer;
+            Encoding.UTF8.GetBytes(value, byteSpan);
+
+            index += (bytesRead - 1);
+
+            parsedValue = new BString(parent, byteSpan.Slice(0, bytesRead).ToArray());
+
+            ArrayPool<char>.Shared.Return(buffer, true);
+            ArrayPool<byte>.Shared.Return(byteBuffer, true);
+        }        
 
         private static int ToInt(this byte b)
         {

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Text;
 
 namespace FlyingRaijin.Bencode.Read
 {
@@ -29,9 +30,17 @@ namespace FlyingRaijin.Bencode.Read
 
             int index = -1;
 
+            //bool isPieces = false;
+
             int dictionaryCount = 0;
 
-            int listCount = 0;            
+            int listCount = 0;
+
+            //var count = Encoding.UTF8.GetCharCount(bytes);
+
+            //Span<char> chars = new char[count];
+
+            //Encoding.UTF8.GetChars(bytes, chars);
 
             // Determine root type
             switch (bytes[++index])
@@ -52,13 +61,13 @@ namespace FlyingRaijin.Bencode.Read
                     break;
                 // Integer
                 case intStart:
-                    error = ParseSingleInteger(bytes, ref index, null, out root);
+                    error = ParseSingleInteger(bytes, null, ref index, out root);
                     if (error.HasError())
                         return new ParseResult(error, null);
                     return new ParseResult(error, root);
                 // String
                 case byte b when PositiveIntegerBytes.Contains(b):
-                    error = ParseSingleString(bytes, ref index, null, out root);
+                    error = ParseSingleString(bytes, null, isPieces: false, ref index, out root);
                     if (error.HasError())
                         return new ParseResult(error, null);
                     return new ParseResult(error, root);
@@ -96,7 +105,7 @@ namespace FlyingRaijin.Bencode.Read
                         break;
                     // Integer
                     case intStart:
-                        error = ParseInteger(bytes, ref index, currentParent, key);
+                        error = ParseInteger(bytes, currentParent, ref index, key);
                         if (error.HasError())
                             return new ParseResult(error, null);
                         SetExpectingKeyFlag(ref dictionaryCount, ref expectingKey);
@@ -121,7 +130,7 @@ namespace FlyingRaijin.Bencode.Read
                         break;
                     // String
                     case byte b when PositiveIntegerBytes.Contains(b):
-                        error = ParseString(bytes, ref index, currentParent, ref expectingKey, ref key);
+                        error = ParseString(bytes, currentParent, ref index, ref expectingKey, ref key);
                         if (error.HasError())
                             return new ParseResult(error, null);
                         break;

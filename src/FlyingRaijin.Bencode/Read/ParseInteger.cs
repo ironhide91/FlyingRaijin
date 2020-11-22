@@ -11,9 +11,9 @@ namespace FlyingRaijin.Bencode.Read
         private static readonly int Int64MaxValueCharLength = long.MaxValue.ToString().Length;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static ErrorType ParseInteger(ReadOnlySpan<byte> bytes, ref int index, IBObject parent, IBObject key)
+        private static ErrorType ParseInteger(ReadOnlySpan<byte> bytes, IBObject parent, ref int index, IBObject key)
         {
-            var error = ParseSingleInteger(bytes, ref index, parent, out IBObject bInteger);
+            var error = ParseSingleInteger(bytes, parent, ref index, out IBObject bInteger);
 
             if (error.HasError())
                 return error;
@@ -39,7 +39,7 @@ namespace FlyingRaijin.Bencode.Read
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static ErrorType ParseSingleInteger(ReadOnlySpan<byte> bytes, ref int index, IBObject parent, out IBObject parsedValue)
+        private static ErrorType ParseSingleInteger(ReadOnlySpan<byte> bytes, IBObject parent, ref int index, out IBObject parsedValue)
         {
             parsedValue = null;
 

@@ -14,7 +14,7 @@ namespace FlyingRaijin.Engine.Torrent
             if (result == null)
                 return string.Empty;
 
-            return result.ToString();;
+            return result.StringValue;
         }
 
         private const string InfoSingleLengthKey = "length";
@@ -38,7 +38,7 @@ namespace FlyingRaijin.Engine.Torrent
             if (result == null)
                 return string.Empty;
 
-            return result.ToString();;
+            return result.StringValue;
         }
     }
 }

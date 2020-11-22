@@ -13,7 +13,7 @@ namespace FlyingRaijin.Test.Engine.Announce
     {
         private static readonly HttpClient httpClient = new HttpClient();
 
-        //[Fact]
+        [Fact]
         public void TrackerRequest1()
         {
             //string str= @"http://legittorrents.info:2710/announce?info_hash=%0A%D8K%FD%EA%91%B2%B43H%F1%BE%0C%9AD%96nr%EC%97&peer_id=b9970db982b16628419f47ebaddc53334a118cc8&port=25962&uploaded=0&downloaded=0&left=314572800&event=started&ip=255.255.255.255&num_want=10";
