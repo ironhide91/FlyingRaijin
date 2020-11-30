@@ -53,6 +53,9 @@
     <None Update="Artifacts\Torrents\Slackware64-14.1-install-dvd.torrent">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Artifacts\Torrents\ubuntu-20.04.1-desktop-amd64.iso.torrent">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

@@ -2,12 +2,15 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using System.Text;
 
 namespace FlyingRaijin.Bencode.Read
 {
     public static partial class Parser
     {
+        private static readonly ParseResult ErrorResult = new ParseResult(ErrorType.Unknown, null);
+
+        private const string InfoKey = "info";
+
         public static ParseResult<T> Parse<T>(ReadOnlySpan<byte> bytes) where T : IBObject
         {
             var result = Parse(bytes);
@@ -22,7 +25,7 @@ namespace FlyingRaijin.Bencode.Read
         public static ParseResult Parse(ReadOnlySpan<byte> bytes)
         {
             if (bytes.Length == 0)
-                return new ParseResult(ErrorType.Unknown, null);
+                return ErrorResult;
 
             IBObject root;
 
@@ -30,17 +33,9 @@ namespace FlyingRaijin.Bencode.Read
 
             int index = -1;
 
-            //bool isPieces = false;
-
             int dictionaryCount = 0;
 
             int listCount = 0;
-
-            //var count = Encoding.UTF8.GetCharCount(bytes);
-
-            //Span<char> chars = new char[count];
-
-            //Encoding.UTF8.GetChars(bytes, chars);
 
             // Determine root type
             switch (bytes[++index])
@@ -63,17 +58,17 @@ namespace FlyingRaijin.Bencode.Read
                 case intStart:
                     error = ParseSingleInteger(bytes, null, ref index, out root);
                     if (error.HasError())
-                        return new ParseResult(error, null);
-                    return new ParseResult(error, root);
+                        return ErrorResult;
+                    return ErrorResult;
                 // String
                 case byte b when PositiveIntegerBytes.Contains(b):
                     error = ParseSingleString(bytes, null, isPieces: false, ref index, out root);
                     if (error.HasError())
-                        return new ParseResult(error, null);
-                    return new ParseResult(error, root);
+                        return ErrorResult;
+                    return ErrorResult;
                 // Unknown
                 default:
-                    return new ParseResult(ErrorType.Unknown, null);
+                    return ErrorResult;
             }
 
             IBObject currentParent = root;
@@ -81,6 +76,11 @@ namespace FlyingRaijin.Bencode.Read
             IBObject key = null;
 
             bool expectingKey = (dictionaryCount > 0);
+
+             int infoDictionatStartIndex = -1;          
+             int infoDictionatEndIndex   = -1;
+             int infoDictionatCount      = -1;
+            bool isInfoDictionary        = false;
 
             // Process nested types
             while (++index < bytes.Length)
@@ -90,6 +90,11 @@ namespace FlyingRaijin.Bencode.Read
                     // Dictionary
                     case dictStart:
                         dictionaryCount++;
+                        if (isInfoDictionary)
+                        {
+                            infoDictionatCount = dictionaryCount;
+                            infoDictionatStartIndex = index;                            
+                        }
                         error = ParseDictionary(ref currentParent, key);
                         if (error.HasError())
                             return new ParseResult(error, null);
@@ -115,9 +120,14 @@ namespace FlyingRaijin.Bencode.Read
                         if (currentParent is BDictionary)
                         {
                             (currentParent as BDictionary).SyncInternalStringDictionary();
+                            if (dictionaryCount == infoDictionatCount)
+                            {
+                                isInfoDictionary = false;
+                                infoDictionatEndIndex = (index);
+                            }
                             dictionaryCount--;
                             if (currentParent.Parent != null)
-                                currentParent = currentParent.Parent;
+                                currentParent = currentParent.Parent;                            
                             break;
                         }
                         if (currentParent is BList)
@@ -133,6 +143,8 @@ namespace FlyingRaijin.Bencode.Read
                         error = ParseString(bytes, currentParent, ref index, ref expectingKey, ref key);
                         if (error.HasError())
                             return new ParseResult(error, null);
+                        if (key is BString @keyString && keyString.StringValue == InfoKey)
+                            isInfoDictionary = true;
                         break;
                     // Unkown
                     default:
@@ -144,9 +156,9 @@ namespace FlyingRaijin.Bencode.Read
                 return new ParseResult(ErrorType.DictionaryInvalid, null);
 
             if (listCount != 0)
-                return new ParseResult(ErrorType.ListInvalid, null);
+                return new ParseResult(ErrorType.ListInvalid, null);            
 
-            return new ParseResult(error, currentParent);
+            return new ParseResult(error, currentParent, infoDictionatStartIndex, infoDictionatEndIndex);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -5,31 +5,34 @@ namespace FlyingRaijin.Engine.Torrent
 {
     public sealed class SingleFileTorrent : TorrentBase<SingleFileInfoDictionary>
     {
-        public SingleFileTorrent(BDictionary dictionary)
+        public SingleFileTorrent(BDictionary _dictionary, ReadOnlyMemory<byte> _infoHash)
         {
-             _AnnounceUrl = dictionary.ReadAnnounceUrl();
-            _AnnounceList = dictionary.ReadAnnounceList();
-            _CreationDate = dictionary.ReadCreationDate().FromUnixTime();
-                 _Comment = dictionary.ReadComment();
-               _CreatedBy = dictionary.ReadCreatedBy();
-                _Encoding = dictionary.ReadEncoding();
-                    _Info = dictionary.ReadSingleFileInfoDictionary();
+             announceUrl = _dictionary.ReadAnnounceUrl();
+            announceList = _dictionary.ReadAnnounceList();
+            creationDate = _dictionary.ReadCreationDate().FromUnixTime();
+                 comment = _dictionary.ReadComment();
+               createdBy = _dictionary.ReadCreatedBy();
+                encoding = _dictionary.ReadEncoding();
+                    info = _dictionary.ReadSingleFileInfoDictionary();
+                infoHash = _infoHash;
         }
 
-        public override string AnnounceUrl { get { return _AnnounceUrl; } }
-        public override AnnounceList AnnounceList { get { return _AnnounceList; } }
-        public override DateTime CreationDate { get { return _CreationDate; } }
-        public override string Comment { get { return _Comment; } }
-        public override string CreatedBy { get { return _CreatedBy; } }
-        public override string Encoding { get { return _Encoding; } }
-        public override SingleFileInfoDictionary Info { get { return _Info; } }
+        public override string AnnounceUrl { get { return announceUrl; } }
+        public override AnnounceList AnnounceList { get { return announceList; } }
+        public override DateTime CreationDate { get { return creationDate; } }
+        public override string Comment { get { return comment; } }
+        public override string CreatedBy { get { return createdBy; } }
+        public override string Encoding { get { return encoding; } }
+        public override SingleFileInfoDictionary Info { get { return info; } }
+        public override ReadOnlyMemory<byte> InfoHash { get { return infoHash; } }
 
-        private readonly string _AnnounceUrl;
-        private readonly AnnounceList _AnnounceList;
-        private readonly DateTime _CreationDate;
-        private readonly string _Comment;
-        private readonly string _CreatedBy;
-        private readonly string _Encoding;
-        private readonly SingleFileInfoDictionary _Info;
+        private readonly string announceUrl;
+        private readonly AnnounceList announceList;
+        private readonly DateTime creationDate;
+        private readonly string comment;
+        private readonly string createdBy;
+        private readonly string encoding;
+        private readonly SingleFileInfoDictionary info;
+        private readonly ReadOnlyMemory<byte> infoHash;
     }
 }

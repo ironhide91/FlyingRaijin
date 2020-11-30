@@ -30,6 +30,6 @@ namespace FlyingRaijin.Test.Engine.TorrentFiles
             torrent.Info.PieceLength.Should().Be(1048576L);            
             torrent.Info.MD5Checksum.Should().Be(string.Empty);
             torrent.Info.IsPrivate.Should().Be(false);
-        }        
+        }
     }
 }
