@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <AssemblyName>FlyingRaijin.Engine</AssemblyName>
     <OutputType>Library</OutputType>
   </PropertyGroup>
@@ -11,12 +11,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Akka" Version="1.4.10" />
-    <PackageReference Include="Akka.Remote" Version="1.4.10" />
+    <PackageReference Include="Akka" Version="1.4.12" />
+    <PackageReference Include="Akka.Remote" Version="1.4.12" />
+    <PackageReference Include="Serilog" Version="2.10.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FlyingRaijin.Bencode\FlyingRaijin.Bencode.csproj" />
     <ProjectReference Include="..\FlyingRaijin.Messages\FlyingRaijin.Messages.csproj" />
   </ItemGroup>
 

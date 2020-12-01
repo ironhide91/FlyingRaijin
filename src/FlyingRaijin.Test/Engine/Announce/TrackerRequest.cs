@@ -1,6 +1,8 @@
 ﻿using FlyingRaijin.Bencode.BObject;
 using FlyingRaijin.Bencode.Read;
 using FlyingRaijin.Engine.Bencode;
+using Serilog;
+using Serilog.Core;
 using System;
 using System.IO;
 using System.Net.Http;
@@ -15,6 +17,17 @@ namespace FlyingRaijin.Test.Engine.Announce
         private static readonly HttpClient httpClient = new HttpClient();
 
         [Fact]
+        public void Serilog()
+        {
+            var logger = new LoggerConfiguration()
+                .WriteTo.File("logs\\myapp.txt", rollingInterval: RollingInterval.Day, outputTemplate: "{SourceContext}")
+                .CreateLogger()
+                .ForContext(typeof(TrackerRequest));            
+
+            logger.Information("hello");
+        }
+
+            [Fact]
         public void TrackerRequest1()
         {
             var filePath = "Artifacts\\Torrents\\ubuntu-20.04.1-desktop-amd64.iso.torrent";
