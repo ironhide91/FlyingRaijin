@@ -1,17 +1,25 @@
 ﻿using FlyingRaijin.Bencode.BObject;
 using System;
 using System.Buffers;
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace FlyingRaijin.Bencode.Read
 {
-    public static partial class Parser
+    public static partial class BencodeParser
     {
         private static readonly byte[] EmptyStringBytes = Enumerable.Empty<byte>().ToArray();
 
         private const string InfoPiecesKey = "pieces";
+        private const string      PeersKey = "peers";
+
+        private static readonly HashSet<string> byteEncodedKeys = new HashSet<string>()
+        {
+            InfoPiecesKey,
+            PeersKey
+        };
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static ErrorType ParseString(
@@ -21,7 +29,7 @@ namespace FlyingRaijin.Bencode.Read
             ref bool expectingKey,
             ref IBObject key)
         {
-            bool isPiecesKey = ((key != null) && ((BString)key).StringValue.Equals(InfoPiecesKey));
+            bool isPiecesKey = ((key != null) && byteEncodedKeys.Contains(((BString)key).StringValue));
 
             var error = ParseSingleString(bytes, parent, isPiecesKey, ref index, out IBObject bString);
 
@@ -62,7 +70,7 @@ namespace FlyingRaijin.Bencode.Read
         private static ErrorType ParseSingleString(
             ReadOnlySpan<byte> bytes,
             IBObject parent,
-            bool isPieces,
+            bool isByteEncoded,
             ref int index,            
             out IBObject parsedValue)
         {
@@ -98,8 +106,9 @@ namespace FlyingRaijin.Bencode.Read
             }
 
             // string Length > 9
-            if (isPieces)
+            if (isByteEncoded)
             {
+                // Peers or Pieces
                 ParseSingleStringLengthGt9Pieces(bytes, parent, ref index, out parsedValue, out error);
                 return error;
             }
@@ -168,9 +177,11 @@ namespace FlyingRaijin.Bencode.Read
 
             var buffer = ArrayPool<char>.Shared.Rent(length);
 
+            Span<char> spanBuffer = buffer;
+
             strLenghtBytes.ToChars(buffer, strLenghtBytes.Length);
 
-            if (!int.TryParse(buffer, out int stringLength))
+            if (!int.TryParse(spanBuffer.Slice(0, strLenghtBytes.Length), out int stringLength))
             {
                 ArrayPool<char>.Shared.Return(buffer, true);
                 error = ErrorType.StringInvalidStringLength;
@@ -223,9 +234,11 @@ namespace FlyingRaijin.Bencode.Read
 
             var buffer = ArrayPool<char>.Shared.Rent(length);
 
+            Span<char> spanBuffer = buffer;
+
             strLenghtBytes.ToChars(buffer, strLenghtBytes.Length);
 
-            if (!int.TryParse(buffer, out int stringLength))
+            if (!int.TryParse(spanBuffer.Slice(0, strLenghtBytes.Length), out int stringLength))
             {
                 ArrayPool<char>.Shared.Return(buffer, true);
                 error = ErrorType.StringInvalidStringLength;

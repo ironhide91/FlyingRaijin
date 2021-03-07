@@ -12,7 +12,7 @@ namespace FlyingRaijin.Test.Engine.BencodeStringLiterals
         [InlineData("d12:piece lengthi512ee")]
         public void CanReadPieceLengthInfoKey(string bencode)
         {
-            var result = Parser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
+            var result = BencodeParser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
             var temp = result.BObject.ReadPieceLength();
 
             temp.Should().Be(512L);
@@ -22,7 +22,7 @@ namespace FlyingRaijin.Test.Engine.BencodeStringLiterals
         [InlineData("d11:piecelengthi512ee")]
         public void MissingPieceLengthInfoKey(string bencode)
         {
-            var result = Parser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
+            var result = BencodeParser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
             var temp = result.BObject.ReadPieceLength();
 
             temp.Should().Be(0L);
@@ -32,7 +32,7 @@ namespace FlyingRaijin.Test.Engine.BencodeStringLiterals
         [InlineData("d7:privatei1ee")]
         public void CanReadPrivateInfoKeyTrue(string bencode)
         {
-            var result = Parser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
+            var result = BencodeParser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
             var temp = result.BObject.ReadIsPrivateFlag();
 
             temp.Should().BeTrue();
@@ -42,7 +42,7 @@ namespace FlyingRaijin.Test.Engine.BencodeStringLiterals
         [InlineData("d7:privatei0ee")]
         public void CanReadPrivateInfoKeyFalse(string bencode)
         {
-            var result = Parser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
+            var result = BencodeParser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
             var temp = result.BObject.ReadIsPrivateFlag();
 
             temp.Should().BeFalse();
@@ -52,7 +52,7 @@ namespace FlyingRaijin.Test.Engine.BencodeStringLiterals
         [InlineData("d11:rivatei512ee")]
         public void MissingPrivateInfoKey(string bencode)
         {
-            var result = Parser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
+            var result = BencodeParser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
             var temp = result.BObject.ReadIsPrivateFlag();
 
             temp.Should().BeFalse();
@@ -62,7 +62,7 @@ namespace FlyingRaijin.Test.Engine.BencodeStringLiterals
         [InlineData("d6:ieces5:helloe")]
         public void MissingPiecesInfoKey(string bencode)
         {
-            var result = Parser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
+            var result = BencodeParser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
             var temp = result.BObject.ReadPieces();
 
             temp.Should().NotBeNull();

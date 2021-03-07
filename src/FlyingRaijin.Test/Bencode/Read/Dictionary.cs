@@ -12,7 +12,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         [InlineData("de")]
         public void CanParseEmpty(string bencode)
         {
-            var result = Parser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
+            var result = BencodeParser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
 
             result.Should().NotBeNull();
             result.Error.Should().Be(ErrorType.None);
@@ -24,7 +24,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         [InlineData("d4:spam3:egge")]
         public void Case1(string bencode)
         {
-            var result = Parser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
+            var result = BencodeParser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
 
             result.Should().NotBeNull();
             result.Error.Should().Be(ErrorType.None);
@@ -44,7 +44,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         [InlineData("d4:spam3:egg3:cow3:mooe")]
         public void Case2(string bencode)
         {
-            var result = Parser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
+            var result = BencodeParser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
 
             result.Should().NotBeNull();
             result.Error.Should().Be(ErrorType.None);
@@ -68,7 +68,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         [InlineData("d4:spam3:egg3:cow3:moo3:inti99e6:numberi753ee")]
         public void Case3(string bencode)
         {
-            var result = Parser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
+            var result = BencodeParser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
 
             result.Should().NotBeNull();
             result.Error.Should().Be(ErrorType.None);
@@ -100,7 +100,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         [InlineData("d4:spam3:egg3:cow3:moo3:inti99e6:numberi753e4:listl5:rahul5:bipini123456789eee")]
         public void Case4(string bencode)
         {
-            var result = Parser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
+            var result = BencodeParser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
 
             result.Should().NotBeNull();
             result.Error.Should().Be(ErrorType.None);
@@ -148,7 +148,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         {
             var bencode = "d8:completei2e10:incompletei1e8:intervali1800e12:min intervali1800e5:peers18:¸:Ñ‘=gÄOìej¸”}¾Ûe";
 
-            var result = Parser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
+            var result = BencodeParser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
 
             result.Should().NotBeNull();
             result.Error.Should().Be(ErrorType.None);
@@ -184,7 +184,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         {
             var bencode = "d2:ip13:185.149.90.647:peer id20:-lt0D60-�r3�@K�9LU!4:porti51072ee";
 
-            var result = Parser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
+            var result = BencodeParser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
 
             //result.Should().NotBeNull();
             //result.Error.Should().Be(ErrorType.None);
@@ -220,7 +220,27 @@ namespace FlyingRaijin.Test.Bencode.Read
         {
             var bencode = "d7:peer id20:-lt0D60-�r3�@K�9LU!e";
 
-            var result = Parser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
+            var result = BencodeParser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
         }
-    }
+
+        [Fact]
+        public void Case8()
+        {
+            var bencode = "d7:peer id20:-lt0D80-�s�u�wSMuԐe";
+
+            var result = BencodeParser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
+        }
+
+        //[Fact]
+        //public void Case9()
+        //{
+            
+
+        //    var temp = System.Net.WebUtility.UrlDecode(peerId);
+
+        //    var result = BencodeParser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
+        //}
+
+        //d8:completei3517e10:incompletei56e8:intervali1800e5:peers300:PmK��Cۈ��PC�]�=��LWBW_��ņ/о"��C�"��FR��w�ҹ-þN$[� L�թ,X�8��XO�ˁS�_C����yV�ռ�1{����E��R�����[>|���S���٫�K��}�bP���\�6����j-�N7�T��Zi���1�-�Bh� ��rٿ��֞e`��Y�����%9��HO��"�����W��g�/��������)G��*)�-�؏����pt�Fq�$�h�X����%�dH��ʻ�;'��9��������kGNN�k���RA�$9FH�`]u�e
+}
 }

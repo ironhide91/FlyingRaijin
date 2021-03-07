@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 
 namespace FlyingRaijin.Bencode.Read
 {    
-    public static partial class Parser
+    public static partial class BencodeParser
     {
         private static readonly int Int64MinValueCharLength = long.MinValue.ToString().Length;
         private static readonly int Int64MaxValueCharLength = long.MaxValue.ToString().Length;
@@ -102,9 +102,11 @@ namespace FlyingRaijin.Bencode.Read
 
                     var buffer = ArrayPool<char>.Shared.Rent(intBytes.Length);
 
+                    Span<char> spanBuffer = buffer;
+
                     intBytes.ToChars(buffer, intBytes.Length);
 
-                    if (long.TryParse(buffer, out long value))
+                    if (long.TryParse(spanBuffer.Slice(0, intBytes.Length), out long value))
                     {
                         ArrayPool<char>.Shared.Return(buffer, true);
 

@@ -10,7 +10,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         [Fact]
         public void CanParseZero()
         {
-            var result = Parser.Parse<BInteger>("i0e".AsReadOnlyByteSpan());
+            var result = BencodeParser.Parse<BInteger>("i0e".AsReadOnlyByteSpan());
 
             result.Should().NotBeNull();
             result.Error.Should().Be(ErrorType.None);
@@ -27,7 +27,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         [InlineData("i1234567890e", 1234567890)]
         public void CanParsePositive(string bencode, int value)
         {
-            var result = Parser.Parse<BInteger>(bencode.AsReadOnlyByteSpan());
+            var result = BencodeParser.Parse<BInteger>(bencode.AsReadOnlyByteSpan());
 
             result.Should().NotBeNull();
             result.Error.Should().Be(ErrorType.None);
@@ -44,7 +44,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         [InlineData("i-1234567890e", -1234567890)]
         public void CanParseNegative(string bencode, int value)
         {
-            var result = Parser.Parse<BInteger>(bencode.AsReadOnlyByteSpan());
+            var result = BencodeParser.Parse<BInteger>(bencode.AsReadOnlyByteSpan());
 
             result.Should().NotBeNull();
             result.Error.Should().Be(ErrorType.None);
@@ -60,7 +60,7 @@ namespace FlyingRaijin.Test.Bencode.Read
             var temp = long.Parse("-9223372036854775808");
 
 
-            var result = Parser.Parse<BInteger>(bencode.AsReadOnlyByteSpan());
+            var result = BencodeParser.Parse<BInteger>(bencode.AsReadOnlyByteSpan());
 
             result.Should().NotBeNull();
             result.Error.Should().Be(ErrorType.None);
@@ -75,7 +75,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         [InlineData("i00001e")]
         public void CannotParseLeadingZeros(string bencode)
         {
-            var result = Parser.Parse<BInteger>(bencode.AsReadOnlyByteSpan());
+            var result = BencodeParser.Parse<BInteger>(bencode.AsReadOnlyByteSpan());
 
             result.Should().NotBeNull();
             result.Error.Should().Be(ErrorType.IntegerInvalid);
@@ -85,7 +85,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         [Fact]
         public void CannotParseMinusZero()
         {
-            var result = Parser.Parse<BInteger>("i-0e".AsReadOnlyByteSpan());
+            var result = BencodeParser.Parse<BInteger>("i-0e".AsReadOnlyByteSpan());
 
             result.Should().NotBeNull();
             result.Error.Should().Be(ErrorType.IntegerInvalid);
@@ -99,7 +99,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         [InlineData("ie")]
         public void CannotParseLessThanIntegerMinimumLength(string bencode)
         {
-            var result = Parser.Parse<BInteger>(bencode.AsReadOnlyByteSpan());
+            var result = BencodeParser.Parse<BInteger>(bencode.AsReadOnlyByteSpan());
 
             result.Should().NotBeNull();
             result.Error.Should().Be(ErrorType.IntegerInvalid);
@@ -113,7 +113,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         [InlineData("i-123")]
         public void CannotParseMissingEndChar(string bencode)
         {
-            var result = Parser.Parse<BInteger>(bencode.AsReadOnlyByteSpan());
+            var result = BencodeParser.Parse<BInteger>(bencode.AsReadOnlyByteSpan());
 
             result.Should().NotBeNull();
             result.Error.Should().Be(ErrorType.IntegerInvalid);
@@ -127,7 +127,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         [InlineData("1234567890e")]
         public void CannotParseInvalidFirstChar(string bencode)
         {
-            var result = Parser.Parse<BInteger>(bencode.AsReadOnlyByteSpan());
+            var result = BencodeParser.Parse<BInteger>(bencode.AsReadOnlyByteSpan());
 
             result.Should().NotBeNull();
             result.Error.Should().NotBe(ErrorType.None);
@@ -137,7 +137,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         [Fact]
         public void CannotParseOnlyNegativeSign()
         {
-            var result = Parser.Parse<BInteger>("i-e".AsReadOnlyByteSpan());
+            var result = BencodeParser.Parse<BInteger>("i-e".AsReadOnlyByteSpan());
 
             result.Should().NotBeNull();
             result.Error.Should().Be(ErrorType.IntegerInvalid);
@@ -151,7 +151,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         [InlineData("i----1234567890e")]
         public void CannotParseMultipleNegativeSign(string bencode)
         {
-            var result = Parser.Parse<BInteger>(bencode.AsReadOnlyByteSpan());
+            var result = BencodeParser.Parse<BInteger>(bencode.AsReadOnlyByteSpan());
 
             result.Should().NotBeNull();
             result.Error.Should().Be(ErrorType.IntegerInvalid);
@@ -166,7 +166,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         [InlineData("i42ae")]
         public void CannotParseNonInteger(string bencode)
         {
-            var result = Parser.Parse<BInteger>(bencode.AsReadOnlyByteSpan());
+            var result = BencodeParser.Parse<BInteger>(bencode.AsReadOnlyByteSpan());
 
             result.Should().NotBeNull();
             result.Error.Should().NotBe(ErrorType.None);
@@ -178,7 +178,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         [InlineData("i-9223372036854775809e")]
         public void CannotParseLengthLargerThanInt64(string bencode)
         {
-            var result = Parser.Parse<BInteger>(bencode.AsReadOnlyByteSpan());
+            var result = BencodeParser.Parse<BInteger>(bencode.AsReadOnlyByteSpan());
 
             result.Should().NotBeNull();
             result.Error.Should().Be(ErrorType.IntegerOutOfInt64Range);
@@ -191,7 +191,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         [InlineData("i123456789012345678901234567890e")]
         public void CannotParseLongerThanint64MaxDigits19(string bencode)
         {
-            var result = Parser.Parse<BInteger>(bencode.AsReadOnlyByteSpan());
+            var result = BencodeParser.Parse<BInteger>(bencode.AsReadOnlyByteSpan());
 
             result.Should().NotBeNull();
             result.Error.Should().Be(ErrorType.IntegerOutOfInt64Range);

@@ -10,7 +10,7 @@ namespace FlyingRaijin.Engine.Torrent
     public static partial class MetaDataHelper
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static T GetValue<T>(this BDictionary dictionary, string key) where T : IBObject
+        internal static T GetValue<T>(this BDictionary dictionary, string key) where T : IBObject
         {
             T value = default;
 

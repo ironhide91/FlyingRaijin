@@ -47,6 +47,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Artifacts\peers.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Artifacts\Torrents\linuxmint-18-cinnamon-64bit.torrent">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

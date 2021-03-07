@@ -1,6 +1,7 @@
 ﻿using FlyingRaijin.Bencode.BObject;
 using FlyingRaijin.Bencode.Read;
 using FlyingRaijin.Engine.Bencode;
+using FlyingRaijin.Engine.Tracker;
 using Serilog;
 using Serilog.Core;
 using System;
@@ -38,33 +39,43 @@ namespace FlyingRaijin.Test.Engine.Announce
 
             var sb = new StringBuilder();
 
-            //foreach (var item in torrent.InfoHash.ToArray())
-            //{
-            //    sb.Append(item.ToString("X2"));
-            //}
 
-            //var hashString = sb.ToString();           
+            var requestBuilder = new TrackerRequestBuilder(torrent.AnnounceUrl)
+                .WithInfoHash(torrent.InfoHash.ToArray())
+                .WithIP("255.255.255.255")
+                .WithPort(25962)
+                .WithUploaded(0)
+                .WithDownloaded(0)
+                .WithLeft(0)
+                .WithEvent(EventType.Started)
+                .Build();
 
-            //var temp = HttpUtility.UrlEncode();
+            //sb.Clear();
+            //sb.Append("https://torrent.ubuntu.com/announce?");
+            //sb.Append($"info_hash={temp}");
+            //sb.Append("&peer_id=ABCDEFGHIJKLMNOPQRST");
+            //sb.Append("&port=25962");
+            //sb.Append("&uploaded=0");
+            //sb.Append("&downloaded=0");
+            //sb.Append("&left=0");
+            //sb.Append("&event=started");
+            //sb.Append("&ip=255.255.255.255");
+            //sb.Append("&compact=1");
+            //sb.Append("no_peer_id=1");
 
-            sb.Clear();
-            sb.Append("https://torrent.ubuntu.com/announce?");
-            sb.Append($"info_hash={temp}");
-            sb.Append("&peer_id=ABCDEFGHIJKLMNOPQRST");
-            sb.Append("&port=25962");
-            sb.Append("&uploaded=0");
-            sb.Append("&downloaded=0");
-            sb.Append("&left=0");
-            sb.Append("&event=started");
-            sb.Append("&ip=255.255.255.255");
+            var response = httpClient.GetByteArrayAsync(requestBuilder).Result;
 
-            var response = httpClient.GetStringAsync(sb.ToString()).Result;
+            System.Diagnostics.Debug.WriteLine(Encoding.UTF8.GetString(response));
 
-            System.Diagnostics.Debug.WriteLine(response);
+            //var response = File.ReadAllText("Artifacts\\peers.txt", Encoding.UTF8);
 
-            var res = Parser.Parse<BDictionary>(response.AsReadOnlyByteSpan());
-            
-            
+            var res = BencodeParser.Parse<BDictionary>(response);
+
+            var parsedResponse = TrackerResponseParser.Parse(response);
+
+
+
+
         }
     }
 }

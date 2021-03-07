@@ -25,7 +25,7 @@ namespace FlyingRaijin.Engine.Bencode
 
         public SingleFileTorrent ReadsingleFile(ReadOnlySpan<byte> bytes)
         {
-            var result = Parser.Parse(bytes);
+            var result = BencodeParser.Parse(bytes);
 
             var torrent = new SingleFileTorrent((BDictionary)result.BObject, GenerateInfoHash(result, bytes));
 
@@ -36,7 +36,7 @@ namespace FlyingRaijin.Engine.Bencode
         {
             var bytes = File.ReadAllBytes(filePath).AsSpan();
 
-            var result = Parser.Parse(bytes);
+            var result = BencodeParser.Parse(bytes);
 
             var torrent = new SingleFileTorrent((BDictionary)result.BObject, GenerateInfoHash(result, bytes));
 
@@ -45,7 +45,7 @@ namespace FlyingRaijin.Engine.Bencode
 
         public MultiFileTorrent ReadMultiFile(ReadOnlySpan<byte> bytes)
         {
-            var result = Parser.Parse(bytes);
+            var result = BencodeParser.Parse(bytes);
 
             var torrent = new MultiFileTorrent((BDictionary)result.BObject, GenerateInfoHash(result, bytes));
 
@@ -56,7 +56,7 @@ namespace FlyingRaijin.Engine.Bencode
         {
             var bytes = File.ReadAllBytes(filePath).AsSpan();
 
-            var result = Parser.Parse(bytes);
+            var result = BencodeParser.Parse(bytes);
 
             var torrent = new MultiFileTorrent((BDictionary)result.BObject, GenerateInfoHash(result, bytes));
 

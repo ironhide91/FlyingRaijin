@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 
 namespace FlyingRaijin.Bencode.Read
 {
-    public static partial class Parser
+    public static partial class BencodeParser
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static ErrorType ParseList(ref IBObject parent, IBObject key)

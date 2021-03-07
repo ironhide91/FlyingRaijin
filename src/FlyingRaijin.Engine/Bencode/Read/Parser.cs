@@ -1,22 +1,38 @@
 ﻿using FlyingRaijin.Bencode.BObject;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using IdGen;
+using Serilog.Context;
 
 namespace FlyingRaijin.Bencode.Read
 {
-    public static partial class Parser
+    public static partial class BencodeParser
     {
+        private static readonly IdGenerator idGenerator = new IdGenerator(0);
+
+        private static readonly ILogger log = Scroll.Logger.ForContext(typeof(BencodeParser));
+
         private static readonly ParseResult ErrorResult = new ParseResult(ErrorType.Unknown, null);
 
         private const string InfoKey = "info";
 
+        private const string PeerId = "peer id";
+
         public static ParseResult<T> Parse<T>(ReadOnlySpan<byte> bytes) where T : IBObject
         {
-            var result = Parse(bytes);
+            var temp = idGenerator.CreateId();
 
-            if (result.BObject == null || result.BObject is T)
-                return new ParseResult<T>(result.Error, (T)result.BObject);
+            log.Debug($"{temp}");
+
+            using (var logContext = LogContext.PushProperty("CorrelationId", idGenerator.CreateId()))
+            {
+                var result = Parse(bytes);
+
+                if (result.BObject == null || result.BObject is T)
+                    return new ParseResult<T>(result.Error, (T)result.BObject);
+            }
 
             return new ParseResult<T>(ErrorType.Unknown, default);
         }
@@ -36,6 +52,10 @@ namespace FlyingRaijin.Bencode.Read
             int dictionaryCount = 0;
 
             int listCount = 0;
+
+            var temp = idGenerator.CreateId();
+
+            log.Debug($"MetaInfo length {bytes.Length}");
 
             // Determine root type
             switch (bytes[++index])
@@ -62,7 +82,7 @@ namespace FlyingRaijin.Bencode.Read
                     return ErrorResult;
                 // String
                 case byte b when PositiveIntegerBytes.Contains(b):
-                    error = ParseSingleString(bytes, null, isPieces: false, ref index, out root);
+                    error = ParseSingleString(bytes, null, isByteEncoded: false, ref index, out root);
                     if (error.HasError())
                         return ErrorResult;
                     return ErrorResult;
