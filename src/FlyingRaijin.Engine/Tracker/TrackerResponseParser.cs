@@ -3,6 +3,7 @@ using FlyingRaijin.Bencode.Read;
 using FlyingRaijin.Engine.Torrent;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace FlyingRaijin.Engine.Tracker
 {
@@ -24,10 +25,7 @@ namespace FlyingRaijin.Engine.Tracker
             if (bDict.BObject.ContainsKey(TrackerResponse.WarningKey))
                 return Warning(bDict);
 
-            if (bDict.BObject.ContainsKey(TrackerResponse.WarningKey))
-                return Success(bDict);
-
-            return null;
+            return Success(bDict);
         }
 
         private static TrackerResponse Failure(ParseResult<BDictionary> bDict)
@@ -46,10 +44,10 @@ namespace FlyingRaijin.Engine.Tracker
             var responseBuilder = new TrackerResponseBuilder()
                 .WithReason(bDict.GetWarningReason())
                 .WithResponseType(TrackerResponseType.Warning)
-                .WithInterval(bDict.GetMinInterval())
-                .WithMinInterval(bDict.GetInterval())
-                .WithComplete(bDict.GetMinInterval())
-                .WithInComplete(bDict.GetInterval())
+                .WithInterval(bDict.GetInterval())
+                .WithMinInterval(bDict.GetMinInterval())
+                .WithComplete(bDict.GetComplete())
+                .WithInComplete(bDict.GetInComplete())
                 .WithTrackerId(bDict.GetTrackerId())
                 .WithPeers(bDict.GetPeers());
 
@@ -60,10 +58,10 @@ namespace FlyingRaijin.Engine.Tracker
         {
             var responseBuilder = new TrackerResponseBuilder()
                 .WithResponseType(TrackerResponseType.Success)
-                .WithInterval(bDict.GetMinInterval())
-                .WithMinInterval(bDict.GetInterval())
-                .WithComplete(bDict.GetMinInterval())
-                .WithInComplete(bDict.GetInterval())
+                .WithInterval(bDict.GetInterval())
+                .WithMinInterval(bDict.GetMinInterval())
+                .WithComplete(bDict.GetComplete())
+                .WithInComplete(bDict.GetInComplete())
                 .WithTrackerId(bDict.GetTrackerId())
                 .WithPeers(bDict.GetPeers());
 
@@ -72,58 +70,100 @@ namespace FlyingRaijin.Engine.Tracker
 
         private static string GetFailureReason(this ParseResult<BDictionary> bDict)
         {
-            var bValue = bDict.BObject.GetValue<BString>(TrackerResponse.FailureReasonKey);
+            BString result;
 
-            return bValue.StringValue;
+            if (bDict.BObject.TryGetValue<BString>(TrackerResponse.FailureReasonKey, out result))
+            {
+                return result.StringValue;
+            }
+
+            return string.Empty;
         }
 
         private static string GetWarningReason(this ParseResult<BDictionary> bDict)
         {
-            var bValue = bDict.BObject.GetValue<BString>(TrackerResponse.WarningKey);
+            BString result;
 
-            return bValue.StringValue;
+            if (bDict.BObject.TryGetValue(TrackerResponse.WarningKey, out result))
+            {
+                return result.StringValue;
+            }
+
+            return string.Empty;
         }
 
         private static long GetInterval(this ParseResult<BDictionary> bDict)
         {
-            var bValue = bDict.BObject.GetValue<BInteger>(TrackerResponse.IntervalKey);
+            BInteger result;
 
-            return bValue.Value;
+            if (bDict.BObject.TryGetValue(TrackerResponse.IntervalKey, out result))
+            {
+                return result.Value;
+            }
+
+            return 0L;
         }
 
         private static long GetMinInterval(this ParseResult<BDictionary> bDict)
         {
-            var bValue = bDict.BObject.GetValue<BInteger>(TrackerResponse.MinIntervalKey);
+            BInteger result;
 
-            return bValue.Value;
+            if (bDict.BObject.TryGetValue(TrackerResponse.MinIntervalKey, out result))
+            {
+                return result.Value;
+            }
+
+            return 0L;
         }
 
         private static long GetComplete(this ParseResult<BDictionary> bDict)
         {
-            var bValue = bDict.BObject.GetValue<BInteger>(TrackerResponse.CompleteKey);
+            BInteger result;
 
-            return bValue.Value;
+            if (bDict.BObject.TryGetValue(TrackerResponse.CompleteKey, out result))
+            {
+                return result.Value;
+            }
+
+            return 0L;
         }
 
         private static long GetInComplete(this ParseResult<BDictionary> bDict)
         {
-            var bValue = bDict.BObject.GetValue<BInteger>(TrackerResponse.InCompleteKey);
+            BInteger result;
 
-            return bValue.Value;
+            if (bDict.BObject.TryGetValue(TrackerResponse.InCompleteKey, out result))
+            {
+                return result.Value;
+            }
+
+            return 0L;
         }
 
         private static string GetTrackerId(this ParseResult<BDictionary> bDict)
         {
-            var bValue = bDict.BObject.GetValue<BString>(TrackerResponse.TrackerIdKey);
+            BString result;
 
-            return bValue.StringValue;
+            if (bDict.BObject.TryGetValue(TrackerResponse.TrackerIdKey, out result))
+            {
+                return result.StringValue;
+            }
+
+            return string.Empty;
         }
 
         private static IEnumerable<Peer> GetPeers(this ParseResult<BDictionary> bDict)
         {
-            var bValue = bDict.BObject.GetValue<BString>(TrackerResponse.TrackerIdKey);
+            BString result;
 
-            return null;
+            if (bDict.BObject.TryGetValue(TrackerResponse.PeersKey, out result))
+            {
+                IList<Peer> peers;
+                CompactPeerParser.TryParsePeers(result.Value.Span, out peers);
+                return peers;
+            }
+
+            return Enumerable.Empty<Peer>();
         }
     }
 }

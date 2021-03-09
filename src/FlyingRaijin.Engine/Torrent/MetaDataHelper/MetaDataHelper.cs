@@ -23,6 +23,23 @@ namespace FlyingRaijin.Engine.Torrent
             return value;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal static bool TryGetValue<T>(this BDictionary dictionary, string key, out T result) where T : IBObject
+        {
+            result = default;
+
+            if (dictionary == null || key == null)
+                return false;
+
+            if (dictionary.ContainsKey(key))
+            {
+                result = (T)dictionary[key];
+                return true;
+            }
+
+            return false;
+        }
+
         private const string RootInfoKey = "info";
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static BDictionary ReadInfo(this BDictionary bDict)

@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Specialized;
+using System.Text;
 using System.Web;
 
 namespace FlyingRaijin.Engine.Tracker
@@ -24,68 +24,64 @@ namespace FlyingRaijin.Engine.Tracker
         private const string eventTypeStopped   = "stopped";
         private const string eventTypeCompleted = "completed";
 
-        private readonly UriBuilder          uriBuilder;
-        private readonly NameValueCollection query;
+        private readonly StringBuilder strBuilder;
 
-        public TrackerRequestBuilder(string uri)
+        public TrackerRequestBuilder(string announceUrl)
         {
-            uriBuilder = new UriBuilder(uri);
-
-            query = HttpUtility.ParseQueryString(uriBuilder.Query);
+            strBuilder = new StringBuilder(200);
+            strBuilder.Append($"{announceUrl}?");
         }
 
         public string Build()
         {
-            uriBuilder.Query = query.ToString();
-
-            return uriBuilder.ToString();
+            return strBuilder.ToString();
         }
 
         public TrackerRequestBuilder WithInfoHash(byte[] value)
         {
-            query[infoHashName] = HttpUtility.UrlEncode(value);
+            strBuilder.Append($"{infoHashName}={HttpUtility.UrlEncode(value)}&");
             return this;
         }
 
         public TrackerRequestBuilder WithPeerId(string value)
         {
-            query[peerIdName] = HttpUtility.UrlEncode(value);
+            strBuilder.Append($"{peerIdName}={value}&");
             return this;
         }
 
         public TrackerRequestBuilder WithIP(string value)
         {
-            query[ipName] = value;
+            strBuilder.Append($"{ipName}={value}&");
             return this;
         }
 
         public TrackerRequestBuilder WithPort(int value)
         {
-            query[portName] = value.ToString();
+            strBuilder.Append($"{portName}={value}&");
             return this;
         }
 
         public TrackerRequestBuilder WithUploaded(long value)
         {
-            query[uploadedName] = value.ToString();
+            strBuilder.Append($"{uploadedName}={value}&");
             return this;
         }
 
         public TrackerRequestBuilder WithDownloaded(long value)
         {
-            query[downloadedName] = value.ToString();
+            strBuilder.Append($"{downloadedName}={value}&");
             return this;
         }
 
         public TrackerRequestBuilder WithLeft(long value)
         {
-            query[leftName] = value.ToString();
+            strBuilder.Append($"{leftName}={value}&");
             return this;
         }        
 
         public TrackerRequestBuilder WithCompact(int value)
         {
-            query[compactName] = value.ToString();
+            strBuilder.Append($"{compactName}={value}&");
             return this;
         }
 
@@ -94,13 +90,13 @@ namespace FlyingRaijin.Engine.Tracker
             switch (value)
             {
                 case EventType.Started:
-                    query[eventTypeName] = eventTypeStarted;
+                    strBuilder.Append($"{eventTypeName}={eventTypeStarted}&");
                     break;
                 case EventType.Stopped:
-                    query[eventTypeName] = eventTypeStopped;
+                    strBuilder.Append($"{eventTypeName}={eventTypeStopped}&");
                     break;
                 case EventType.Completed:
-                    query[eventTypeName] = eventTypeCompleted;
+                    strBuilder.Append($"{eventTypeName}={eventTypeCompleted}&");
                     break;
                 default:
                     break;
@@ -111,25 +107,25 @@ namespace FlyingRaijin.Engine.Tracker
 
         public TrackerRequestBuilder WithTrackerId(int value)
         {
-            query[trackerIdName] = value.ToString();
+            strBuilder.Append($"{trackerIdName}={value}&");
             return this;
         }
 
         public TrackerRequestBuilder WithNoPeerId(int value)
         {
-            query[noPeerIdName] = value.ToString();
+            strBuilder.Append($"{noPeerIdName}={value}&");
             return this;
         }        
 
         public TrackerRequestBuilder WithNumWant(int value)
         {
-            query[numWantName] = value.ToString();
+            strBuilder.Append($"{numWantName}={value}&");
             return this;
         }
 
         public TrackerRequestBuilder WithKey(int value)
         {
-            query[keyName] = value.ToString();
+            strBuilder.Append($"{keyName}={value}&");
             return this;
         }
     }
