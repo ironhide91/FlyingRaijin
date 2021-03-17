@@ -3,61 +3,50 @@ using System.Collections.Generic;
 
 namespace FlyingRaijin.Engine.Tracker
 {
-    internal class TrackerRequest
+    public class TrackerRequest
     {
-        internal TrackerRequest Create(
-            byte[] infoHash,
-            byte[] peerId,
-               int port,
-              long uploaded,
-              long downloaded,
-              long left,
-               int eventType,
-            string ip,
-               int NumWant)
-        {
-            return new TrackerRequest(
-                infoHash,
-                peerId,
-                port,
-                uploaded,
-                downloaded,
-                left,
-                eventType,
-                ip,
-                NumWant);
-        }
-
-        private TrackerRequest(
-            byte[] infoHash,
-            byte[] peerId,
-               int port,
-              long uploaded,
-              long downloaded,
-              long left,
-               int eventType,
-            string ip,
-               int numWant)
+        public TrackerRequest(
+               byte[] infoHash,
+               byte[] peerId,
+               string ip,
+                  int port,
+                 long uploaded,
+                 long downloaded,
+                 long left,
+            EventType eventType,
+                  int compact,
+                  int trackerId,               
+                  int noPeerId,
+                  int numWant,
+                  int key)
         {
               InfoHash = Array.AsReadOnly(infoHash);
                 PeerId = Array.AsReadOnly(peerId);
+                    IP = ip;
                   Port = port;
               Uploaded = uploaded;
             Downloaded = downloaded;
                   Left = left;
                  Event = eventType;
-                    IP = ip;
+               Compact = compact;
+             TrackerId = trackerId;               
+              NoPeerId = noPeerId;
                NumWant = numWant;
+                   Key = key;
         }
 
-        internal readonly IList<byte> InfoHash;
-        internal readonly IList<byte> PeerId;
-        internal readonly         int Port;
-        internal readonly        long Uploaded;
-        internal readonly        long Downloaded;
-        internal readonly        long Left;
-        internal readonly         int Event;
-        internal readonly      string IP;
-        internal readonly         int NumWant;
+        public readonly IList<byte> InfoHash;
+        public readonly IList<byte> PeerId;
+        public readonly string      IP;
+        public readonly int         Port;
+        public readonly long        Uploaded;
+        public readonly long        Downloaded;
+        public readonly long        Left;
+        public readonly EventType   Event; 
+        public readonly int         Compact;
+        public readonly int         TrackerId; 
+        public readonly int         NoPeerId;
+        public readonly int         NumWant;
+        public readonly int         Key;
     }
 }

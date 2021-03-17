@@ -13,7 +13,7 @@ namespace FlyingRaijin.Test.Engine.BencodeStringLiterals
         [InlineData("d4:name10:SomeFoldere")]
         public void CanReadNameInfoMultiKey(string bencode)
         {
-            var result = Parser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
+            var result = BencodeParser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
             var temp = result.BObject.ReadMultiName();
 
             temp.Should().NotBeNull();
@@ -24,7 +24,7 @@ namespace FlyingRaijin.Test.Engine.BencodeStringLiterals
         [InlineData("d3:nam10:SomeFoldere")]
         public void MissingNameInfoMultiKey(string bencode)
         {
-            var result = Parser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
+            var result = BencodeParser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
             var temp = result.BObject.ReadMultiName();
 
             temp.Should().BeEmpty();
@@ -34,7 +34,7 @@ namespace FlyingRaijin.Test.Engine.BencodeStringLiterals
         [InlineData("d5:filesldededeee")]
         public void CanReadFilesInfoMultiKey(string bencode)
         {
-            var result = Parser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
+            var result = BencodeParser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
             var temp = result.BObject.ReadMultiFiles();
 
             temp.Should().NotBeNull();
@@ -45,7 +45,7 @@ namespace FlyingRaijin.Test.Engine.BencodeStringLiterals
         [InlineData("d4:fileldededeee")]
         public void MissingFilesInfoMultiKey(string bencode)
         {
-            var result = Parser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
+            var result = BencodeParser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
             var temp = result.BObject.ReadMultiFiles();
 
             temp.Should().NotBeNull();
@@ -87,7 +87,7 @@ namespace FlyingRaijin.Test.Engine.BencodeStringLiterals
                 strBuilder.Append("e");
             strBuilder.Append("e");
 
-            var result = Parser.Parse<BDictionary>(strBuilder.ToString().AsReadOnlyByteSpan());
+            var result = BencodeParser.Parse<BDictionary>(strBuilder.ToString().AsReadOnlyByteSpan());
             var temp = result.BObject.ReadMultiFiles();
 
             temp.Should().NotBeNull();

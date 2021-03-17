@@ -17,5 +17,8 @@ namespace FlyingRaijin.Engine.Torrent
         public abstract string Encoding { get; }
 
         public abstract T Info { get; }
+
+        public abstract ReadOnlyMemory<byte> InfoHash { get; }
+
     }
 }

@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace FlyingRaijin.Bencode.Read
 {
-    public static partial class Parser
+    public static partial class BencodeParser
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static ReadOnlySpan<byte> SliceExclude(this ReadOnlySpan<byte> bytes, int start, int end)

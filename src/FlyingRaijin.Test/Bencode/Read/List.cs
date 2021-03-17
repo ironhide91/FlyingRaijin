@@ -11,7 +11,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         [InlineData("l4:spame")]
         public void CanParseSimple1(string bencode)
         {
-            var result = Parser.Parse<BList>(bencode.AsReadOnlyByteSpan());
+            var result = BencodeParser.Parse<BList>(bencode.AsReadOnlyByteSpan());
 
             result.Should().NotBeNull();
             result.Error.Should().Be(ErrorType.None);
@@ -29,7 +29,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         [InlineData("l4:spami42ee")]
         public void CanParseSimple2(string bencode)
         {
-            var result = Parser.Parse<BList>(bencode.AsReadOnlyByteSpan());
+            var result = BencodeParser.Parse<BList>(bencode.AsReadOnlyByteSpan());
 
             result.Should().NotBeNull();
             result.Error.Should().Be(ErrorType.None);
@@ -52,7 +52,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         [InlineData("l5:Hello6:World!li123ei456eee")]
         public void CanParseNested1(string bencode)
         {
-            var result = Parser.Parse<BList>(bencode.AsReadOnlyByteSpan());
+            var result = BencodeParser.Parse<BList>(bencode.AsReadOnlyByteSpan());
 
             result.Should().NotBeNull();
             result.Error.Should().Be(ErrorType.None);
@@ -91,7 +91,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         [InlineData("le")]
         public void CanParseEmptyList(string bencode)
         {
-            var result = Parser.Parse<BList>(bencode.AsReadOnlyByteSpan());
+            var result = BencodeParser.Parse<BList>(bencode.AsReadOnlyByteSpan());
 
             result.Should().NotBeNull();
             result.Error.Should().Be(ErrorType.None);
@@ -110,7 +110,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         [InlineData("e")]
         public void InvalidBelowMinimumLength2(string bencode)
         {
-            var result = Parser.Parse<BList>(bencode.AsReadOnlyByteSpan());
+            var result = BencodeParser.Parse<BList>(bencode.AsReadOnlyByteSpan());
 
             result.Should().NotBeNull();
             result.Error.Should().NotBe(ErrorType.None);
@@ -126,7 +126,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         [InlineData(".e")]
         public void InvalidFirstChar(string bencode)
         {
-            var result = Parser.Parse<BList>(bencode.AsReadOnlyByteSpan());
+            var result = BencodeParser.Parse<BList>(bencode.AsReadOnlyByteSpan());
 
             result.Should().NotBeNull();
             result.Error.Should().NotBe(ErrorType.None);
@@ -139,7 +139,7 @@ namespace FlyingRaijin.Test.Bencode.Read
         [InlineData("l:")]
         public void InvalidMissingEndChar(string bencode)
         {
-            var result = Parser.Parse<BList>(bencode.AsReadOnlyByteSpan());
+            var result = BencodeParser.Parse<BList>(bencode.AsReadOnlyByteSpan());
 
             result.Should().NotBeNull();
             result.Error.Should().NotBe(ErrorType.None);

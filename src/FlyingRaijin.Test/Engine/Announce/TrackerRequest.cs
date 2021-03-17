@@ -1,11 +1,14 @@
-﻿using System.Net.Http;
-using System.Web;
-using Xunit;
+﻿using FluentAssertions;
 using FlyingRaijin.Bencode.BObject;
 using FlyingRaijin.Bencode.Read;
-using System.Text;
+using FlyingRaijin.Engine.Bencode;
+using FlyingRaijin.Engine.Tracker;
 using System;
 using System.IO;
+using System.Net.Http;
+using System.Text;
+using System.Web;
+using Xunit;
 
 namespace FlyingRaijin.Test.Engine.Announce
 {
@@ -13,48 +16,146 @@ namespace FlyingRaijin.Test.Engine.Announce
     {
         private static readonly HttpClient httpClient = new HttpClient();
 
+        private const string announceUrl = "https://torrent.ubuntu.com/announce";        
+
         [Fact]
-        public void TrackerRequest1()
+        public void InfoHash()
         {
-            //string str= @"http://legittorrents.info:2710/announce?info_hash=%0A%D8K%FD%EA%91%B2%B43H%F1%BE%0C%9AD%96nr%EC%97&peer_id=b9970db982b16628419f47ebaddc53334a118cc8&port=25962&uploaded=0&downloaded=0&left=314572800&event=started&ip=255.255.255.255&num_want=10";
-            //                                           //announce?info_hash=%0A%D8K%FD%EA%91%B2%B43H%F1%BE%0C%9AD%96nr%EC%97&peer_id=TIX0276-f1a2a0i1d6d2&port=25962&uploaded=0&downloaded=0&left=314572800&corrupt=0&key=1Q2O5P0Q&event=started&numwant=100&compact=1&no_peer_id=1 HTTP/1.1\r\n
+            var url = new TrackerRequestBuilder(announceUrl)
+                .WithInfoHash(new byte[]
+                {
+                    209,16,26,43,
+                    157,32,40,17,
+                    160,94,140,87,
+                    197,87,162,11,
+                    249,116,220,138
+                })
+                .Build();
 
-            //var temp = HttpUtility.UrlEncode("0ad84bfdea91b2b43348f1be0c9a44966e72ec97");
+            url.Should().NotBeNullOrEmpty();
+            url.Should().Be($"https://torrent.ubuntu.com/announce?info_hash=%d1%10%1a%2b%9d+(%11%a0%5e%8cW%c5W%a2%0b%f9t%dc%8a&");
+        }
 
-            //var response = httpClient.GetStringAsync(str).Result;
+        [Fact]
+        public void IP()
+        {
+            var url = new TrackerRequestBuilder(announceUrl)
+                .WithIP("255.255.255.255")
+                .Build();
 
-            //int i = 0;
-            //foreach (var item in response.AsReadOnlyByteSpan())
-            //{
-            //    System.Diagnostics.Debug.WriteLine($"{i}-{item}");
-            //    i++;
-            //}
+            url.Should().NotBeNullOrEmpty();
+            url.Should().Be($"https://torrent.ubuntu.com/announce?ip=255.255.255.255&");
+        }
 
-            //var bencode = "d8:completei6e10:incompletei1e8:intervali1800e12:min intervali1800e5:peers42:g?O?ej?&3???L?× ,X?-Y??S?_^c?#'.??Q??e";
-            var bencode = "d8:completei2e10:incompletei1e8:intervali1800e12:min intervali1800e5:peers18:¸:Ñ‘=gÄOìej¸”}¾Ûe";
+        [Fact]
+        public void Port()
+        {
+            var url = new TrackerRequestBuilder(announceUrl)
+                .WithPort(25962)
+                .Build();
 
-            //ReadOnlySpan<byte> bytes = Encoding.UTF8.GetBytes(bencode);
-            //var bytes = Encoding.UTF8.GetBytes(bencode);
+            url.Should().NotBeNullOrEmpty();
+            url.Should().Be("https://torrent.ubuntu.com/announce?port=25962&");
+        }
 
-            //char[] bcs = new char[18];
-            //Span<char> chars = new Span<char>(bcs);
+        [Fact]
+        public void Uploaded()
+        {
+            var url = new TrackerRequestBuilder(announceUrl)
+                .WithUploaded(362145L)
+                .Build();
 
-            ////var str = Encoding.UTF8.GetChars(bytes.Slice(77), chars);
-            ////var str = Encoding.UTF8.GetChars(bytes, 77 , , chars);
-            //var strc = Encoding.UTF8.GetCharCount(bytes);
-            ////strc.is
+            url.Should().NotBeNullOrEmpty();
+            url.Should().Be("https://torrent.ubuntu.com/announce?uploaded=362145&");
+        }
 
-            //var ms = new MemoryStream(bytes);
+        [Fact]
+        public void Downloaded()
+        {
+            var url = new TrackerRequestBuilder(announceUrl)
+                .WithDownloaded(456781L)
+                .Build();
 
-            //var streamReader = new StreamReader(ms, Encoding.UTF8);
-            //streamReader.BaseStream.Seek(77, SeekOrigin.Begin);
-            //var num = streamReader.Read(bcs, 0, 18);
+            url.Should().NotBeNullOrEmpty();
+            url.Should().Be("https://torrent.ubuntu.com/announce?downloaded=456781&");
+        }
 
-            var res = Parser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
-            
+        [Fact]
+        public void Left()
+        {
+            var url = new TrackerRequestBuilder(announceUrl)
+                .WithLeft(753951L)
+                .Build();
 
+            url.Should().NotBeNullOrEmpty();
+            url.Should().Be("https://torrent.ubuntu.com/announce?left=753951&");
+        }
+
+        [Fact]
+        public void EventStarted()
+        {
+            var url = new TrackerRequestBuilder(announceUrl)
+                .WithEvent(EventType.Started)
+                .Build();
+
+            url.Should().NotBeNullOrEmpty();
+            url.Should().Be("https://torrent.ubuntu.com/announce?event=started&");
+        }
+
+        [Fact]
+        public void EventStopped()
+        {
+            var url = new TrackerRequestBuilder(announceUrl)
+                .WithEvent(EventType.Stopped)
+                .Build();
+
+            url.Should().NotBeNullOrEmpty();
+            url.Should().Be("https://torrent.ubuntu.com/announce?event=stopped&");
+        }
+
+        [Fact]
+        public void EventCompleted()
+        {
+            var url = new TrackerRequestBuilder(announceUrl)
+                .WithEvent(EventType.Completed)
+                .Build();
+
+            url.Should().NotBeNullOrEmpty();
+            url.Should().Be("https://torrent.ubuntu.com/announce?event=completed&");
+        }
+
+        [Fact]
+        public void CompleteRequest()
+        {
+            var filePath = "Artifacts\\Torrents\\ubuntu-20.04.2.0-desktop-amd64.iso.torrent";
+
+            var torrent = BencodeEngine.Instance.ReadsingleFile(File.ReadAllBytes(filePath).AsSpan());
+
+            var url = new TrackerRequestBuilder(torrent.AnnounceUrl)
+                .WithInfoHash(torrent.InfoHash.ToArray())
+                .WithPeerId("ABCDEFGHIJKLMNOPQRST")
+                .WithIP("255.255.255.255")
+                .WithPort(25962)
+                .WithUploaded(0)
+                .WithDownloaded(0)
+                .WithLeft(0)
+                .WithEvent(EventType.Started)
+                .WithCompact(1)
+                .Build();
+
+            var expectedRequest = "https://torrent.ubuntu.com/announce?"
+                + "info_hash=K%a4%fb%f7%23%1a%3af%0e%86%89%27%07%d2%5c%13U3%a1j&"
+                + "peer_id=ABCDEFGHIJKLMNOPQRST&"
+                + "ip=255.255.255.255&"
+                + "port=25962&"
+                + "uploaded=0&"
+                + "downloaded=0&"
+                + "left=0&"
+                + "event=started&"
+                + "compact=1&";
+
+            url.Should().NotBeNullOrEmpty();
+            url.Should().Be(expectedRequest);
         }
     }
-
-    //b9970db982b16628419f47ebaddc53334a118cc8
 }

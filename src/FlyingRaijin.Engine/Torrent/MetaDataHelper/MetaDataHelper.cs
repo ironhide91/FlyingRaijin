@@ -10,7 +10,7 @@ namespace FlyingRaijin.Engine.Torrent
     public static partial class MetaDataHelper
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static T GetValue<T>(this BDictionary dictionary, string key) where T : IBObject
+        internal static T GetValue<T>(this BDictionary dictionary, string key) where T : IBObject
         {
             T value = default;
 
@@ -21,6 +21,23 @@ namespace FlyingRaijin.Engine.Torrent
                 value = (T)dictionary[key];
 
             return value;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal static bool TryGetValue<T>(this BDictionary dictionary, string key, out T result) where T : IBObject
+        {
+            result = default;
+
+            if (dictionary == null || key == null)
+                return false;
+
+            if (dictionary.ContainsKey(key))
+            {
+                result = (T)dictionary[key];
+                return true;
+            }
+
+            return false;
         }
 
         private const string RootInfoKey = "info";
