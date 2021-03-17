@@ -131,7 +131,7 @@ namespace FlyingRaijin.Test.Engine.Announce
 
             var torrent = BencodeEngine.Instance.ReadsingleFile(File.ReadAllBytes(filePath).AsSpan());
 
-            var requestBuilder = new TrackerRequestBuilder(torrent.AnnounceUrl)
+            var url = new TrackerRequestBuilder(torrent.AnnounceUrl)
                 .WithInfoHash(torrent.InfoHash.ToArray())
                 .WithPeerId("ABCDEFGHIJKLMNOPQRST")
                 .WithIP("255.255.255.255")
@@ -143,28 +143,19 @@ namespace FlyingRaijin.Test.Engine.Announce
                 .WithCompact(1)
                 .Build();
 
-            //var sb = new StringBuilder();
-            //sb.Clear();
-            //sb.Append("https://torrent.ubuntu.com/announce?");
-            //sb.Append($"info_hash={HttpUtility.UrlEncode(torrent.InfoHash.ToArray())}");
-            //sb.Append("&peer_id=ABCDEFGHIJKLMNOPQRST");
-            //sb.Append("&port=25962");
-            //sb.Append("&uploaded=0");
-            //sb.Append("&downloaded=0");
-            //sb.Append("&left=0");
-            //sb.Append("&event=started");
-            //sb.Append("&ip=255.255.255.255");
-            //sb.Append("&compact=1");
-            //sb.Append("no_peer_id=1");
+            var expectedRequest = "https://torrent.ubuntu.com/announce?"
+                + "info_hash=K%a4%fb%f7%23%1a%3af%0e%86%89%27%07%d2%5c%13U3%a1j&"
+                + "peer_id=ABCDEFGHIJKLMNOPQRST&"
+                + "ip=255.255.255.255&"
+                + "port=25962&"
+                + "uploaded=0&"
+                + "downloaded=0&"
+                + "left=0&"
+                + "event=started&"
+                + "compact=1&";
 
-            var response = httpClient.GetByteArrayAsync(requestBuilder).Result;
-            //var response = httpClient.GetByteArrayAsync(sb.ToString()).Result;
-
-            System.Diagnostics.Debug.WriteLine(Encoding.UTF8.GetString(response));
-
-            var res = BencodeParser.Parse<BDictionary>(response);
-
-            var parsedResponse = TrackerResponseParser.Parse(response);
+            url.Should().NotBeNullOrEmpty();
+            url.Should().Be(expectedRequest);
         }
     }
 }
