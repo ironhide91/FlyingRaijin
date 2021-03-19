@@ -4,15 +4,14 @@ namespace FlyingRaijin.Engine.Tracker
 {
     public class TrackerResponseBuilder
     {
-        private string            reason;
-        private string            warning;
-        private long              interval;
-        private long              minInterval;        
-        private long              complete;
-        private long              inComplete;
-        private string            trackerId;
-        private IEnumerable<Peer> peers;
-
+        private string              reason;
+        private string              warning;
+        private long                interval;
+        private long                minInterval;        
+        private long                complete;
+        private long                inComplete;
+        private string              trackerId;
+        private IEnumerable<Peer>   peers;
         private TrackerResponseType responseType;
 
         public TrackerResponseBuilder()
