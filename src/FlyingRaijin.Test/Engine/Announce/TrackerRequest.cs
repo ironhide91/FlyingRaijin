@@ -1,21 +1,14 @@
 ﻿using FluentAssertions;
-using FlyingRaijin.Bencode.BObject;
-using FlyingRaijin.Bencode.Read;
 using FlyingRaijin.Engine.Bencode;
 using FlyingRaijin.Engine.Tracker;
 using System;
 using System.IO;
-using System.Net.Http;
-using System.Text;
-using System.Web;
 using Xunit;
 
 namespace FlyingRaijin.Test.Engine.Announce
 {
     public class TrackerRequest
     {
-        private static readonly HttpClient httpClient = new HttpClient();
-
         private const string announceUrl = "https://torrent.ubuntu.com/announce";        
 
         [Fact]
