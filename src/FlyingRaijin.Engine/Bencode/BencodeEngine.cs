@@ -9,58 +9,32 @@ using System.Text;
 
 namespace FlyingRaijin.Engine.Bencode
 {
-    public sealed class BencodeEngine : IBencodeEngine
+    public static class BencodeEngine
     {
-        private BencodeEngine()
-        {
+        private static readonly SHA1Managed sha1Managed = new SHA1Managed();
 
+        public static ParseResult<BDictionary> Parse(ReadOnlySpan<byte> data)
+        {
+            return BencodeParser.Parse<BDictionary>(data);
         }
 
-        private static readonly Lazy<BencodeEngine> lazy =
-            new Lazy<BencodeEngine> (() => new BencodeEngine());
-
-        public static BencodeEngine Instance { get { return lazy.Value; } }
-
-        private static readonly SHA1Managed sHA1Managed = new SHA1Managed();
-
-        public SingleFileTorrent ReadsingleFile(ReadOnlySpan<byte> bytes)
-        {
-            var result = BencodeParser.Parse(bytes);
-
-            var torrent = new SingleFileTorrent((BDictionary)result.BObject, GenerateInfoHash(result, bytes));
-
-            return torrent;
-        }
-
-        public SingleFileTorrent ReadsingleFile(string filePath)
+        public static ParseResult<BDictionary> Parse(string filePath)
         {
             var bytes = File.ReadAllBytes(filePath).AsSpan();
 
-            var result = BencodeParser.Parse(bytes);
+            return BencodeParser.Parse<BDictionary>(bytes);
+        }
 
-            var torrent = new SingleFileTorrent((BDictionary)result.BObject, GenerateInfoHash(result, bytes));
+        public static MetaData ReadMetaData(ReadOnlySpan<byte> data, ParseResult<BDictionary> result)
+        {
+            var torrent = new MetaData(result.BObject, GenerateInfoHash(result, data));
 
             return torrent;
         }
 
-        public MultiFileTorrent ReadMultiFile(ReadOnlySpan<byte> bytes)
+        public static MetaData ParseAndReadMetaData(ReadOnlySpan<byte> data)
         {
-            var result = BencodeParser.Parse(bytes);
-
-            var torrent = new MultiFileTorrent((BDictionary)result.BObject, GenerateInfoHash(result, bytes));
-
-            return torrent;
-        }
-
-        public MultiFileTorrent ReadMultiFile(string filePath)
-        {
-            var bytes = File.ReadAllBytes(filePath).AsSpan();
-
-            var result = BencodeParser.Parse(bytes);
-
-            var torrent = new MultiFileTorrent((BDictionary)result.BObject, GenerateInfoHash(result, bytes));
-
-            return torrent;
+            return ReadMetaData(data, Parse(data));
         }
 
         private static ReadOnlyMemory<byte> GenerateInfoHash(ParseResult result, ReadOnlySpan<byte> bytes)
@@ -74,11 +48,10 @@ namespace FlyingRaijin.Engine.Bencode
 
             var bytesToHash = bytes.Slice(result.InfoBeginIndex, (result.InfoEndIndex - result.InfoBeginIndex+1));
 
-            int read = 0;
-
-            if (sHA1Managed.TryComputeHash(bytesToHash, spanBuffer, out read))
+            if (sha1Managed.TryComputeHash(bytesToHash, spanBuffer, out _))
             {
                 ReadOnlyMemory<byte> hash = spanBuffer.Slice(0, 20).ToArray().AsMemory();
+
                 ArrayPool<byte>.Shared.Return(rawBuffer);
 
                 var sb = new StringBuilder();
@@ -87,9 +60,6 @@ namespace FlyingRaijin.Engine.Bencode
                 {
                     sb.Append(hash.Span[i].ToString("X2"));
                 }
-
-                //var temp = Uri.EscapeUriString(sb.ToString());
-                var temp = System.Net.WebUtility.UrlEncode(sb.ToString());
 
                 return hash;
             }

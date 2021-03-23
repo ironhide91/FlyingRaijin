@@ -1,8 +1,8 @@
 ﻿using Akka.Actor;
-using FlyingRaijin.Engine.ActorModel.Actors;
+using FlyingRaijin.Engine.Actors;
 using System;
 
-namespace FFlyingRaijin.Engine.ActorModel
+namespace FFlyingRaijin.Engine.Actors
 {
     internal class EngineActorSystem
     {
@@ -22,7 +22,7 @@ namespace FFlyingRaijin.Engine.ActorModel
         internal void Start()
         {
             engineActorSystem = ActorSystem.Create("Engine");
-            newTorrentEngineActorRef = engineActorSystem.ActorOf<NewTorrentEngineActor>(nameof(NewTorrentEngineActor));
+            newTorrentEngineActorRef = engineActorSystem.ActorOf<NewTorrentActor>(nameof(NewTorrentActor));
         }
 
         internal void Stop()

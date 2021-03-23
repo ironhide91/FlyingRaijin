@@ -14,7 +14,7 @@ namespace FlyingRaijin.Bencode.Read
 
         private static readonly ILogger log = Scroll.Logger.ForContext(typeof(BencodeParser));
 
-        private static readonly ParseResult ErrorResult = new ParseResult(ErrorType.Unknown, null);
+        private static readonly ParseResult ErrorResult = new ParseResult(ErrorType.Unknown, null, -1, -1);
 
         private const string InfoKey = "info";
 
@@ -31,10 +31,10 @@ namespace FlyingRaijin.Bencode.Read
                 var result = Parse(bytes);
 
                 if (result.BObject == null || result.BObject is T)
-                    return new ParseResult<T>(result.Error, (T)result.BObject);
+                    return new ParseResult<T>(result.Error, (T)result.BObject, result.InfoBeginIndex, result.InfoEndIndex);
             }
 
-            return new ParseResult<T>(ErrorType.Unknown, default);
+            return new ParseResult<T>(ErrorType.Unknown, default, -1, -1);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -78,14 +78,14 @@ namespace FlyingRaijin.Bencode.Read
                 case intStart:
                     error = ParseSingleInteger(bytes, null, ref index, out root);
                     if (error.HasError())
-                        return ErrorResult;
-                    return ErrorResult;
+                        return new ParseResult(error, null, -1, -1);
+                    return new ParseResult(error, root, -1, -1);
                 // String
                 case byte b when PositiveIntegerBytes.Contains(b):
                     error = ParseSingleString(bytes, null, isByteEncoded: false, ref index, out root);
                     if (error.HasError())
-                        return ErrorResult;
-                    return ErrorResult;
+                        return new ParseResult(error, null, -1, -1);
+                    return new ParseResult(error, root, -1, -1);
                 // Unknown
                 default:
                     return ErrorResult;
@@ -117,7 +117,7 @@ namespace FlyingRaijin.Bencode.Read
                         }
                         error = ParseDictionary(ref currentParent, key);
                         if (error.HasError())
-                            return new ParseResult(error, null);
+                            return new ParseResult(error, null, -1, -1);
                         SetExpectingKeyFlag(ref dictionaryCount, ref expectingKey);
                         break;
                     // List
@@ -125,14 +125,14 @@ namespace FlyingRaijin.Bencode.Read
                         listCount++;
                         error = ParseList(ref currentParent, key);
                         if (error.HasError())
-                            return new ParseResult(error, null);
+                            return new ParseResult(error, null, -1, -1);
                         SetExpectingKeyFlag(ref dictionaryCount, ref expectingKey);
                         break;
                     // Integer
                     case intStart:
                         error = ParseInteger(bytes, currentParent, ref index, key);
                         if (error.HasError())
-                            return new ParseResult(error, null);
+                            return new ParseResult(error, null, -1, -1);
                         SetExpectingKeyFlag(ref dictionaryCount, ref expectingKey);
                         break;
                     // End { Dictionary, List, Integer }
@@ -162,21 +162,21 @@ namespace FlyingRaijin.Bencode.Read
                     case byte b when PositiveIntegerBytes.Contains(b):
                         error = ParseString(bytes, currentParent, ref index, ref expectingKey, ref key);
                         if (error.HasError())
-                            return new ParseResult(error, null);
+                            return new ParseResult(error, null, -1, -1);
                         if (key is BString @keyString && keyString.StringValue == InfoKey)
                             isInfoDictionary = true;
                         break;
                     // Unkown
                     default:
-                        return new ParseResult(ErrorType.Unknown, null);
+                        return new ParseResult(ErrorType.Unknown, null, -1, -1);
                 }
             }
 
             if (dictionaryCount != 0)
-                return new ParseResult(ErrorType.DictionaryInvalid, null);
+                return new ParseResult(ErrorType.DictionaryInvalid, null, -1, -1);
 
             if (listCount != 0)
-                return new ParseResult(ErrorType.ListInvalid, null);            
+                return new ParseResult(ErrorType.ListInvalid, null, -1, -1);            
 
             return new ParseResult(error, currentParent, infoDictionatStartIndex, infoDictionatEndIndex);
         }

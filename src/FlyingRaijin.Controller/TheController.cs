@@ -22,7 +22,7 @@ namespace FlyingRaijin.Controller
 
         public void Add(string filePath)
         {
-            newTorrentClientActorRef.Tell(new NewTorrentRequest(filePath));
+            newTorrentClientActorRef.Tell(new NewTorrentCommand(filePath));
         }
 
         public void Dispose()

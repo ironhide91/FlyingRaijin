@@ -122,7 +122,7 @@ namespace FlyingRaijin.Test.Engine.Announce
         {
             var filePath = "Artifacts\\Torrents\\ubuntu-20.04.2.0-desktop-amd64.iso.torrent";
 
-            var torrent = BencodeEngine.Instance.ReadsingleFile(File.ReadAllBytes(filePath).AsSpan());
+            var torrent = BencodeEngine.ParseAndReadMetaData(File.ReadAllBytes(filePath).AsSpan());
 
             var url = new TrackerRequestBuilder(torrent.AnnounceUrl)
                 .WithInfoHash(torrent.InfoHash.ToArray())

@@ -13,13 +13,13 @@ namespace FlyingRaijin.Test.ControllerActors
         [Fact]
         public void NewTorrentRequest()
         {
-            var message = new NewTorrentRequest("test");
+            var message = new NewTorrentCommand("test");
             var subject = Sys.ActorOf<NewTorrentClientActor>();
 
             var probe = CreateTestProbe();
             subject.Tell(message);
 
-            var result = ExpectMsg<NewTorrentRequest>(TimeSpan.FromSeconds(1));
+            var result = ExpectMsg<NewTorrentCommand>(TimeSpan.FromSeconds(1));
             result.Should().NotBeNull();
             result.FilePath.Should().NotBeNull();
             result.FilePath.Should().BeEquivalentTo(message.FilePath);

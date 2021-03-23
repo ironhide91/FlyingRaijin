@@ -203,19 +203,5 @@ namespace FlyingRaijin.Test.Bencode.Read
             result.Error.Should().NotBe(ErrorType.None);
             result.BObject.Should().BeNull();
         }
-
-        [Fact]
-        public void Case9()
-        {
-            //var bencode = "d2:ip14:192.131.44.1337:peer id20:-lt0D80-�s�u�wSMuԐ4:porti60809ee";
-
-            var peerId = "20:-lt0D80-�s�u�wSMuԐ";
-
-            var result = BencodeParser.Parse<BString>(peerId.AsReadOnlyByteSpan());
-
-            result.Should().NotBeNull();
-            result.Error.Should().NotBe(ErrorType.None);
-            result.BObject.Should().BeNull();
-        }
     }
 }

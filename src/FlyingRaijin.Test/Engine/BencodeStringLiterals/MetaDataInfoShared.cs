@@ -9,7 +9,7 @@ namespace FlyingRaijin.Test.Engine.BencodeStringLiterals
     public class MetaDataInfoShared
     {
         [Theory]
-        [InlineData("d12:piece lengthi512ee")]
+        [InlineData("d4:infod12:piece lengthi512eee")]
         public void CanReadPieceLengthInfoKey(string bencode)
         {
             var result = BencodeParser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
