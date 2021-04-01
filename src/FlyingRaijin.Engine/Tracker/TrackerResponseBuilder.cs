@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Net;
 
 namespace FlyingRaijin.Engine.Tracker
 {
@@ -11,7 +12,7 @@ namespace FlyingRaijin.Engine.Tracker
         private long                complete;
         private long                inComplete;
         private string              trackerId;
-        private IEnumerable<Peer>   peers;
+        private IEnumerable<DnsEndPoint>   peers;
         private TrackerResponseType responseType;
 
         public TrackerResponseBuilder()
@@ -77,7 +78,7 @@ namespace FlyingRaijin.Engine.Tracker
             return this;
         }
 
-        public TrackerResponseBuilder WithPeers(IEnumerable<Peer> value)
+        public TrackerResponseBuilder WithPeers(IEnumerable<DnsEndPoint> value)
         {
             peers = value;
             return this;

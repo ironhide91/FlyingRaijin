@@ -19,6 +19,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FlyingRaijin.Messages", "Fl
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FlyingRaijin.Service", "FlyingRaijin.Service\FlyingRaijin.Service.csproj", "{CF99969B-0E18-4D50-A87D-B2828C2B55BB}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Clients", "Clients", "{01623741-BC82-4C72-9F97-9858EF03B711}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlyingRaijin.ConsoleClient", "FlyingRaijin.ConsoleClient\FlyingRaijin.ConsoleClient.csproj", "{32632B8D-ECAD-4875-AB88-B7EF854C2819}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,9 +49,16 @@ Global
 		{CF99969B-0E18-4D50-A87D-B2828C2B55BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CF99969B-0E18-4D50-A87D-B2828C2B55BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CF99969B-0E18-4D50-A87D-B2828C2B55BB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{32632B8D-ECAD-4875-AB88-B7EF854C2819}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{32632B8D-ECAD-4875-AB88-B7EF854C2819}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{32632B8D-ECAD-4875-AB88-B7EF854C2819}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{32632B8D-ECAD-4875-AB88-B7EF854C2819}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{32632B8D-ECAD-4875-AB88-B7EF854C2819} = {01623741-BC82-4C72-9F97-9858EF03B711}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {621CC4F7-EBE3-401D-A96B-431D4EA8D72D}

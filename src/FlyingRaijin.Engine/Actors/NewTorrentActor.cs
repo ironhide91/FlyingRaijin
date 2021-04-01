@@ -7,15 +7,15 @@ namespace FlyingRaijin.Engine.Actors
     {
         public NewTorrentActor()
         {
-            Receive<NewTorrentCommand>(request => OnNewTorrentRequest(request));
+            Receive<NewTorrentCommand>(command => OnNewTorrentCommand(command));
         }
 
-        private void OnNewTorrentRequest(NewTorrentCommand request)
+        private void OnNewTorrentCommand(NewTorrentCommand command)
         {
-            var torrentManger = Context.ActorOf(TorrentManagerActor.Props(request));
-            //torrentManger.Tell(new StartParsingCommand());
+            var torrentManger =
+                Context.ActorOf(TorrentManagerActor.Props(command.FilePath));
 
-            //Sender.Tell(new NewTorrentResponse(0L));
+            torrentManger.Tell(new BeginCommand());
         }
     }
 }

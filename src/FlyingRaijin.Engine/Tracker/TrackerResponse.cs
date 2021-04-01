@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Net;
 
 namespace FlyingRaijin.Engine.Tracker
 {
@@ -13,18 +14,18 @@ namespace FlyingRaijin.Engine.Tracker
         public const string    InCompleteKey = "incomplete";
         public const string         PeersKey = "peers";
 
-        public readonly string            Reason;
-        public readonly string            Warning;
-        public readonly long              Interval;
-        public readonly long              MinInterval;        
-        public readonly long              Complete;
-        public readonly long              InComplete;
-        public readonly string            TrackerId;
-        public readonly IEnumerable<Peer> Peers;
+        public readonly string                   Reason;
+        public readonly string                   Warning;
+        public readonly long                     Interval;
+        public readonly long                     MinInterval;        
+        public readonly long                     Complete;
+        public readonly long                     InComplete;
+        public readonly string                   TrackerId;
+        public readonly IEnumerable<DnsEndPoint> Peers;
 
         public readonly TrackerResponseType ResponseType;
 
-        public TrackerResponse (
+        public TrackerResponse(
                          string reason,
                          string warning,
                            long interval,
@@ -32,7 +33,7 @@ namespace FlyingRaijin.Engine.Tracker
                            long complete,
                            long inComplete,
                          string trackerId,
-              IEnumerable<Peer> peers,
+              IEnumerable<DnsEndPoint> peers,
             TrackerResponseType responseType)
         {
                    Reason = reason;

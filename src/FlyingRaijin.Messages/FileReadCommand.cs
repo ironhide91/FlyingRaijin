@@ -1,10 +1,10 @@
 ﻿namespace FlyingRaijin.Messages
 {
-    public class ReadFileCommand
+    public class FileReadCommand
     {
         public readonly string Path;
 
-        public ReadFileCommand(string path)
+        public FileReadCommand(string path)
         {
             Path = path;
         }

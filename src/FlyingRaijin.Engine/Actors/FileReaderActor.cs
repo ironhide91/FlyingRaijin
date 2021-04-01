@@ -8,10 +8,10 @@ namespace FlyingRaijin.Engine.Actors
     {
         public FileReaderActor()
         {
-            Receive<ReadFileCommand>(command => OnReadFileCommand(command));
+            Receive<FileReadCommand>(command => OnReadFileCommand(command));
         }
 
-        private void OnReadFileCommand(ReadFileCommand command)
+        private void OnReadFileCommand(FileReadCommand command)
         {
             var data = File.ReadAllBytes(command.Path);
 

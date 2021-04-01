@@ -14,7 +14,7 @@ namespace FlyingRaijin.Engine.Torrent
         public readonly string             Encoding;
                                            
         public readonly long               PieceLength;
-        public readonly bool               IsPrivate;        
+        public readonly bool               IsPrivate;
         public readonly string             Name;
         public readonly Pieces             Pieces;
         public readonly FileUnitCollection Files;
