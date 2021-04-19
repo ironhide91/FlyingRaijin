@@ -1,113 +1,119 @@
 ﻿using Akka.Actor;
 using Akka.IO;
-using Akka.Streams.Dsl;
-using FlyingRaijin.Engine.Torrent;
-using FlyingRaijin.Messages;
+using FlyingRaijin.Engine.Messages;
 using System;
 using System.Buffers;
 using System.Collections.Generic;
+using System.IO.Pipelines;
 using System.Net;
-using System.Text;
-using IoTcp = Akka.IO.Tcp;
+using System.Threading.Tasks;
+using static Akka.IO.Tcp;
 
 namespace FlyingRaijin.Engine.Actors
 {
     public class PeerActor : ReceiveActor
-    {        
-        private static readonly ReadOnlyMemory<byte> protocolIdentifierLength;
-        private static readonly ReadOnlyMemory<byte> protocolIdentifier;        
-        private static readonly ReadOnlyMemory<byte> reservedBytes = new byte[8];
-        private static readonly MemorySegment<byte>  handShakeHeader;
-        private static readonly MemorySegment<byte>  handShakeTrail;
-
-        private readonly MetaData    torrent;
-        private readonly DnsEndPoint endPoint;
-
-        static PeerActor()
+    {
+        public static Props Props(DnsEndPoint endPoint, ReadOnlySequence<byte> handshake)
         {
-                  protocolIdentifier = Encoding.UTF8.GetBytes("BitTorrent protocol");
-            protocolIdentifierLength = new byte[] { (byte)protocolIdentifier.Length };
-
-            handShakeHeader = new MemorySegment<byte>(protocolIdentifierLength);
-
-            handShakeTrail = handShakeHeader
-                .Append(protocolIdentifier)
-                .Append(reservedBytes);
+            return Akka.Actor.Props.Create(() => new PeerActor(endPoint, handshake));
         }
+        
+        private readonly ReadOnlySequence<byte> handshake;
+        private readonly DnsEndPoint endPoint;        
+        private readonly Pipe pipe;
 
-        public static Props Props(MetaData torrent, DnsEndPoint endPoint)
-        {
-            return Akka.Actor.Props.Create(() => new PeerActor(torrent, endPoint));
-        }
+        private IActorRef remote;
+        private RemotePeerState remoteState;       
 
-        public PeerActor(MetaData torrent, DnsEndPoint endPoint)
+        public PeerActor(DnsEndPoint endPoint, ReadOnlySequence<byte> handshake)
         {
-             this.torrent = torrent;
             this.endPoint = endPoint;
+            this.handshake = handshake;
 
-            Receive<BeginHandShakeCommand>(command => OnBeginHandShakeCommand(command));
-                Receive<IoTcp.CommandFailed>(message => OnCommandFailed(message));
-             Receive<IoTcp.ConnectionClosed>(message => OnConnectionClosed(message));
-                    Receive<IoTcp.Connected>(message => OnConnected(message));          
-                     Receive<IoTcp.Received>(message => OnReceived(message));
+            pipe = new Pipe();
+
+            remoteState = RemotePeerState.Disconnected;
+
+            Receive<ConnectCommand>(command => OnConnectCommand(command));
+            Receive<CommandFailed>(message => OnCommandFailed(message));
+            Receive<ConnectionClosed>(message => OnConnectionClosed(message));
+            Receive<Connected>(message => OnConnected(message));          
+            Receive<BeginHandshake>(message => OnBeginHandshake(message));
+            Receive<Received>(message => OnReceived(message));
+            Receive<PipeWritten>(message => OnPipeWritten(message));
         }
 
-        private void OnBeginHandShakeCommand(BeginHandShakeCommand command)
+        private void OnConnectCommand(ConnectCommand command)
         {
-            Context.System.Tcp().Tell(new IoTcp.Connect(endPoint));           
+            Context.System.Tcp().Tell(new Connect(endPoint));
+
+            remoteState = RemotePeerState.Connecting;
         }
 
-        private void OnCommandFailed(IoTcp.CommandFailed message)
+        private void OnCommandFailed(CommandFailed message)
         {
             System.Diagnostics.Debug.WriteLine($"command failed on {endPoint}");
+
+            remoteState = RemotePeerState.Failed;
         }
 
-        private void OnConnectionClosed(IoTcp.ConnectionClosed message)
+        private void OnConnectionClosed(ConnectionClosed message)
         {
             System.Diagnostics.Debug.WriteLine($"connection closed on {endPoint}");
+
+            remoteState = RemotePeerState.Closed;
         }
 
-        private void OnConnected(IoTcp.Connected message)
+        private void OnConnected(Connected message)
         {
-            Sender.Tell(new IoTcp.Register(Self, true, true));
+            remoteState = RemotePeerState.Connected;
+
+            Sender.Tell(new Register(Self));
+
+            remote = Sender;
 
             System.Diagnostics.Debug.WriteLine($"connected to {endPoint}");
 
-            //var first = new MemorySegment<byte>(handShakeTrail.Memory);
-
-            var last = handShakeTrail
-                .Append(torrent.InfoHash)
-                .Append(Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQRST"));
-
-            var ros = new ReadOnlySequence<byte>(handShakeHeader, 0, last, last.Memory.Length);
-
-            Sender.Tell(IoTcp.Write.Create(ByteString.FromBytes(ToArraySegment(ros))));
+            Self.Tell(new BeginHandshake());
         }
 
-        private void OnReceived(IoTcp.Received message)
+        private void OnBeginHandshake(BeginHandshake message)
+        {
+            remote.Tell(
+                Write.Create(
+                    ByteString.FromBytes(
+                        ToArraySegment(handshake))));
+
+            remoteState = RemotePeerState.HandshakeInProgress;
+        }
+
+        private async void OnReceived(Received message)
         {
             System.Diagnostics.Debug.WriteLine($"received on {endPoint}");
 
-            var flow = Flow.Create<ByteString>()
-                .Via(Framing.Delimiter(ByteString.FromString("\n"),
-                    256,
-                    true))
-                .Via(Flow.Create<ByteString>()
-                    .Select(bytes =>
-                    {
-                        var message = Encoding.UTF8.GetString(bytes.ToArray());
-                       //_logger.Info(message);
-                        return message;
-                    }))
-                .Via(Flow.Create<string>()
-                    .Select(s => "Hello World"))
-                .Via(Flow.Create<string>()
-                    .Select(s => s += "\n"))
-                .Via(Flow.Create<string>()
-                    .Select(ByteString.FromString));
+            await PeerWireProtocolHelper.Push(pipe.Writer, message.Data.ToArray());
 
-            //var materializer = system.Materializer();
-            //connection.Join(flow).Run(materializer);
+            Self.Tell(new PipeWritten());
+        }
+
+        private async Task OnPipeWritten(PipeWritten message)
+        {
+            var result = await pipe.Reader.ReadAsync();
+
+            if (remoteState == RemotePeerState.HandshakeInProgress)
+            {
+                if (PeerWireProtocolHelper.IsValidHandshakeResponse(pipe.Reader, handshake, result.Buffer))
+                {
+                    remoteState = RemotePeerState.HandshakeSuccessfull;
+                    return;
+                }
+            }
+
+            if (remoteState == RemotePeerState.HandshakeSuccessfull)
+            {
+                PeerWireProtocolHelper.TryReadMessage(pipe.Reader, result.Buffer);
+                return;
+            }
         }
 
         private IEnumerable<ArraySegment<byte>> ToArraySegment(ReadOnlySequence<byte> ros)
@@ -122,6 +128,24 @@ namespace FlyingRaijin.Engine.Actors
             }
 
             return arraySegment;
+        }
+
+        struct PipeWritten
+        {
+
+        }
+
+        enum RemotePeerState
+        {           
+            Failed,
+            Closed,
+            Disconnected,
+            Connecting,
+            Connected,
+            HandshakeInProgress,
+            HandshakeSuccessfull,
+            HandshakeUnsuccessfull,
+            Payload
         }
     }
 }

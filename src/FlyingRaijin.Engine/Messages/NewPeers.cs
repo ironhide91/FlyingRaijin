@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Net;
 
-namespace FlyingRaijin.Messages
+namespace FlyingRaijin.Engine.Messages
 {
     public class NewPeers
     {

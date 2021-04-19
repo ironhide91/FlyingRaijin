@@ -1,15 +1,18 @@
 ﻿using Akka.Actor;
 using FlyingRaijin.Engine.Torrent;
 using FlyingRaijin.Engine.Tracker;
-using FlyingRaijin.Messages;
+using FlyingRaijin.Engine.Messages;
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
+using System.Text;
 
 namespace FlyingRaijin.Engine.Actors
 {
     public class TorrentManagerActor : ReceiveActor
     {
+        private static readonly ReadOnlyMemory<byte> peerId = Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQR15");
+
         public static Props Props(string path)
         {
             return Akka.Actor.Props.Create(() => new TorrentManagerActor(path));
@@ -61,7 +64,7 @@ namespace FlyingRaijin.Engine.Actors
         private void OnTrackerResponse(TrackerResponse message)
         {
             if (peerManager == null)
-                peerManager = Context.ActorOf(PeerManagerActor.Props(torrent, message.Peers));
+                peerManager = Context.ActorOf(PeerManagerActor.Props(peerId, torrent));
 
             peerManager.Tell(new NewPeers(message.Peers));
         }

@@ -1,4 +1,5 @@
 ﻿using Akka.Actor;
+using FlyingRaijin.Engine.Messages;
 using FlyingRaijin.Messages;
 
 namespace FlyingRaijin.Engine.Actors

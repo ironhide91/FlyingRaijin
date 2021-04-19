@@ -1,15 +1,12 @@
 ﻿using Akka.Actor;
-using Akka.IO;
-using Akka.Streams.Dsl;
 using FlyingRaijin.Engine.Torrent;
-using FlyingRaijin.Engine.Tracker;
-using FlyingRaijin.Messages;
+using FlyingRaijin.Engine.Messages;
 using System;
 using System.Buffers;
 using System.Collections.Generic;
 using System.Net;
 using System.Text;
-using IoTcp = Akka.IO.Tcp;
+using System.Linq;
 
 namespace FlyingRaijin.Engine.Actors
 {
@@ -18,11 +15,13 @@ namespace FlyingRaijin.Engine.Actors
         private static readonly ReadOnlyMemory<byte> protocolIdentifierLength;
         private static readonly ReadOnlyMemory<byte> protocolIdentifier;        
         private static readonly ReadOnlyMemory<byte> reservedBytes = new byte[8];
-        private static readonly MemorySegment<byte>  handShakeHeader;
-        private static readonly MemorySegment<byte>  handShakeTrail;
+        private static readonly  MemorySegment<byte> handShakeHeader;
+        private static readonly  MemorySegment<byte> handShakeTrail;
 
-        private readonly MetaData torrent;
-        private readonly HashSet<DnsEndPoint> peers;
+        private readonly   ReadOnlyMemory<byte> peerId;
+        private readonly               MetaData torrent;
+        private readonly   HashSet<DnsEndPoint> peers;
+        private readonly ReadOnlySequence<byte> handShake;
 
         static PeerManagerActor()
         {
@@ -36,27 +35,44 @@ namespace FlyingRaijin.Engine.Actors
                 .Append(reservedBytes);
         }
 
-        public static Props Props(MetaData torrent, IEnumerable<DnsEndPoint> peers)
+        public static Props Props(
+                ReadOnlyMemory<byte> peerId,
+                            MetaData torrent)
         {
-            return Akka.Actor.Props.Create(() => new PeerManagerActor(torrent, peers));
+            return Akka.Actor.Props.Create(() => new PeerManagerActor(peerId, torrent));
         }
 
-        public PeerManagerActor(MetaData torrent, IEnumerable<DnsEndPoint> peers)
+        public PeerManagerActor(
+            ReadOnlyMemory<byte> peerId,
+                        MetaData torrent)
         {
-             this.torrent = torrent;
-               this.peers = new HashSet<DnsEndPoint>(peers);
+            this.peerId = peerId;
+            this.torrent = torrent;
+            
+            peers = new HashSet<DnsEndPoint>();
+
+            var last = handShakeTrail
+                .Append(torrent.InfoHash)
+                .Append(peerId);
+
+            handShake = new ReadOnlySequence<byte>(handShakeHeader, 0, last, last.Memory.Length);
 
             Receive<NewPeers>(message => OnNewPeers(message));
         }
 
         private void OnNewPeers(NewPeers message)
         {
-            foreach (var peer in message.Peers)
+            foreach (var peer in message.Peers.Skip(0))
             {
                 if (!peers.Contains(peer))
                 {
                     peers.Add(peer);
-                    Context.ActorOf(PeerActor.Props(torrent, peer));
+
+                    var peerActor = Context.ActorOf(PeerActor.Props(peer, handShake));
+
+                    peerActor.Tell(new ConnectCommand());
+
+                    break;
                 }
             }
         }

@@ -2,7 +2,7 @@
 using FlyingRaijin.Bencode.BObject;
 using FlyingRaijin.Bencode.Read;
 using FlyingRaijin.Engine.Bencode;
-using FlyingRaijin.Messages;
+using FlyingRaijin.Engine.Messages;
 
 namespace FlyingRaijin.Engine.Actors
 {

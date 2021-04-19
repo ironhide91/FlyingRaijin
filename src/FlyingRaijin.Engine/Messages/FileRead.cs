@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace FlyingRaijin.Messages
+namespace FlyingRaijin.Engine.Messages
 {
     public class FileRead
     {

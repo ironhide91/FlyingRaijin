@@ -1,4 +1,4 @@
-﻿namespace FlyingRaijin.Messages
+﻿namespace FlyingRaijin.Engine.Messages
 {
     public class BeginCommand
     {
