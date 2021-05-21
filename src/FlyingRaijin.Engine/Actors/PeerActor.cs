@@ -1,6 +1,7 @@
 ﻿using Akka.Actor;
 using Akka.IO;
 using FlyingRaijin.Engine.Messages;
+using FlyingRaijin.Engine.Wire;
 using System;
 using System.Buffers;
 using System.Collections.Generic;
@@ -11,22 +12,24 @@ using static Akka.IO.Tcp;
 
 namespace FlyingRaijin.Engine.Actors
 {
-    public class PeerActor : ReceiveActor
+    public partial class PeerActor : ReceiveActor
     {
-        public static Props Props(DnsEndPoint endPoint, ReadOnlySequence<byte> handshake)
+        public static Props Props(long pieceLength, DnsEndPoint endPoint, ReadOnlySequence<byte> handshake)
         {
-            return Akka.Actor.Props.Create(() => new PeerActor(endPoint, handshake));
+            return Akka.Actor.Props.Create(() => new PeerActor(pieceLength, endPoint, handshake));
         }
         
         private readonly ReadOnlySequence<byte> handshake;
-        private readonly DnsEndPoint endPoint;        
+        private readonly DnsEndPoint endPoint;
+        private readonly long pieceLength;
         private readonly Pipe pipe;
 
         private IActorRef remote;
         private RemotePeerState remoteState;       
 
-        public PeerActor(DnsEndPoint endPoint, ReadOnlySequence<byte> handshake)
+        public PeerActor(long pieceLength, DnsEndPoint endPoint, ReadOnlySequence<byte> handshake)
         {
+            this.pieceLength = pieceLength;
             this.endPoint = endPoint;
             this.handshake = handshake;
 
@@ -77,7 +80,7 @@ namespace FlyingRaijin.Engine.Actors
             Self.Tell(new BeginHandshake());
         }
 
-        private void OnBeginHandshake(BeginHandshake message)
+        private void OnBeginHandshake(BeginHandshake _)
         {
             remote.Tell(
                 Write.Create(
@@ -91,27 +94,74 @@ namespace FlyingRaijin.Engine.Actors
         {
             System.Diagnostics.Debug.WriteLine($"received on {endPoint}");
 
-            await PeerWireProtocolHelper.Push(pipe.Writer, message.Data.ToArray());
+            await ProtocolHelper.Push(pipe.Writer, message.Data.ToArray());
 
             Self.Tell(new PipeWritten());
         }
 
-        private async Task OnPipeWritten(PipeWritten message)
+        //private async Task OnPipeWrittenAsync(PipeWritten _)
+        //{
+        //    var result = await pipe.Reader.ReadAsync();
+
+        //    OnPipeWritten(pipe.Reader, result.Buffer);
+        //}
+
+        private void OnPipeWritten(PipeWritten _)
         {
-            var result = await pipe.Reader.ReadAsync();
+            pipe.Reader.TryRead(out ReadResult result);
+
+            OnPipeWritten(pipe.Reader, result.Buffer);
+        }
+
+        private void OnPipeWritten(
+            PipeReader reader,
+            ReadOnlySequence<byte> buffer)
+        {
+            var hsReader = new SequenceReader<byte>(handshake);
+
+            var seqReader = new SequenceReader<byte>(buffer);
 
             if (remoteState == RemotePeerState.HandshakeInProgress)
             {
-                if (PeerWireProtocolHelper.IsValidHandshakeResponse(pipe.Reader, handshake, result.Buffer))
-                {
+                if (ProtocolHelper.IsValidHandshakeResponse(ref hsReader, ref seqReader))
+                {                    
+                    //reader.AdvanceTo(seqReader.Position);
                     remoteState = RemotePeerState.HandshakeSuccessfull;
-                    return;
+                    //return;
                 }
             }
 
             if (remoteState == RemotePeerState.HandshakeSuccessfull)
             {
-                PeerWireProtocolHelper.TryReadMessage(pipe.Reader, result.Buffer);
+                int length = 0;
+
+                do
+                {
+                    length = ProtocolHelper.TryReadMessageLength(ref seqReader);                    
+                }
+                while (length == 0);
+
+                var messageType = ProtocolHelper.TryReadMessageType(ref seqReader);                
+
+                if (messageType == MessageType.UnKnown)
+                {
+                    remote.Tell(Close.Instance);
+                    return;
+                }
+
+                if ((messageType == MessageType.BitField) && (((length-1) * 8) != pieceLength))
+                {
+                    remote.Tell(Close.Instance);
+                    return;
+                }
+
+                if (true)
+                {
+
+                }
+
+                reader.AdvanceTo(seqReader.Position);
+
                 return;
             }
         }
@@ -128,24 +178,6 @@ namespace FlyingRaijin.Engine.Actors
             }
 
             return arraySegment;
-        }
-
-        struct PipeWritten
-        {
-
-        }
-
-        enum RemotePeerState
-        {           
-            Failed,
-            Closed,
-            Disconnected,
-            Connecting,
-            Connected,
-            HandshakeInProgress,
-            HandshakeSuccessfull,
-            HandshakeUnsuccessfull,
-            Payload
         }
     }
 }

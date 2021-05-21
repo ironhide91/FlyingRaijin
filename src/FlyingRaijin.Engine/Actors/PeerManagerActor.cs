@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Text;
 using System.Linq;
+using System.Collections;
 
 namespace FlyingRaijin.Engine.Actors
 {
@@ -15,13 +16,14 @@ namespace FlyingRaijin.Engine.Actors
         private static readonly ReadOnlyMemory<byte> protocolIdentifierLength;
         private static readonly ReadOnlyMemory<byte> protocolIdentifier;        
         private static readonly ReadOnlyMemory<byte> reservedBytes = new byte[8];
-        private static readonly  MemorySegment<byte> handShakeHeader;
-        private static readonly  MemorySegment<byte> handShakeTrail;
+        private static readonly MemorySegment<byte> handShakeHeader;
+        private static readonly MemorySegment<byte> handShakeTrail;
 
-        private readonly   ReadOnlyMemory<byte> peerId;
-        private readonly               MetaData torrent;
-        private readonly   HashSet<DnsEndPoint> peers;
+        private readonly ReadOnlyMemory<byte> peerId;
+        private readonly MetaData torrent;
+        private readonly HashSet<DnsEndPoint> peers;
         private readonly ReadOnlySequence<byte> handShake;
+        private readonly BitArray pieces;
 
         static PeerManagerActor()
         {
@@ -36,19 +38,21 @@ namespace FlyingRaijin.Engine.Actors
         }
 
         public static Props Props(
-                ReadOnlyMemory<byte> peerId,
-                            MetaData torrent)
+            ReadOnlyMemory<byte> peerId,
+            MetaData torrent)
         {
             return Akka.Actor.Props.Create(() => new PeerManagerActor(peerId, torrent));
         }
 
         public PeerManagerActor(
             ReadOnlyMemory<byte> peerId,
-                        MetaData torrent)
+            MetaData torrent)
         {
             this.peerId = peerId;
             this.torrent = torrent;
-            
+
+            pieces = new BitArray((int)torrent.PieceLength, false);
+
             peers = new HashSet<DnsEndPoint>();
 
             var last = handShakeTrail
@@ -68,7 +72,7 @@ namespace FlyingRaijin.Engine.Actors
                 {
                     peers.Add(peer);
 
-                    var peerActor = Context.ActorOf(PeerActor.Props(peer, handShake));
+                    var peerActor = Context.ActorOf(PeerActor.Props(torrent.Pieces.Sha1Checksums.Count, peer, handShake));
 
                     peerActor.Tell(new ConnectCommand());
 

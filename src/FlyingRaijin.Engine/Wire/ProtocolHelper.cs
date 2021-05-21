@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Buffers;
-using System.Collections.Generic;
 using System.IO.Pipelines;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
-namespace FlyingRaijin.Engine
+namespace FlyingRaijin.Engine.Wire
 {
-    internal static class PeerWireProtocolHelper
+    internal static class ProtocolHelper
     {
         private const int ProtocolIdentifierBegin = 0;
         private const int   ProtocolIdentifierEnd = 19;
@@ -24,15 +21,10 @@ namespace FlyingRaijin.Engine
             _ = await writer.FlushAsync();
         }
 
-        internal static bool IsValidHandshakeResponse(PipeReader reader, ReadOnlySequence<byte> handshake, ReadOnlySequence<byte> buffer)
+        internal static bool IsValidHandshakeResponse(
+            ref SequenceReader<byte> hsReader,
+            ref SequenceReader<byte> seqReader)
         {
-            if (buffer.IsEmpty)
-                return false;
-
-            var seqReader = new SequenceReader<byte>(buffer);
-
-            var hsReader = new SequenceReader<byte>(handshake);
-
             long consumed = 0;
 
             // Protocol Length Prefix(1) + Protcol Length(19) = 20 bytes
@@ -51,7 +43,7 @@ namespace FlyingRaijin.Engine
             failed = !SequenceEquals(hsReader, InfoHashBegin, InfoHashEnd, seqReader);
             if (failed)
                 return false;
-            consumed += 28;
+            consumed += 20;
 
             // Peer Id
             failed = !SequenceHasEnough(seqReader, 20);
@@ -59,53 +51,92 @@ namespace FlyingRaijin.Engine
                 return false;
             consumed += 20;
 
-            seqReader.Advance(consumed);
-            reader.AdvanceTo(seqReader.Position);
+            seqReader.Advance(consumed);            
 
             return true;
         }
 
-        internal static void TryReadMessage(PipeReader reader, ReadOnlySequence<byte> buffer)
+        internal static int TryReadMessageLength(ref SequenceReader<byte> seqReader)
         {
-            if (buffer.IsEmpty)
-                return;
-
-            var seqReader = new SequenceReader<byte>(buffer);            
-
             if (!SequenceHasEnough(seqReader, 4))
-                return;
+                return int.MinValue;
 
             var pooledBytes = ArrayPool<byte>.Shared.Rent(4);
 
             Span<byte> span = pooledBytes;
+            
+            seqReader.TryPeek(0, out pooledBytes[3]);
+            seqReader.TryPeek(1, out pooledBytes[2]);
+            seqReader.TryPeek(2, out pooledBytes[1]);
+            seqReader.TryPeek(3, out pooledBytes[0]);
 
-            while (!seqReader.End)
-            {
-                seqReader.TryPeek(0, out pooledBytes[3]);
-                seqReader.TryPeek(1, out pooledBytes[2]);
-                seqReader.TryPeek(2, out pooledBytes[1]);
-                seqReader.TryPeek(3, out pooledBytes[0]);
+            Span<byte> span4 = span.Slice(0, 4);
 
-                Span<byte> span4 = span.Slice(0, 4);
-
-                var length = BitConverter.ToInt32(span4);                
-
-                if (length == 0)
-                {
-                    seqReader.Advance(4);
-                    continue;
-                }
-
-                seqReader.Advance(4);
-
-                System.Diagnostics.Debug.WriteLine($"length {length}");
-
-                seqReader.TryPeek(0, out byte messageType);
-
-                System.Diagnostics.Debug.WriteLine($"messageType {(decimal)messageType}");
-            }
+            var length = BitConverter.ToInt32(span4);
 
             ArrayPool<byte>.Shared.Return(pooledBytes);
+
+            seqReader.Advance(4);
+
+            System.Diagnostics.Debug.WriteLine($"length {length}");            
+
+            return length;
+        }
+
+        internal static MessageType TryReadMessageType(ref SequenceReader<byte> seqReader)
+        {
+            if (!SequenceHasEnough(seqReader, 1))
+                return byte.MinValue;            
+
+            seqReader.TryPeek(0, out byte messageType);
+
+            seqReader.Advance(1);
+
+            if (messageType >= (byte)MessageType.UnKnown)
+                return MessageType.UnKnown;
+
+            return (MessageType)messageType;
+        }
+
+        public static void TryReadMessage(byte messageType, SequenceReader<byte> seqReader)
+        {
+            switch (messageType)
+            {
+                case 0:
+                    //choke
+                    break;
+                case 1:
+                    //unchoke
+                    break;
+                case 2:
+                    //interested
+                    break;
+                case 3:
+                    //not interested
+                    break;
+                case 4:
+                    //have
+                    break;
+                case 5:
+                    // BitField
+                    break;
+                case 6:
+                    //request
+                    break;
+                case 7:
+                    //piece
+                    break;
+                case 8:
+                    //cancel
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private static void TryReadBitFieldMessage(SequenceReader<byte> seqReader)
+        {
+
         }
 
         private static bool SequenceEquals(

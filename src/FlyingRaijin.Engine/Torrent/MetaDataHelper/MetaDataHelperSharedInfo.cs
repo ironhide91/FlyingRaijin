@@ -39,10 +39,12 @@ namespace FlyingRaijin.Engine.Torrent
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Pieces ReadPieces(this BDictionary bDict)
         {
-            var result = bDict.GetValue<BString>(InfoPiecesKey);
+            var info = bDict.GetValue<BDictionary>(RootInfoKey);
 
-            if (result == null)
+            if (info == null)
                 return Pieces.Empty;
+
+            var result = info.GetValue<BString>(InfoPiecesKey);
 
             var isNotMultipleOf20 = (result.Value.Length % 20) != 0;
             if (isNotMultipleOf20)
