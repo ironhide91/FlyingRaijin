@@ -1,4 +1,4 @@
-﻿using FFlyingRaijin.Engine.ActorModel;
+﻿using FFlyingRaijin.Engine.Actors;
 using System;
 
 namespace FlyingRaijin.Engine

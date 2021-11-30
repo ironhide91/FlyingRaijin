@@ -1,4 +1,5 @@
 ﻿using Akka.Actor;
+using Akka.Configuration;
 using FlyingRaijin.Controller.Actors;
 using FlyingRaijin.Messages;
 using System;
@@ -9,7 +10,21 @@ namespace FlyingRaijin.Controller
     {
         private TheController()
         {
-            clientActorSystem = ActorSystem.Create("Client");
+            var config = ConfigurationFactory.ParseString(@"
+                akka {  
+                    actor {
+                        provider = remote
+                    }
+                    remote {
+                        dot-netty.tcp {
+		                    port = 0
+		                    hostname = localhost
+                        }
+                    }
+                }
+            ");
+
+            clientActorSystem = ActorSystem.Create("Client", config);
 
             newTorrentClientActorRef = clientActorSystem.ActorOf<NewTorrentClientActor>();
         }
@@ -22,7 +37,14 @@ namespace FlyingRaijin.Controller
 
         public void Add(string filePath)
         {
-            newTorrentClientActorRef.Tell(new NewTorrentRequest(filePath));
+            System.Diagnostics.Debug.WriteLine("");
+            foreach (var item in System.Text.Encoding.UTF8.GetBytes(filePath))
+            {
+                System.Diagnostics.Debug.Write(item);
+            }
+            System.Diagnostics.Debug.WriteLine("");
+
+            newTorrentClientActorRef.Tell(new NewTorrentCommand(filePath));
         }
 
         public void Dispose()

@@ -13,7 +13,9 @@ namespace FlyingRaijin.Engine.Torrent
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static long ReadPieceLength(this BDictionary bDict)
         {
-            var result = bDict.GetValue<BInteger>(InfoPieceLengthKey);
+            var infoDict = bDict.GetValue<BDictionary>(RootInfoKey);
+
+            var result = infoDict.GetValue<BInteger>(InfoPieceLengthKey);
 
             if (result == null)
                 return 0L;
@@ -37,10 +39,12 @@ namespace FlyingRaijin.Engine.Torrent
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Pieces ReadPieces(this BDictionary bDict)
         {
-            var result = bDict.GetValue<BString>(InfoPiecesKey);
+            var info = bDict.GetValue<BDictionary>(RootInfoKey);
 
-            if (result == null)
+            if (info == null)
                 return Pieces.Empty;
+
+            var result = info.GetValue<BString>(InfoPiecesKey);
 
             var isNotMultipleOf20 = (result.Value.Length % 20) != 0;
             if (isNotMultipleOf20)
@@ -59,6 +63,39 @@ namespace FlyingRaijin.Engine.Torrent
             }
 
             return new Pieces(ImmutableList.CreateRange(sha1Checksumns));
+        }
+
+        private const string InfoMultiFileNameKey = "name";
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static string ReadDirectoryName(this BDictionary dict)
+        {
+            var infoDict = dict.GetValue<BDictionary>(RootInfoKey);
+
+            if (infoDict.ContainsKey(InfoMultiFiles))
+            {
+                return infoDict.GetValue<BString>(InfoMultiFileNameKey).StringValue;
+            }
+
+            return string.Empty;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static FileUnitCollection ReadFiles(this BDictionary dict)
+        {
+            var infoDict = dict.GetValue<BDictionary>(RootInfoKey);
+
+            if (infoDict.ContainsKey(InfoMultiFiles))
+            {
+                return infoDict.ReadMultiFiles();
+            }
+
+            var singleFile = infoDict.ReadSingleFile();
+
+            var files = new List<FileUnit>() { singleFile };
+
+            var collection = ImmutableList.CreateRange(files);
+
+            return new FileUnitCollection(collection);
         }
     }
 }

@@ -40,5 +40,15 @@ namespace FlyingRaijin.Engine.Torrent
 
             return result.StringValue;
         }
+
+        public static FileUnit ReadSingleFile(this BDictionary infoDict)
+        {
+            var file = new FileUnit(
+                     infoDict.ReadSingleLength(),
+                     infoDict.ReadSingleMD5Checksum(),
+                     infoDict.ReadSingleName());
+
+            return file;
+        }
     }
 }

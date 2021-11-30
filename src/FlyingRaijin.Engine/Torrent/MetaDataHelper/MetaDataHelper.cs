@@ -40,29 +40,11 @@ namespace FlyingRaijin.Engine.Torrent
             return false;
         }
 
-        private const string RootInfoKey = "info";
+        public const string RootInfoKey = "info";
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static BDictionary ReadInfo(this BDictionary bDict)
         {
             return bDict.GetValue<BDictionary>(RootInfoKey);
-        }
-        
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static SingleFileInfoDictionary ReadSingleFileInfoDictionary(this BDictionary bDict)
-        {
-                 var info = bDict.GetValue<BDictionary>(RootInfoKey);
-            var typedInfo = new SingleFileInfoDictionary(info);
-
-            return typedInfo;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static MultiFileInfoDictionary ReadMultiFileInfoDictionary(this BDictionary bDict)
-        {
-            var info = bDict.GetValue<BDictionary>(RootInfoKey);
-            var typedInfo = new MultiFileInfoDictionary(info);
-
-            return typedInfo;
         }
 
         private const string RootAnnounceUrlKey = "announce";

@@ -8,9 +8,6 @@ namespace FlyingRaijin.Engine.Torrent
 {
     public static partial class MetaDataHelper
     {
-        private static IImmutableList<MultiFileInfoDictionaryItem> EmptyFiles =
-            ImmutableList.CreateRange(Enumerable.Empty<MultiFileInfoDictionaryItem>());
-
         private const string InfoMultiNameKey = "name";
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string ReadMultiName(this BDictionary bDict)
@@ -23,29 +20,30 @@ namespace FlyingRaijin.Engine.Torrent
             return result.StringValue;
         }
 
-        private const string InfoMultiFiles = "files";
+        public const string InfoMultiFiles = "files";
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static IImmutableList<MultiFileInfoDictionaryItem> ReadMultiFiles(this BDictionary bDict)
+        public static FileUnitCollection ReadMultiFiles(this BDictionary bDict)
         {
             var files = bDict.GetValue<BList>(InfoMultiFiles);
 
             if (files == null)
-                return EmptyFiles;
+                return FileUnitCollection.Empty;
 
-            var typedFiles = new List<MultiFileInfoDictionaryItem>(files.Value.Count);
+            var typedFiles = new List<FileUnit>(files.Value.Count);
 
             foreach (var fileDict in files.Value.Cast<BDictionary>())
             {
-                var item =
-                    new MultiFileInfoDictionaryItem(
-                        fileDict.ReadMultiFileLength(),
-                        fileDict.ReadMultiFileM55Checksum(),
-                        fileDict.ReadInfoMultiFilePath());
+                var item = new FileUnit(
+                    fileDict.ReadMultiFileLength(),
+                    fileDict.ReadMultiFileM55Checksum(),
+                    fileDict.ReadInfoMultiFilePath());
 
                 typedFiles.Add(item);
             }
 
-            return ImmutableList.CreateRange(typedFiles);
+            var collection = ImmutableList.CreateRange(typedFiles);
+
+            return new FileUnitCollection(collection);
         }
 
         private const string InfoMultiFileLengthKey = "length";

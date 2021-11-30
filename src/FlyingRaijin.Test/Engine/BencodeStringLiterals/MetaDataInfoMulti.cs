@@ -31,14 +31,14 @@ namespace FlyingRaijin.Test.Engine.BencodeStringLiterals
         }
 
         [Theory]
-        [InlineData("d5:filesldededeee")]
+        [InlineData("d4:infod5:filesldededeeee")]
         public void CanReadFilesInfoMultiKey(string bencode)
         {
             var result = BencodeParser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
-            var temp = result.BObject.ReadMultiFiles();
+            var temp = result.BObject.ReadFiles();
 
             temp.Should().NotBeNull();
-            temp.Should().NotBeEmpty();
+            temp.Collection.Should().NotBeEmpty();
         }
 
         [Theory]
@@ -49,7 +49,7 @@ namespace FlyingRaijin.Test.Engine.BencodeStringLiterals
             var temp = result.BObject.ReadMultiFiles();
 
             temp.Should().NotBeNull();
-            temp.Should().BeEmpty();
+            temp.Collection.Should().BeEmpty();
         }
 
         [Fact]
@@ -58,40 +58,43 @@ namespace FlyingRaijin.Test.Engine.BencodeStringLiterals
             var strBuilder = new StringBuilder();
 
             strBuilder.Append("d");
-                strBuilder.Append("5:files");
-                strBuilder.Append("l");
-                    strBuilder.Append("d");
-                        strBuilder.Append("6:length");
-                        strBuilder.Append("i1024e");
-                        strBuilder.Append("6:md5sum");
-                        strBuilder.Append("32:9e107d9d372bb6826bd81d3542a419d6");
-                        strBuilder.Append("4:path");
-                        strBuilder.Append("l");
-                            strBuilder.Append("4:dir1");
-                            strBuilder.Append("4:dir2");
-                            strBuilder.Append("8:file.ext");
+                strBuilder.Append("4:info");
+                strBuilder.Append("d");
+                    strBuilder.Append("5:files");
+                    strBuilder.Append("l");
+                        strBuilder.Append("d");
+                            strBuilder.Append("6:length");
+                            strBuilder.Append("i1024e");
+                            strBuilder.Append("6:md5sum");
+                            strBuilder.Append("32:9e107d9d372bb6826bd81d3542a419d6");
+                            strBuilder.Append("4:path");
+                            strBuilder.Append("l");
+                                strBuilder.Append("4:dir1");
+                                strBuilder.Append("4:dir2");
+                                strBuilder.Append("8:file.ext");
+                            strBuilder.Append("e");
                         strBuilder.Append("e");
-                    strBuilder.Append("e");
-                    strBuilder.Append("d");
-                        strBuilder.Append("6:length");
-                        strBuilder.Append("i2024e");
-                        strBuilder.Append("6:md5sum");
-                        strBuilder.Append("32:9e107d9d372bb6826bd81d3542a419d6");
-                        strBuilder.Append("4:path");
-                        strBuilder.Append("l");
-                            strBuilder.Append("4:dir1");
-                            strBuilder.Append("4:dir2");
-                            strBuilder.Append("8:file.ext");
+                        strBuilder.Append("d");
+                            strBuilder.Append("6:length");
+                            strBuilder.Append("i2024e");
+                            strBuilder.Append("6:md5sum");
+                            strBuilder.Append("32:9e107d9d372bb6826bd81d3542a419d6");
+                            strBuilder.Append("4:path");
+                            strBuilder.Append("l");
+                                strBuilder.Append("4:dir1");
+                                strBuilder.Append("4:dir2");
+                                strBuilder.Append("8:file.ext");
+                            strBuilder.Append("e");
                         strBuilder.Append("e");
                     strBuilder.Append("e");
                 strBuilder.Append("e");
             strBuilder.Append("e");
 
             var result = BencodeParser.Parse<BDictionary>(strBuilder.ToString().AsReadOnlyByteSpan());
-            var temp = result.BObject.ReadMultiFiles();
+            var temp = result.BObject.ReadFiles();
 
             temp.Should().NotBeNull();
-            temp.Should().HaveCount(2);
+            temp.Collection.Should().HaveCount(2);
 
             temp[0].Should().NotBeNull();
             temp[0].LengthInBytes.Should().Be(1024);

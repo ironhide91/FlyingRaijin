@@ -1,8 +1,8 @@
 ﻿namespace FlyingRaijin.Messages
 {
-    public class NewTorrentRequest
+    public class NewTorrentCommand
     {
-        public NewTorrentRequest(string filePath)
+        public NewTorrentCommand(string filePath)
         {
             FilePath = filePath;
         }

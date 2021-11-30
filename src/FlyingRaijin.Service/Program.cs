@@ -1,6 +1,5 @@
-﻿using System;
+﻿using FlyingRaijin.Engine;
 using Topshelf;
-using FlyingRaijin.Engine;
 
 namespace FlyingRaijin.Service
 {

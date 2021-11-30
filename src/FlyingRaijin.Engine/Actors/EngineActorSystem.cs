@@ -1,8 +1,9 @@
 ﻿using Akka.Actor;
-using FlyingRaijin.Engine.ActorModel.Actors;
+using Akka.Streams;
+using FlyingRaijin.Engine.Actors;
 using System;
 
-namespace FFlyingRaijin.Engine.ActorModel
+namespace FFlyingRaijin.Engine.Actors
 {
     internal class EngineActorSystem
     {
@@ -12,7 +13,10 @@ namespace FFlyingRaijin.Engine.ActorModel
             new Lazy<EngineActorSystem>(() => new EngineActorSystem());
 
         private ActorSystem engineActorSystem;
-        private IActorRef newTorrentEngineActorRef;        
+
+        private IActorRef newTorrentEngineActorRef;
+
+        private IActorRef httpClientActorRef;        
 
         private EngineActorSystem()
         {
@@ -22,7 +26,12 @@ namespace FFlyingRaijin.Engine.ActorModel
         internal void Start()
         {
             engineActorSystem = ActorSystem.Create("Engine");
-            newTorrentEngineActorRef = engineActorSystem.ActorOf<NewTorrentEngineActor>(nameof(NewTorrentEngineActor));
+
+            newTorrentEngineActorRef = engineActorSystem.ActorOf<NewTorrentActor>(nameof(NewTorrentActor));
+
+            httpClientActorRef = engineActorSystem.ActorOf<HttpClientActor>(nameof(HttpClientActor));
+
+            
         }
 
         internal void Stop()

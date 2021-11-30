@@ -4,28 +4,42 @@ using FlyingRaijin.Engine.Torrent;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 
 namespace FlyingRaijin.Engine.Tracker
 {
     public static class TrackerResponseParser
     {
-        public static TrackerResponse Parse(ReadOnlySpan<byte> response)
+        public static bool TryParse(ReadOnlySpan<byte> response, out TrackerResponse output)
         {
             var result = BencodeParser.Parse<BDictionary>(response);
 
             if (result.Error != ErrorType.None)
-                return null;
+            {
+                output = null;
+                return false;
+            }
 
             if (result == null || result.BObject == null)
-                return null;
+            {
+                output = null;
+                return false;
+            }
 
             if (result.BObject.ContainsKey(TrackerResponse.FailureReasonKey))
-                return Failure(result.BObject);
+            {
+                output = Failure(result.BObject);
+                return true;
+            }
 
             if (result.BObject.ContainsKey(TrackerResponse.WarningKey))
-                return Warning(result.BObject);
+            {
+                output = Warning(result.BObject);
+                return true;
+            }
 
-            return Success(result.BObject);
+            output = Success(result.BObject);
+            return true;
         }
 
         public static TrackerResponse Failure(BDictionary bDict)
@@ -152,18 +166,18 @@ namespace FlyingRaijin.Engine.Tracker
             return string.Empty;
         }
 
-        private static IEnumerable<Peer> GetPeers(this BDictionary bDict)
+        private static IEnumerable<DnsEndPoint> GetPeers(this BDictionary bDict)
         {
             BString result;
 
             if (bDict.TryGetValue(TrackerResponse.PeersKey, out result))
             {
-                IList<Peer> peers;
+                IList<DnsEndPoint> peers;
                 CompactPeerParser.TryParsePeers(result.Value.Span, out peers);
                 return peers;
             }
 
-            return Enumerable.Empty<Peer>();
+            return Enumerable.Empty<DnsEndPoint>();
         }
     }
 }
