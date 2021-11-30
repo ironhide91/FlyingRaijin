@@ -17,6 +17,8 @@ namespace FlyingRaijin.Engine.Actors
                 Context.ActorOf(TorrentManagerActor.Props(command.FilePath));
 
             torrentManger.Tell(new BeginCommand());
+
+            //FSM<State, IData>
         }
     }
 }

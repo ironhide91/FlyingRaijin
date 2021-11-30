@@ -37,16 +37,12 @@ namespace FlyingRaijin.Engine.Actors
                 .Append(reservedBytes);
         }
 
-        public static Props Props(
-            ReadOnlyMemory<byte> peerId,
-            MetaData torrent)
+        public static Props Props(ReadOnlyMemory<byte> peerId, MetaData torrent)
         {
             return Akka.Actor.Props.Create(() => new PeerManagerActor(peerId, torrent));
         }
 
-        public PeerManagerActor(
-            ReadOnlyMemory<byte> peerId,
-            MetaData torrent)
+        public PeerManagerActor(ReadOnlyMemory<byte> peerId, MetaData torrent)
         {
             this.peerId = peerId;
             this.torrent = torrent;

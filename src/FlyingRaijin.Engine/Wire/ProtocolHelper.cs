@@ -9,8 +9,6 @@ namespace FlyingRaijin.Engine.Wire
     {
         private const int ProtocolIdentifierBegin = 0;
         private const int   ProtocolIdentifierEnd = 19;
-        private const int           ReservedBegin = 20;
-        private const int             ReservedEnd = 27;
         private const int           InfoHashBegin = 28;
         private const int             InfoHashEnd = 47;
 

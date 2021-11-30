@@ -115,6 +115,8 @@ namespace FlyingRaijin.Bencode.Read
                         return ErrorType.None;
                     }
 
+                    ArrayPool<char>.Shared.Return(buffer, true);
+
                     return ErrorType.IntegerOutOfInt64Range;
                 }
 

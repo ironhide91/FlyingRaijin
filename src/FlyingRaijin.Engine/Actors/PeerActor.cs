@@ -7,7 +7,6 @@ using System.Buffers;
 using System.Collections.Generic;
 using System.IO.Pipelines;
 using System.Net;
-using System.Threading.Tasks;
 using static Akka.IO.Tcp;
 
 namespace FlyingRaijin.Engine.Actors
@@ -75,7 +74,7 @@ namespace FlyingRaijin.Engine.Actors
 
             remote = Sender;
 
-            System.Diagnostics.Debug.WriteLine($"connected to {endPoint}");
+            System.Diagnostics.Debug.WriteLine($"connected to {message.RemoteAddress}");
 
             Self.Tell(new BeginHandshake());
         }
@@ -99,13 +98,6 @@ namespace FlyingRaijin.Engine.Actors
             Self.Tell(new PipeWritten());
         }
 
-        //private async Task OnPipeWrittenAsync(PipeWritten _)
-        //{
-        //    var result = await pipe.Reader.ReadAsync();
-
-        //    OnPipeWritten(pipe.Reader, result.Buffer);
-        //}
-
         private void OnPipeWritten(PipeWritten _)
         {
             pipe.Reader.TryRead(out ReadResult result);
@@ -113,9 +105,7 @@ namespace FlyingRaijin.Engine.Actors
             OnPipeWritten(pipe.Reader, result.Buffer);
         }
 
-        private void OnPipeWritten(
-            PipeReader reader,
-            ReadOnlySequence<byte> buffer)
+        private void OnPipeWritten(PipeReader reader, ReadOnlySequence<byte> buffer)
         {
             var hsReader = new SequenceReader<byte>(handshake);
 
@@ -133,7 +123,7 @@ namespace FlyingRaijin.Engine.Actors
 
             if (remoteState == RemotePeerState.HandshakeSuccessfull)
             {
-                int length = 0;
+                int length;
 
                 do
                 {
@@ -157,7 +147,7 @@ namespace FlyingRaijin.Engine.Actors
 
                 if (true)
                 {
-
+                    
                 }
 
                 reader.AdvanceTo(seqReader.Position);

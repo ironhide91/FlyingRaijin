@@ -109,63 +109,90 @@ namespace FlyingRaijin.Bencode.Read
                 {
                     // Dictionary
                     case dictStart:
-                        dictionaryCount++;
-                        if (isInfoDictionary)
                         {
-                            infoDictionatCount = dictionaryCount;
-                            infoDictionatStartIndex = index;                            
+                            dictionaryCount++;
+
+                            if (isInfoDictionary)
+                            {
+                                infoDictionatCount = dictionaryCount;
+                                infoDictionatStartIndex = index;
+                            }
+
+                            error = ParseDictionary(ref currentParent, key);
+
+                            if (error.HasError())
+                                return new ParseResult(error, null, -1, -1);
+
+                            SetExpectingKeyFlag(ref dictionaryCount, ref expectingKey);
+
+                            break;
                         }
-                        error = ParseDictionary(ref currentParent, key);
-                        if (error.HasError())
-                            return new ParseResult(error, null, -1, -1);
-                        SetExpectingKeyFlag(ref dictionaryCount, ref expectingKey);
-                        break;
                     // List
                     case listStart:
-                        listCount++;
-                        error = ParseList(ref currentParent, key);
-                        if (error.HasError())
-                            return new ParseResult(error, null, -1, -1);
-                        SetExpectingKeyFlag(ref dictionaryCount, ref expectingKey);
-                        break;
+                        {
+                            listCount++;
+
+                            error = ParseList(ref currentParent, key);
+
+                            if (error.HasError())
+                                return new ParseResult(error, null, -1, -1);
+
+                            SetExpectingKeyFlag(ref dictionaryCount, ref expectingKey);
+
+                            break;
+                        }
                     // Integer
                     case intStart:
+                    {
                         error = ParseInteger(bytes, currentParent, ref index, key);
+                        
                         if (error.HasError())
                             return new ParseResult(error, null, -1, -1);
+                        
                         SetExpectingKeyFlag(ref dictionaryCount, ref expectingKey);
+                        
                         break;
+                    }
                     // End { Dictionary, List, Integer }
                     case end:
-                        if (currentParent is BDictionary)
                         {
-                            (currentParent as BDictionary).SyncInternalStringDictionary();
-                            if (dictionaryCount == infoDictionatCount)
+                            if (currentParent is BDictionary)
                             {
-                                isInfoDictionary = false;
-                                infoDictionatEndIndex = (index);
+                                (currentParent as BDictionary).SyncInternalStringDictionary();
+                                if (dictionaryCount == infoDictionatCount)
+                                {
+                                    isInfoDictionary = false;
+                                    infoDictionatEndIndex = (index);
+                                }
+                                dictionaryCount--;
+                                if (currentParent.Parent != null)
+                                    currentParent = currentParent.Parent;
+                                break;
                             }
-                            dictionaryCount--;
-                            if (currentParent.Parent != null)
-                                currentParent = currentParent.Parent;                            
+
+                            if (currentParent is BList)
+                            {
+                                listCount--;
+                                if (currentParent.Parent != null)
+                                    currentParent = currentParent.Parent;
+                                break;
+                            }
+
                             break;
                         }
-                        if (currentParent is BList)
-                        {
-                            listCount--;
-                            if (currentParent.Parent != null)
-                                currentParent = currentParent.Parent;
-                            break;
-                        }
-                        break;
                     // String
                     case byte b when PositiveIntegerBytes.Contains(b):
-                        error = ParseString(bytes, currentParent, ref index, ref expectingKey, ref key);
-                        if (error.HasError())
-                            return new ParseResult(error, null, -1, -1);
-                        if (key is BString @keyString && keyString.StringValue == InfoKey)
-                            isInfoDictionary = true;
-                        break;
+                        {
+                            error = ParseString(bytes, currentParent, ref index, ref expectingKey, ref key);
+
+                            if (error.HasError())
+                                return new ParseResult(error, null, -1, -1);
+
+                            if (key is BString @keyString && keyString.StringValue == InfoKey)
+                                isInfoDictionary = true;
+
+                            break;
+                        }
                     // Unkown
                     default:
                         return new ParseResult(ErrorType.Unknown, null, -1, -1);
