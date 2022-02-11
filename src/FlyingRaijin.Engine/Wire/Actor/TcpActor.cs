@@ -1,6 +1,6 @@
 ﻿using Akka.Actor;
 using Akka.IO;
-using FlyingRaijin.Engine.Messages;
+using FlyingRaijin.Engine.Messages.Peer;
 using System.Buffers;
 using System.IO.Pipelines;
 using System.Net;
@@ -10,24 +10,24 @@ namespace FlyingRaijin.Engine.Wire
 {
     internal class TcpActor : ReceiveActor
     {
-        private readonly DnsEndPoint endPoint;        
-        private readonly Pipe pipe;
-
-        private IActorRef remotePeer;
-
-        public TcpActor(DnsEndPoint endPoint, Pipe pipe)
+        public TcpActor(DnsEndPoint endPoint, PipeWriter pipeWriter)
         {
             this.endPoint = endPoint;
-            this.pipe = pipe;
+            this.pipeWriter = pipeWriter;
 
-            Receive<ConnectCommand>(command => OnConnectCommand(command));
+            Receive<PeerConnectMessage>(message => OnConnectCommand(message));
             Receive<CommandFailed>(message => OnCommandFailed(message));
             Receive<ConnectionClosed>(message => OnConnectionClosed(message));
             Receive<Connected>(message => OnConnected(message));
             Receive<Received>(message => OnReceived(message));
+            Receive<PeerWriteMessage>(message => OnWrite(message));
         }
 
-        private void OnConnectCommand(ConnectCommand command)
+        private readonly DnsEndPoint endPoint;
+        private readonly PipeWriter pipeWriter;
+        private IActorRef remotePeer;
+
+        private void OnConnectCommand(PeerConnectMessage command)
         {
             Context.System.Tcp().Tell(new Connect(endPoint));
         }
@@ -46,15 +46,25 @@ namespace FlyingRaijin.Engine.Wire
         {
             Sender.Tell(new Register(Self));
             remotePeer = Sender;
+            Context.Parent.Tell(PeerConnectedMessage.Instance);
             System.Diagnostics.Debug.WriteLine($"connected to {message.RemoteAddress}");
         }
 
-        private async void OnReceived(Received message)
+        private void OnReceived(Received message)
         {
             System.Diagnostics.Debug.WriteLine($"received on {endPoint}");
-            pipe.Writer.Write(message.Data.ToArray());
-            pipe.Writer.Advance(message.Data.Count);
-            _ = await pipe.Writer.FlushAsync();
+            pipeWriter.Write(message.Data.ToArray());
+            pipeWriter.Advance(message.Data.Count);
+            pipeWriter.FlushAsync();
+
+            Context.Parent.Tell(PeerPipeWritten.Instance);
+        }
+
+        private void OnWrite(PeerWriteMessage message)
+        {
+            System.Diagnostics.Debug.WriteLine($"writing to {endPoint}");
+            remotePeer.Tell(Write.Create(ByteString.FromBytes(message.Data.Span.ToArray())));
+            System.Diagnostics.Debug.WriteLine($"written to {endPoint}");
         }
     }
 }

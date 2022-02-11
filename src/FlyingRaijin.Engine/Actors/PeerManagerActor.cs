@@ -1,61 +1,56 @@
 ﻿using Akka.Actor;
-using FlyingRaijin.Engine.Torrent;
 using FlyingRaijin.Engine.Messages;
+using FlyingRaijin.Engine.Messages.Peer;
+using FlyingRaijin.Engine.Torrent;
+using FlyingRaijin.Engine.Wire;
 using System;
-using System.Buffers;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Text;
-using System.Linq;
-using System.Collections;
 
 namespace FlyingRaijin.Engine.Actors
 {
     public class PeerManagerActor : ReceiveActor
-    {        
-        private static readonly ReadOnlyMemory<byte> protocolIdentifierLength;
-        private static readonly ReadOnlyMemory<byte> protocolIdentifier;        
-        private static readonly ReadOnlyMemory<byte> reservedBytes = new byte[8];
-        private static readonly MemorySegment<byte> handShakeHeader;
-        private static readonly MemorySegment<byte> handShakeTrail;
+    {
+        private static readonly ReadOnlyMemory<byte> handShakeHeader;
 
-        private readonly ReadOnlyMemory<byte> peerId;
+        private readonly ReadOnlyMemory<byte> handshake;
+        private readonly ReadOnlyMemory<byte> myPeerId;
         private readonly MetaData torrent;
         private readonly HashSet<DnsEndPoint> peers;
-        private readonly ReadOnlySequence<byte> handShake;
         private readonly BitArray pieces;
 
         static PeerManagerActor()
         {
-                  protocolIdentifier = Encoding.UTF8.GetBytes("BitTorrent protocol");
-            protocolIdentifierLength = new byte[] { (byte)protocolIdentifier.Length };
+            var protocolIdentifier = Encoding.UTF8.GetBytes("BitTorrent protocol");            
+            var header = new byte[20];
 
-            handShakeHeader = new MemorySegment<byte>(protocolIdentifierLength);
+            header[0] = (byte)protocolIdentifier.Length;
+            protocolIdentifier.CopyTo(header, 1);
 
-            handShakeTrail = handShakeHeader
-                .Append(protocolIdentifier)
-                .Append(reservedBytes);
+            handShakeHeader = new ReadOnlyMemory<byte>(header);
         }
 
-        public static Props Props(ReadOnlyMemory<byte> peerId, MetaData torrent)
+        public static Props Props(ReadOnlyMemory<byte> myPeerId, MetaData torrent)
         {
-            return Akka.Actor.Props.Create(() => new PeerManagerActor(peerId, torrent));
+            return Akka.Actor.Props.Create(() => new PeerManagerActor(myPeerId, torrent));
         }
 
-        public PeerManagerActor(ReadOnlyMemory<byte> peerId, MetaData torrent)
+        public PeerManagerActor(ReadOnlyMemory<byte> myPeerId, MetaData torrent)
         {
-            this.peerId = peerId;
+            this.myPeerId = myPeerId;
             this.torrent = torrent;
 
             pieces = new BitArray((int)torrent.PieceLength, false);
-
             peers = new HashSet<DnsEndPoint>();
 
-            var last = handShakeTrail
-                .Append(torrent.InfoHash)
-                .Append(peerId);
-
-            handShake = new ReadOnlySequence<byte>(handShakeHeader, 0, last, last.Memory.Length);
+            Memory<byte> handshakeTemp = new byte[68];
+            handShakeHeader.CopyTo(handshakeTemp);
+            torrent.InfoHash.CopyTo(handshakeTemp);
+            myPeerId.CopyTo(handshakeTemp);
+            handshake = handshakeTemp;
 
             Receive<NewPeers>(message => OnNewPeers(message));
         }
@@ -68,10 +63,13 @@ namespace FlyingRaijin.Engine.Actors
                 {
                     peers.Add(peer);
 
-                    var peerActor = Context.ActorOf(PeerActor.Props(torrent.Pieces.Sha1Checksums.Count, peer, handShake));
+                    var peerActorBuilder = new PeerActorBuilder();
+                    peerActorBuilder.With(torrent.Pieces.Sha1Checksums.Count);
+                    peerActorBuilder.With(peer);
+                    peerActorBuilder.With(handshake);
 
-                    peerActor.Tell(new ConnectCommand());
-
+                    var peerActor = Context.ActorOf(peerActorBuilder.Build());
+                    peerActor.Tell(PeerConnectMessage.Instance);
                     break;
                 }
             }

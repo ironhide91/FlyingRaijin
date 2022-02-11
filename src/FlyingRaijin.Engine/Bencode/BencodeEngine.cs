@@ -11,7 +11,9 @@ namespace FlyingRaijin.Engine.Bencode
 {
     public static class BencodeEngine
     {
+#pragma warning disable SYSLIB0021 // Type or member is obsolete
         private static readonly SHA1Managed sha1Managed = new SHA1Managed();
+#pragma warning restore SYSLIB0021 // Type or member is obsolete
 
         public static ParseResult<BDictionary> Parse(ReadOnlySpan<byte> data)
         {
@@ -42,20 +44,16 @@ namespace FlyingRaijin.Engine.Bencode
             if (result.Error != ErrorType.None)
                 return null;
 
-            var rawBuffer = ArrayPool<byte>.Shared.Rent(20);
+            var buffer = MemoryPool<byte>.Shared.Rent(20);
 
-            Span<byte> spanBuffer = rawBuffer;
+            var bytesToHash = bytes.Slice(result.InfoBeginIndex, (result.InfoEndIndex - result.InfoBeginIndex + 1));
 
-            var bytesToHash = bytes.Slice(result.InfoBeginIndex, (result.InfoEndIndex - result.InfoBeginIndex+1));
-
-            if (sha1Managed.TryComputeHash(bytesToHash, spanBuffer, out _))
+            if (sha1Managed.TryComputeHash(bytesToHash, buffer.Memory.Span, out _))
             {
-                ReadOnlyMemory<byte> hash = spanBuffer.Slice(0, 20).ToArray().AsMemory();
-
-                ArrayPool<byte>.Shared.Return(rawBuffer);
+                ReadOnlyMemory<byte> hash = buffer.Memory.Slice(0, 20);
+                buffer.Dispose();
 
                 var sb = new StringBuilder();
-
                 for (int i = 0; i < hash.Length; i++)
                 {
                     sb.Append(hash.Span[i].ToString("X2"));
@@ -64,6 +62,7 @@ namespace FlyingRaijin.Engine.Bencode
                 return hash;
             }
 
+            buffer.Dispose();
             return null;
         }
     }

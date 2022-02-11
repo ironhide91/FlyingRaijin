@@ -1,11 +1,10 @@
 ﻿using Akka.Actor;
-using FlyingRaijin.Engine.Tracker;
 using FlyingRaijin.Engine.Messages;
 using System;
 using System.Buffers;
 using System.Net.Http;
 
-namespace FlyingRaijin.Engine.Actors
+namespace FlyingRaijin.Engine.Tracker
 {
     public class TrackerActor : ReceiveActor
     {
