@@ -1,18 +1,21 @@
 ﻿using Akka.Actor;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Threading.Channels;
 
 namespace FlyingRaijin.Engine.Wire
 {
     internal class MessageProcessorActor : ReceiveActor, IRecordMessage
     {
-        internal MessageProcessorActor()
+        internal MessageProcessorActor(ChannelWriter<PieceMessage> writer)
         {
+            this.writer = writer;
             messageQueue = new Queue<IMessage>(50);
 
-            Receive<MonitorMessageQueue>(_ => OnMonitorMessageQueue());
+            Receive<MonitorMessageQueue>(_ => OnMonitorMessageQueue());            
         }
 
+        private readonly ChannelWriter<PieceMessage> writer;
         private readonly Queue<IMessage> messageQueue;
 
         public void Record(IMessage message)
@@ -119,7 +122,7 @@ namespace FlyingRaijin.Engine.Wire
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void ProcessPiece(IMessage message)
         {
-
+            writer.TryWrite((PieceMessage)message);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

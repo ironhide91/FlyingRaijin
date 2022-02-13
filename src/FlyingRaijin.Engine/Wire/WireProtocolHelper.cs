@@ -198,59 +198,135 @@ namespace FlyingRaijin.Engine.Wire
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static void ParseBitFieldMessage(this ref SequenceReader<byte> seqReader, long length)
+        internal static ValueTuple<bool, IMessage> TryParseBitFieldMessage(this ref SequenceReader<byte> seqReader, long length)
         {
+            bool success = false;
+            BitFieldMessage message = default;
 
+            try
+            {
+                var pooledBytes = ByteArrayPool.Rent(RequestMessage.MessageLength);
+                Span<byte> span = pooledBytes;
+                seqReader.TryCopyTo(span);
+                span.Reverse();
+
+                var index = BitConverter.ToInt32(span.Slice(0, 4));
+                var begin = BitConverter.ToInt32(span.Slice(4, 4));
+                var rlength = BitConverter.ToInt32(span.Slice(8, 4));
+
+                message = BitFieldMessagePool.Pool.Get();
+                message.Index = index;
+                message.Begin = begin;
+                message.Length = rlength;
+
+                ByteArrayPool.Return(pooledBytes);
+
+                seqReader.Advance(RequestMessage.MessageLength);
+            }
+            catch (Exception e)
+            {
+
+            }
+
+            return (success, message);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static RequestMessage ParseRequestMessage(this ref SequenceReader<byte> seqReader)
+        internal static ValueTuple<bool, RequestMessage> TryParseRequestMessage(this ref SequenceReader<byte> seqReader)
         {
-            var pooledBytes = ByteArrayPool.Rent(RequestMessage.MessageLength);
-            Span<byte> span = pooledBytes;
-            seqReader.TryCopyTo(span);
-            span.Reverse();
+            bool success = false;
+            RequestMessage message = default;
 
-            var index = BitConverter.ToInt32(span.Slice(0, 4));
-            var begin = BitConverter.ToInt32(span.Slice(4, 4));
-            var rlength = BitConverter.ToInt32(span.Slice(8, 4));
+            try
+            {
+                var pooledBytes = ByteArrayPool.Rent(RequestMessage.MessageLength);
+                Span<byte> span = pooledBytes;
+                seqReader.TryCopyTo(span);
+                span.Reverse();
 
-            ByteArrayPool.Return(pooledBytes);
+                var index = BitConverter.ToInt32(span.Slice(0, 4));
+                var begin = BitConverter.ToInt32(span.Slice(4, 4));
+                var rlength = BitConverter.ToInt32(span.Slice(8, 4));
 
-            var message = RequestMessagePool.Pool.Get();
-            message.Index = index;
-            message.Begin = begin;
-            message.Length = rlength;
+                ByteArrayPool.Return(pooledBytes);
 
-            seqReader.Advance(RequestMessage.MessageLength);
+                message = RequestMessagePool.Pool.Get();
+                message.Index = index;
+                message.Begin = begin;
+                message.Length = rlength;
 
-            return message;
+                seqReader.Advance(RequestMessage.MessageLength);
+            }
+            catch (Exception e)
+            {
+
+            }
+
+            return (success, message);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static void ParsePieceMessage(this ref SequenceReader<byte> seqReader, long length)
+        internal static ValueTuple<bool, PieceMessage> TryParsePieceMessage(this ref SequenceReader<byte> seqReader, long length)
         {
+            bool success = false;
+            PieceMessage message = default;
 
+            try
+            {
+                var pooledBytes = ByteArrayPool.Rent(RequestMessage.MessageLength);
+                Span<byte> span = pooledBytes;
+                seqReader.TryCopyTo(span);
+                span.Reverse();
+
+                var index = BitConverter.ToInt32(span.Slice(0, 4));
+                var begin = BitConverter.ToInt32(span.Slice(4, 4));                
+
+                message = PieceMessagePool.Pool.Get();
+                message.Index = index;
+                message.Begin = begin;
+                message.InitializeBuffer((int)length - 8);
+                message.CopyFrom(span.Slice(9));
+
+                ByteArrayPool.Return(pooledBytes);
+
+                seqReader.Advance(RequestMessage.MessageLength);
+            }
+            catch (Exception e)
+            {
+
+            }
+
+            return (success, message);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static PortMessage ParsePortMessage(this ref SequenceReader<byte> seqReader)
+        internal static ValueTuple<bool, PortMessage> TryParsePortMessage(this ref SequenceReader<byte> seqReader)
         {
-            var pooledBytes = ByteArrayPool.Rent(2);
-            Span<byte> span = pooledBytes;
-            seqReader.TryCopyTo(span);
-            span.Reverse();
+            bool success = false;
+            PortMessage message = default;
 
-            var port = BitConverter.ToUInt16(span);
+            try
+            {
+                var pooledBytes = ByteArrayPool.Rent(2);
+                Span<byte> span = pooledBytes;
+                seqReader.TryCopyTo(span);
+                span.Reverse();
 
-            ByteArrayPool.Return(pooledBytes);
+                var port = BitConverter.ToUInt16(span);
 
-            var message = PortMessagePool.Pool.Get();
-            message.Port = port;
+                ByteArrayPool.Return(pooledBytes);
 
-            seqReader.Advance(PortMessage.MessageLength);
+                message = PortMessagePool.Pool.Get();
+                message.Port = port;
 
-            return message;
+                seqReader.Advance(PortMessage.MessageLength);
+            }
+            catch (Exception e)
+            {
+
+            }
+
+            return (success, message);
         }
 
         internal static bool SequenceNotEquals(

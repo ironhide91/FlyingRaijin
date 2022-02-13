@@ -37,18 +37,18 @@ namespace FlyingRaijin.Engine.Torrent
 
         private const string InfoPiecesKey = "pieces";
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Pieces ReadPieces(this BDictionary bDict)
+        public static PieceHash ReadPieceHash(this BDictionary bDict)
         {
             var info = bDict.GetValue<BDictionary>(RootInfoKey);
 
             if (info == null)
-                return Pieces.Empty;
+                return PieceHash.Empty;
 
             var result = info.GetValue<BString>(InfoPiecesKey);
 
             var isNotMultipleOf20 = (result.Value.Length % 20) != 0;
             if (isNotMultipleOf20)
-                return Pieces.Empty;
+                return PieceHash.Empty;
 
             int start = 0;
             int end   = (result.Value.Length - 20);
@@ -62,7 +62,7 @@ namespace FlyingRaijin.Engine.Torrent
                 start += 20;
             }
 
-            return new Pieces(ImmutableList.CreateRange(sha1Checksumns));
+            return new PieceHash(ImmutableList.CreateRange(sha1Checksumns));
         }
 
         private const string InfoMultiFileNameKey = "name";

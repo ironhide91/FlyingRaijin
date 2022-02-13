@@ -12,8 +12,8 @@ namespace FlyingRaijin.Engine.Wire
         {
             this.pipeReader = pipeReader;
             this.handshake = handshake;
+            this.recordMessage = recordMessage;
             handshakeStatus = HandshakeStatus.Uninitiated;
-            //messageQueue = new Queue<IMessage>(50);
 
             Receive<HandshakeInitiated>(_ => OnHandshakeInitiated());
             Receive<MonitorPipeForData>(_ => OnMonitorPipeForData());
@@ -34,7 +34,7 @@ namespace FlyingRaijin.Engine.Wire
             Timers.StartPeriodicTimer(
                 nameof(MonitorPipeForData),
                 MonitorPipeForData.Instance,
-                TimeSpan.FromSeconds(5),
+                TimeSpan.FromSeconds(30),
                 TimeSpan.FromSeconds(5));
         }
 
@@ -167,34 +167,49 @@ namespace FlyingRaijin.Engine.Wire
                     break;
                 case MessageId.BitField:
                     {
-                        var result = seqReader.TryParseHaveMessage();
+                        var result = seqReader.TryParseBitFieldMessage(pendingMessageLength);
                         if (result.Item1)
                         {
                             // error
                         }
                         recordMessage.Record(result.Item2);
                     }
-                    seqReader.ParseBitFieldMessage(pendingMessageLength);
                     break;
                 case MessageId.Request:
-                    seqReader.ParseRequestMessage();
+                    {
+                        var result = seqReader.TryParseRequestMessage();
+                        if (result.Item1)
+                        {
+                            // error
+                        }
+                        recordMessage.Record(result.Item2);
+                    }
                     break;
                 case MessageId.Piece:
-                    seqReader.ParsePieceMessage(pendingMessageLength);
+                    {
+                        var result = seqReader.TryParsePieceMessage(pendingMessageLength);
+                        if (result.Item1)
+                        {
+                            // error
+                        }
+                        recordMessage.Record(result.Item2);
+                    }
                     break;
                 case MessageId.Port:
-                    seqReader.ParsePortMessage();
+                    {
+                        var result = seqReader.TryParsePortMessage();
+                        if (result.Item1)
+                        {
+                            // error
+                        }
+                        recordMessage.Record(result.Item2);
+                    }
                     break;
                 default:
                     break;
             }
 
-
             pipeReader.AdvanceTo(seqReader.Position);
-
-            recordMessage.Record(dataMessage);
-        }
-
-       
+        }       
     }
 }

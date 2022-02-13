@@ -16,7 +16,7 @@ namespace FlyingRaijin.Engine.Torrent
         public readonly long               PieceLength;
         public readonly bool               IsPrivate;
         public readonly string             Name;
-        public readonly Pieces             Pieces;
+        public readonly PieceHash          PieceHash;
         public readonly FileUnitCollection Files;
 
         public readonly ReadOnlyMemory<byte>   InfoHash;
@@ -30,7 +30,7 @@ namespace FlyingRaijin.Engine.Torrent
                CreatedBy = dictionary.ReadCreatedBy();
                 Encoding = dictionary.ReadEncoding();
 
-                  Pieces = dictionary.ReadPieces();
+               PieceHash = dictionary.ReadPieceHash();
                IsPrivate = dictionary.ReadIsPrivateFlag();
              PieceLength = dictionary.ReadPieceLength();
                     Name = dictionary.ReadDirectoryName();

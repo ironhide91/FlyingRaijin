@@ -65,5 +65,10 @@ namespace FlyingRaijin.Engine.Bencode
             buffer.Dispose();
             return null;
         }
+
+        internal static void GenerateHash(ReadOnlySpan<byte> source, Span<byte> destination)
+        {
+            sha1Managed.TryComputeHash(source, destination, out _);
+        }
     }
 }

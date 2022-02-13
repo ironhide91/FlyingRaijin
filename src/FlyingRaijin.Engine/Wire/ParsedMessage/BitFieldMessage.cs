@@ -1,10 +1,8 @@
-﻿using System;
-
-namespace FlyingRaijin.Engine.Wire
+﻿namespace FlyingRaijin.Engine.Wire
 {
-    internal sealed class PieceMessage : ByteBufferManager, IMessage
+    internal sealed class BitFieldMessage : ByteBufferManager, IMessage
     {
-        public MessageId MessageId { get { return MessageId.Piece; } }
+        public MessageId MessageId { get { return MessageId.BitField; } }
 
         /// <summary>
         /// integer specifying the zero-based piece index
@@ -17,8 +15,8 @@ namespace FlyingRaijin.Engine.Wire
         public int Begin { get; set; }
 
         /// <summary>
-        /// block of data, which is a subset of the piece specified by index
+        /// integer specifying the requested length.
         /// </summary>
-        public ReadOnlyMemory<byte> Block { get { return Buffer; } }
+        public int Length { get; set; }
     }
 }

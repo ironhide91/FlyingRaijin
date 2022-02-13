@@ -63,7 +63,7 @@ namespace FlyingRaijin.Test.Engine.BencodeStringLiterals
         public void MissingPiecesInfoKey(string bencode)
         {
             var result = BencodeParser.Parse<BDictionary>(bencode.AsReadOnlyByteSpan());
-            var temp = result.BObject.ReadPieces();
+            var temp = result.BObject.ReadPieceHash();
 
             temp.Should().NotBeNull();
             temp.Sha1Checksums.Should().NotBeNull();

@@ -75,14 +75,13 @@ namespace FlyingRaijin.Engine.Actors
                     63499));
 
             peerManager = Context.ActorOf(PeerManagerActor.Props(peerId, torrent));
-            pieceWriter = Context.ActorOf(SingleFilePieceWriterActor.Props(channel.Reader));
+            pieceWriter = Context.ActorOf(GlobalPieceWriterActor.Props(channel.Reader));
 
             trackerActor.Tell(new AnnounceCommand());
         }
 
         private void OnTrackerResponse(TrackerResponse message)
-        {                
-
+        {
             peerManager.Tell(new NewPeers(message.Peers));
         }
     }
