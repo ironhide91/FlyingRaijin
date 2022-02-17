@@ -11,12 +11,6 @@ using FlyingRaijin.Engine.Wire;
 
 namespace FlyingRaijin.Engine.Actors
 {
-
-    internal class PieceChannel : Channel<ReadOnlyMemory<byte>>
-    {
-
-    }
-
     public class TorrentManagerActor : ReceiveActor
     {
         private static readonly ReadOnlyMemory<byte> peerId = Encoding.UTF8.GetBytes("ABCDEFGHIJKLMNOPQR15");
@@ -59,7 +53,7 @@ namespace FlyingRaijin.Engine.Actors
 
         private void OnFileRead(FileRead message)
         {
-            Context.ActorOf<ParseActor>().Tell(message);
+            //Context.ActorOf<ParseActor>().Tell(message);
         }
 
         private void OnMetaData(MetaData message)
@@ -69,13 +63,13 @@ namespace FlyingRaijin.Engine.Actors
             var trackerActor = Context.ActorOf(
                 TrackerActor.Props(
                     message.AnnounceUrl,
-                    message.InfoHash.ToArray(),
+                    message.InfoHash.Hash.ToArray(),
                     "ABCDEFGHIJKLMNOPQRST",
                     "255.255.255.255",
                     63499));
 
             peerManager = Context.ActorOf(PeerManagerActor.Props(peerId, torrent));
-            pieceWriter = Context.ActorOf(GlobalPieceWriterActor.Props(channel.Reader));
+            //pieceWriter = Context.ActorOf(GlobalPieceWriterActor.Props(channel.Reader));
 
             trackerActor.Tell(new AnnounceCommand());
         }

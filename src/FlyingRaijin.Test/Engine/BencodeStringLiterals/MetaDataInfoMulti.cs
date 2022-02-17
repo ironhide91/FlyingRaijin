@@ -1,8 +1,10 @@
 ﻿using FluentAssertions;
 using FlyingRaijin.Bencode.BObject;
 using FlyingRaijin.Bencode.Read;
+using FlyingRaijin.Engine.Bencode;
 using FlyingRaijin.Engine.Torrent;
 using System.Text;
+using System.Linq;
 using Xunit;
 
 namespace FlyingRaijin.Test.Engine.BencodeStringLiterals
@@ -105,6 +107,55 @@ namespace FlyingRaijin.Test.Engine.BencodeStringLiterals
             temp[1].LengthInBytes.Should().Be(2024);
             temp[1].Md5Checksum.Should().Be("9e107d9d372bb6826bd81d3542a419d6");
             temp[1].Path.Should().Be("dir1/dir2/file.ext");
+        }
+
+        [Fact]
+        public void Overlap()
+        {
+            var sb = new StringBuilder();
+            sb.Append("d");
+                sb.Append("5:files");
+                sb.Append("l");
+                    sb.Append("d");
+                        sb.Append("6:length");
+                        sb.Append("i3e");
+                        sb.Append("4:path");
+                        sb.Append("l5:file1e");
+                    sb.Append("e");
+                    sb.Append("d");
+                        sb.Append("6:length");
+                        sb.Append("i7e");
+                        sb.Append("4:path");
+                        sb.Append("l5:file2e");
+                    sb.Append("e");
+                    sb.Append("d");
+                        sb.Append("6:length");
+                        sb.Append("i10e");
+                        sb.Append("4:path");
+                        sb.Append("l5:file3e");
+                    sb.Append("e");
+                    sb.Append("d");
+                        sb.Append("6:length");
+                        sb.Append("i8e");
+                        sb.Append("4:path");
+                        sb.Append("l5:file4e");
+                    sb.Append("e");
+                    sb.Append("d");
+                        sb.Append("6:length");
+                        sb.Append("i2e");
+                        sb.Append("4:path");
+                        sb.Append("l5:file5e");
+                    sb.Append("e");
+                sb.Append("e");
+            sb.Append("e");
+
+            var parsed = BencodeEngine.Parse(sb.ToString().AsReadOnlyByteSpan());
+
+            var filesMetaData = MetaDataHelper.ReadMultiFiles(parsed.BObject);
+
+            var totalSize = filesMetaData.Collection.Sum(x => x.LengthInBytes);
+
+            totalSize.Should().Be(30);
         }
     }
 }

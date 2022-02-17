@@ -8,7 +8,7 @@ using Serilog.Context;
 
 namespace FlyingRaijin.Bencode.Read
 {
-    public static partial class BencodeParser
+    internal static partial class BencodeParser
     {
         private static readonly IdGenerator idGenerator = new IdGenerator(0);
 

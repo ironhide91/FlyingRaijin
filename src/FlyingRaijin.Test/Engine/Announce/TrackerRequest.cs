@@ -125,7 +125,7 @@ namespace FlyingRaijin.Test.Engine.Announce
             var torrent = BencodeEngine.ParseAndReadMetaData(File.ReadAllBytes(filePath).AsSpan());
 
             var url = new TrackerRequestBuilder(torrent.AnnounceUrl)
-                .WithInfoHash(torrent.InfoHash.ToArray())
+                .WithInfoHash(torrent.InfoHash.Hash.ToArray())
                 .WithPeerId("ABCDEFGHIJKLMNOPQRST")
                 .WithIP("255.255.255.255")
                 .WithPort(25962)

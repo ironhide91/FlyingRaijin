@@ -37,4 +37,8 @@
     <ProjectReference Include="..\FlyingRaijin.Messages\FlyingRaijin.Messages.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Bencode\Write\" />
+  </ItemGroup>
+
 </Project>

@@ -4,13 +4,15 @@ namespace FlyingRaijin.Engine.Wire
 {
     internal sealed class CompletePiece
     {
-        internal CompletePiece(MetaData torrent, PieceBlock block)
+        internal CompletePiece(MetaData metaData, int pieceIndex, PieceBlock block)
         {
-            Torrent = torrent;
+            MetaData = metaData;
+            PieceIndex = pieceIndex;
             Block = block;
         }
 
-        internal readonly MetaData Torrent;
+        internal readonly MetaData MetaData;
+        internal readonly int PieceIndex;
         internal readonly PieceBlock Block;
     }
 }

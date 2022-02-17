@@ -5,34 +5,34 @@ using System.Threading.Channels;
 
 namespace FlyingRaijin.Engine.Wire
 {
-    internal class MessageProcessorActor : ReceiveActor, IRecordMessage
+    internal class MessageProcessorActorBuilder : ActorBuilderBase<ChannelReader<IMessage>, ChannelWriter<PieceMessage>>
     {
-        internal MessageProcessorActor(ChannelWriter<PieceMessage> writer)
+        internal override IActorRef Build(IUntypedActorContext context)
         {
-            this.writer = writer;
-            messageQueue = new Queue<IMessage>(50);
+            return context.ActorOf(Props.Create(() => new MessageProcessorActor(Value1, Value2)));
+        }
+    }
 
-            Receive<MonitorMessageQueue>(_ => OnMonitorMessageQueue());            
+    internal class MessageProcessorActor : ReceiveActor
+    {
+        internal MessageProcessorActor(
+            ChannelReader<IMessage> channelReaderMessage,
+            ChannelWriter<PieceMessage> channelWriterPiece)
+        {
+            this.channelReaderMessage = channelReaderMessage;
+            this.channelWriterPiece = channelWriterPiece;
+
+            Receive<MonitorMessageQueue>(_ => OnMonitorChannelReaderMessage());            
         }
 
-        private readonly ChannelWriter<PieceMessage> writer;
-        private readonly Queue<IMessage> messageQueue;
+        private readonly ChannelReader<IMessage> channelReaderMessage;
+        private readonly ChannelWriter<PieceMessage> channelWriterPiece;
 
-        public void Record(IMessage message)
+        private void OnMonitorChannelReaderMessage()
         {
-            messageQueue.Enqueue(message);
-        }
-
-        private void OnMonitorMessageQueue()
-        {
-            if (messageQueue.Count == 0)
-            {
-                return;
-            }
-
             int maxMessageToProcess = 10;
 
-            while (maxMessageToProcess != 0 && messageQueue.TryPeek(out IMessage message))
+            while (maxMessageToProcess != 0 && channelReaderMessage.TryRead(out IMessage message))
             {
                 switch (message.MessageId)
                 {
@@ -73,7 +73,7 @@ namespace FlyingRaijin.Engine.Wire
                         break;
                 }
 
-                maxMessageToProcess--;
+                --maxMessageToProcess;
             }
         }
 
@@ -122,7 +122,7 @@ namespace FlyingRaijin.Engine.Wire
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void ProcessPiece(IMessage message)
         {
-            writer.TryWrite((PieceMessage)message);
+            channelWriterPiece.TryWrite((PieceMessage)message);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

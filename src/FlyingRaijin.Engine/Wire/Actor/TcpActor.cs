@@ -8,6 +8,14 @@ using static Akka.IO.Tcp;
 
 namespace FlyingRaijin.Engine.Wire
 {
+    internal class TcpActorBuilder : ActorBuilderBase<DnsEndPoint, PipeWriter>
+    {
+        internal override IActorRef Build(IUntypedActorContext context)
+        {
+            return context.ActorOf(Props.Create(() => new TcpActor(Value1, Value2)));
+        }
+    }
+
     internal class TcpActor : ReceiveActor
     {
         public TcpActor(DnsEndPoint endPoint, PipeWriter pipeWriter)

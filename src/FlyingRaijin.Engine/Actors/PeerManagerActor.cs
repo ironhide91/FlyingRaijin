@@ -12,7 +12,7 @@ using System.Text;
 
 namespace FlyingRaijin.Engine.Actors
 {
-    public class PeerManagerActor : ReceiveActor
+    internal class PeerManagerActor : ReceiveActor
     {
         private static readonly ReadOnlyMemory<byte> handShakeHeader;
 
@@ -33,12 +33,12 @@ namespace FlyingRaijin.Engine.Actors
             handShakeHeader = new ReadOnlyMemory<byte>(header);
         }
 
-        public static Props Props(ReadOnlyMemory<byte> myPeerId, MetaData torrent)
+        internal static Props Props(ReadOnlyMemory<byte> myPeerId, MetaData torrent)
         {
             return Akka.Actor.Props.Create(() => new PeerManagerActor(myPeerId, torrent));
         }
 
-        public PeerManagerActor(ReadOnlyMemory<byte> myPeerId, MetaData torrent)
+        internal PeerManagerActor(ReadOnlyMemory<byte> myPeerId, MetaData torrent)
         {
             this.myPeerId = myPeerId;
             this.torrent = torrent;
@@ -48,7 +48,7 @@ namespace FlyingRaijin.Engine.Actors
 
             Memory<byte> handshakeTemp = new byte[68];
             handShakeHeader.CopyTo(handshakeTemp);
-            torrent.InfoHash.CopyTo(handshakeTemp);
+            //torrent.InfoHash.CopyTo(handshakeTemp);
             myPeerId.CopyTo(handshakeTemp);
             handshake = handshakeTemp;
 
@@ -64,11 +64,11 @@ namespace FlyingRaijin.Engine.Actors
                     peers.Add(peer);
 
                     var peerActorBuilder = new PeerActorBuilder();
-                    peerActorBuilder.With(torrent.Pieces.Sha1Checksums.Count);
+                    peerActorBuilder.With(torrent);
                     peerActorBuilder.With(peer);
                     peerActorBuilder.With(handshake);
 
-                    var peerActor = Context.ActorOf(peerActorBuilder.Build());
+                    var peerActor = peerActorBuilder.Build(Context);
                     peerActor.Tell(PeerConnectMessage.Instance);
                     break;
                 }

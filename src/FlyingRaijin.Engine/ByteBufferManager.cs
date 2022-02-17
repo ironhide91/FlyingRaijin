@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Buffers;
 
-namespace FlyingRaijin.Engine.Wire
+namespace FlyingRaijin.Engine
 {
     internal abstract class ByteBufferManager
     {

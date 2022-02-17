@@ -1,14 +1,27 @@
 ﻿using System;
+using System.Buffers;
 
 namespace FlyingRaijin.Engine.Messages
 {
-    public class FileRead
+    internal class FileRead
     {
-        public readonly ReadOnlyMemory<byte> Data;
-
-        public FileRead(ReadOnlyMemory<byte> data)
+        internal FileRead()
         {
-            Data = data;
+
+        }
+
+        private IMemoryOwner<byte> buffer;
+
+        internal Span<byte> Buffer { get { return buffer.Memory.Span; } }
+
+        internal void InitializeBuffer(int bufferSize)
+        {
+            buffer = ByteMemoryPool.Rent(bufferSize);
+        }
+
+        internal void ReleaseBuffer()
+        {
+            buffer.Dispose();
         }
     }
 }

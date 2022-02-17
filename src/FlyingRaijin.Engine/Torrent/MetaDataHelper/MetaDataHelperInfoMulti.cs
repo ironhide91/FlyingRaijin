@@ -6,11 +6,11 @@ using System.Runtime.CompilerServices;
 
 namespace FlyingRaijin.Engine.Torrent
 {
-    public static partial class MetaDataHelper
+    internal static partial class MetaDataHelper
     {
         private const string InfoMultiNameKey = "name";
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string ReadMultiName(this BDictionary bDict)
+        internal static string ReadMultiName(this BDictionary bDict)
         {
             var result = bDict.GetValue<BString>(InfoMultiNameKey);
 
@@ -20,9 +20,9 @@ namespace FlyingRaijin.Engine.Torrent
             return result.StringValue;
         }
 
-        public const string InfoMultiFiles = "files";
+        internal const string InfoMultiFiles = "files";
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static FileUnitCollection ReadMultiFiles(this BDictionary bDict)
+        internal static FileUnitCollection ReadMultiFiles(this BDictionary bDict)
         {
             var files = bDict.GetValue<BList>(InfoMultiFiles);
 
@@ -31,14 +31,22 @@ namespace FlyingRaijin.Engine.Torrent
 
             var typedFiles = new List<FileUnit>(files.Value.Count);
 
+            long index = 0;
+
             foreach (var fileDict in files.Value.Cast<BDictionary>())
             {
+                var length = fileDict.ReadMultiFileLength();
+                long end = (index + length -1);
+
                 var item = new FileUnit(
-                    fileDict.ReadMultiFileLength(),
+                    fileDict.ReadInfoMultiFilePath(),
                     fileDict.ReadMultiFileM55Checksum(),
-                    fileDict.ReadInfoMultiFilePath());
+                    fileDict.ReadMultiFileLength(),
+                    index,
+                    end);
 
                 typedFiles.Add(item);
+                index = end + 1;
             }
 
             var collection = ImmutableList.CreateRange(typedFiles);

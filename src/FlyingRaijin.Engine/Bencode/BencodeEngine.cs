@@ -9,37 +9,37 @@ using System.Text;
 
 namespace FlyingRaijin.Engine.Bencode
 {
-    public static class BencodeEngine
+    internal static class BencodeEngine
     {
 #pragma warning disable SYSLIB0021 // Type or member is obsolete
         private static readonly SHA1Managed sha1Managed = new SHA1Managed();
 #pragma warning restore SYSLIB0021 // Type or member is obsolete
 
-        public static ParseResult<BDictionary> Parse(ReadOnlySpan<byte> data)
+        internal static ParseResult<BDictionary> Parse(ReadOnlySpan<byte> data)
         {
             return BencodeParser.Parse<BDictionary>(data);
         }
 
-        public static ParseResult<BDictionary> Parse(string filePath)
+        internal static ParseResult<BDictionary> Parse(string filePath)
         {
             var bytes = File.ReadAllBytes(filePath).AsSpan();
 
             return BencodeParser.Parse<BDictionary>(bytes);
         }
 
-        public static MetaData ReadMetaData(ReadOnlySpan<byte> data, ParseResult<BDictionary> result)
+        internal static MetaData ReadMetaData(ReadOnlySpan<byte> data, ParseResult<BDictionary> result)
         {
             var torrent = new MetaData(result.BObject, GenerateInfoHash(result, data));
 
             return torrent;
         }
 
-        public static MetaData ParseAndReadMetaData(ReadOnlySpan<byte> data)
+        internal static MetaData ParseAndReadMetaData(ReadOnlySpan<byte> data)
         {
             return ReadMetaData(data, Parse(data));
         }
 
-        private static ReadOnlyMemory<byte> GenerateInfoHash(ParseResult result, ReadOnlySpan<byte> bytes)
+        private static InfoHash GenerateInfoHash(ParseResult result, ReadOnlySpan<byte> bytes)
         {
             if (result.Error != ErrorType.None)
                 return null;
@@ -59,7 +59,7 @@ namespace FlyingRaijin.Engine.Bencode
                     sb.Append(hash.Span[i].ToString("X2"));
                 }
 
-                return hash;
+                return new InfoHash(hash);
             }
 
             buffer.Dispose();

@@ -7,11 +7,11 @@ using System.Runtime.CompilerServices;
 
 namespace FlyingRaijin.Engine.Torrent
 {
-    public static partial class MetaDataHelper
+    internal static partial class MetaDataHelper
     {
         private const string InfoPieceLengthKey = "piece length";
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static long ReadPieceLength(this BDictionary bDict)
+        internal static long ReadPieceLength(this BDictionary bDict)
         {
             var infoDict = bDict.GetValue<BDictionary>(RootInfoKey);
 
@@ -25,7 +25,7 @@ namespace FlyingRaijin.Engine.Torrent
 
         private const string InfoPrivateKey = "private";
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool ReadIsPrivateFlag(this BDictionary bDict)
+        internal static bool ReadIsPrivateFlag(this BDictionary bDict)
         {
             var result = bDict.GetValue<BInteger>(InfoPrivateKey);
 
@@ -37,7 +37,7 @@ namespace FlyingRaijin.Engine.Torrent
 
         private const string InfoPiecesKey = "pieces";
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static PieceHash ReadPieceHash(this BDictionary bDict)
+        internal static PieceHash ReadPieceHash(this BDictionary bDict)
         {
             var info = bDict.GetValue<BDictionary>(RootInfoKey);
 
@@ -67,7 +67,7 @@ namespace FlyingRaijin.Engine.Torrent
 
         private const string InfoMultiFileNameKey = "name";
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string ReadDirectoryName(this BDictionary dict)
+        internal static string ReadDirectoryName(this BDictionary dict)
         {
             var infoDict = dict.GetValue<BDictionary>(RootInfoKey);
 
@@ -80,7 +80,7 @@ namespace FlyingRaijin.Engine.Torrent
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static FileUnitCollection ReadFiles(this BDictionary dict)
+        internal static FileUnitCollection ReadFiles(this BDictionary dict)
         {
             var infoDict = dict.GetValue<BDictionary>(RootInfoKey);
 

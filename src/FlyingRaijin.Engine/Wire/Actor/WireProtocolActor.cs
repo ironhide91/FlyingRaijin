@@ -3,16 +3,28 @@ using System;
 using System.Buffers;
 using System.IO.Pipelines;
 using System.Runtime.CompilerServices;
+using System.Threading.Channels;
 
 namespace FlyingRaijin.Engine.Wire
 {
+    internal class WireProtocolActorBuilder : ActorBuilderBase<ReadOnlyMemory<byte>, PipeReader, ChannelWriter<IMessage>>
+    {
+        internal override IActorRef Build(IUntypedActorContext context)
+        {
+            return context.ActorOf(Props.Create(() => new WireProtocolActor(Value1, Value2, Value3)));
+        }
+    }
+
     internal class WireProtocolActor : ReceiveActor, IWithTimers
     {
-        internal WireProtocolActor(ReadOnlyMemory<byte> handshake, PipeReader pipeReader, IRecordMessage recordMessage)
+        internal WireProtocolActor(
+            ReadOnlyMemory<byte> handshake,
+            PipeReader pipeReader,
+            ChannelWriter<IMessage> channelWriterMessage)
         {
-            this.pipeReader = pipeReader;
             this.handshake = handshake;
-            this.recordMessage = recordMessage;
+            this.pipeReader = pipeReader;
+            this.channelWriterMessage = channelWriterMessage;
             handshakeStatus = HandshakeStatus.Uninitiated;
 
             Receive<HandshakeInitiated>(_ => OnHandshakeInitiated());
@@ -20,8 +32,8 @@ namespace FlyingRaijin.Engine.Wire
         }
 
         private readonly ReadOnlyMemory<byte> handshake;
-        private readonly PipeReader pipeReader;        
-        private readonly IRecordMessage recordMessage;
+        private readonly PipeReader pipeReader;
+        private readonly ChannelWriter<IMessage> channelWriterMessage;
 
         private HandshakeStatus handshakeStatus;
         private MessageId currentMessageId;
@@ -130,7 +142,7 @@ namespace FlyingRaijin.Engine.Wire
                         continue;
                     }
 
-                    recordMessage.Record(messageId.CreateControlMessage());
+                    channelWriterMessage.TryWrite(messageId.CreateControlMessage());
                     continue;
                 }
 
@@ -162,7 +174,7 @@ namespace FlyingRaijin.Engine.Wire
                         {
                             // error
                         }
-                        recordMessage.Record(result.Item2);
+                        channelWriterMessage.TryWrite(result.Item2);
                     }
                     break;
                 case MessageId.BitField:
@@ -172,7 +184,7 @@ namespace FlyingRaijin.Engine.Wire
                         {
                             // error
                         }
-                        recordMessage.Record(result.Item2);
+                        channelWriterMessage.TryWrite(result.Item2);
                     }
                     break;
                 case MessageId.Request:
@@ -182,7 +194,7 @@ namespace FlyingRaijin.Engine.Wire
                         {
                             // error
                         }
-                        recordMessage.Record(result.Item2);
+                        channelWriterMessage.TryWrite(result.Item2);
                     }
                     break;
                 case MessageId.Piece:
@@ -192,7 +204,7 @@ namespace FlyingRaijin.Engine.Wire
                         {
                             // error
                         }
-                        recordMessage.Record(result.Item2);
+                        channelWriterMessage.TryWrite(result.Item2);
                     }
                     break;
                 case MessageId.Port:
@@ -202,7 +214,7 @@ namespace FlyingRaijin.Engine.Wire
                         {
                             // error
                         }
-                        recordMessage.Record(result.Item2);
+                        channelWriterMessage.TryWrite(result.Item2);
                     }
                     break;
                 default:

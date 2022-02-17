@@ -3,14 +3,14 @@ using System.Linq;
 
 namespace FlyingRaijin.Engine.Torrent
 {
-    public class FileUnitCollection
+    internal class FileUnitCollection
     {
-        public static readonly FileUnitCollection Empty =
+        internal static readonly FileUnitCollection Empty =
             new FileUnitCollection(ImmutableList.CreateRange(Enumerable.Empty<FileUnit>()));
 
-        public readonly IImmutableList<FileUnit> Collection;
+        internal readonly IImmutableList<FileUnit> Collection;
 
-        public FileUnit this[int index]
+        internal FileUnit this[int index]
         {
             get
             {
@@ -18,7 +18,7 @@ namespace FlyingRaijin.Engine.Torrent
             }
         }
 
-        public FileUnitCollection(IImmutableList<FileUnit> files)
+        internal FileUnitCollection(IImmutableList<FileUnit> files)
         {
             Collection = files;
         }     

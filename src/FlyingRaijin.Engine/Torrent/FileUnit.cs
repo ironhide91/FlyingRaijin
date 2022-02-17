@@ -1,16 +1,25 @@
 ﻿namespace FlyingRaijin.Engine.Torrent
 {
-    public class FileUnit
-    {
-        public readonly long   LengthInBytes;
-        public readonly string Md5Checksum;
-        public readonly string Path;
-
-        public FileUnit(long lengthInBytes, string md5Checksum, string path)
+    internal class FileUnit
+    {                
+        internal readonly string Path;
+        internal readonly string Md5Checksum;
+        internal readonly long LengthInBytes;        
+        internal readonly long PieceIndexBegin;
+        internal readonly long PieceIndexEnd;
+        
+        internal FileUnit(
+            string path,
+            string md5Checksum,
+            long lengthInBytes,
+            long pieceIndexBegin,
+            long pieceIndexEnd)
         {
+            Path = path;
+            Md5Checksum = md5Checksum;
             LengthInBytes = lengthInBytes;
-              Md5Checksum = md5Checksum;
-                     Path = path;
+            PieceIndexBegin = pieceIndexBegin;
+            PieceIndexEnd = pieceIndexEnd;
         }
 
         public bool Equals(FileUnit other)

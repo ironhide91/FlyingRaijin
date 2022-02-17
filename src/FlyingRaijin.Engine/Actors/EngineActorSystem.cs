@@ -13,10 +13,10 @@ namespace FFlyingRaijin.Engine.Actors
             new Lazy<EngineActorSystem>(() => new EngineActorSystem());
 
         private ActorSystem engineActorSystem;
-
-        private IActorRef newTorrentEngineActorRef;
-
-        private IActorRef httpClientActorRef;        
+        private IActorRef newTorrentActor;
+        private IActorRef httpClientActor;
+        private IActorRef fileCreateActor;
+        private IActorRef globalPieceWriterActor;
 
         private EngineActorSystem()
         {
@@ -27,11 +27,10 @@ namespace FFlyingRaijin.Engine.Actors
         {
             engineActorSystem = ActorSystem.Create("Engine");
 
-            newTorrentEngineActorRef = engineActorSystem.ActorOf<NewTorrentActor>(nameof(NewTorrentActor));
-
-            httpClientActorRef = engineActorSystem.ActorOf<HttpClientActor>(nameof(HttpClientActor));
-
-            
+            newTorrentActor = engineActorSystem.ActorOf<NewTorrentActor>(nameof(NewTorrentActor));
+            httpClientActor = engineActorSystem.ActorOf<HttpClientActor>(nameof(HttpClientActor));
+            httpClientActor = engineActorSystem.ActorOf<HttpClientActor>(nameof(HttpClientActor));
+            httpClientActor = engineActorSystem.ActorOf<HttpClientActor>(nameof(HttpClientActor));
         }
 
         internal void Stop()

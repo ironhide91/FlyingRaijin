@@ -4,24 +4,24 @@ using System.Collections.Immutable;
 
 namespace FlyingRaijin.Engine.Torrent
 {
-    public sealed class MetaData
+    internal sealed class MetaData
     {
-        public readonly string             AnnounceUrl;
-        public readonly AnnounceList       AnnounceList;
-        public readonly DateTime           CreationDate;
-        public readonly string             Comment;
-        public readonly string             CreatedBy;
-        public readonly string             Encoding;
-                                           
-        public readonly long               PieceLength;
-        public readonly bool               IsPrivate;
-        public readonly string             Name;
-        public readonly PieceHash          PieceHash;
-        public readonly FileUnitCollection Files;
+        internal readonly string AnnounceUrl;
+        internal readonly AnnounceList AnnounceList;
+        internal readonly DateTime CreationDate;
+        internal readonly string Comment;
+        internal readonly string CreatedBy;
+        internal readonly string Encoding;
 
-        public readonly ReadOnlyMemory<byte>   InfoHash;
+        internal readonly long PieceLength;
+        internal readonly bool IsPrivate;
+        internal readonly string Name;
+        internal readonly PieceHash PieceHash;
+        internal readonly FileUnitCollection Files;
 
-        public MetaData(BDictionary dictionary, ReadOnlyMemory<byte> computedInfoHash)
+        internal readonly InfoHash InfoHash;
+
+        internal MetaData(BDictionary dictionary, InfoHash computedInfoHash)
         {
              AnnounceUrl = dictionary.ReadAnnounceUrl();
             AnnounceList = dictionary.ReadAnnounceList();
