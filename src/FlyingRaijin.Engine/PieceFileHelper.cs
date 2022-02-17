@@ -8,29 +8,71 @@ namespace FlyingRaijin.Engine
     internal static class PieceFileHelper
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static ValueTuple<long, int> DetermineSlice(CompletePiece piece)
+        internal static ValueTuple<FileUnit, long, int, int> DetermineSlice(CompletePiece piece)
         {
             var (overlaps, file) = PieceOverlaps(piece);
 
+            long offset = long.MinValue;
+            int begin = int.MinValue;
+            int length = int.MinValue;
+
             if (overlaps)
             {
-                long pieceEnd = piece.PieceIndex + piece.MetaData.PieceLength - 1;
+                long pieceEnd = piece.PieceIndex + piece.MetaData.PieceLength - 1;                
 
-                if ((file.PieceIndexBegin == piece.PieceIndex) && (file.PieceIndexEnd >= pieceEnd))
+                // we have 5 possibilities now
+
+                // --|-----p----|-----------
+                // ------|-------f------|---
+                if ((piece.PieceIndex < file.PieceIndexBegin) && (pieceEnd < file.PieceIndexEnd))
                 {
-                    var begin = file.PieceIndexBegin;
-                    var length = file.PieceIndexBegin + piece.MetaData.PieceLength - 1;
+                    begin = (int)(file.PieceIndexBegin - piece.PieceIndex);
+                    length = (int)(file.PieceIndexBegin + pieceEnd);
 
-                    return (begin, (int)length);
+                    return (file, 0L, begin, length);
                 }
 
-                if (file.PieceIndexBegin < piece.PieceIndex)
+                // --|-----p------|---------
+                // --|---------f------|-----
+                if ((piece.PieceIndex == file.PieceIndexBegin) && (pieceEnd < file.PieceIndexEnd))
                 {
+                    // our overlap function is incorrect
+                    return (file, 0L, 0, 0);
+                }
 
+                // ------|-----p----|-------
+                // --|---------f--------|---
+                if ((piece.PieceIndex > file.PieceIndexBegin) && (pieceEnd < file.PieceIndexEnd))
+                {
+                    // our overlap function is incorrect
+                    return (file, 0L, 0, 0);
+                }
+
+                // -----|-----p----|--------
+                // --|-----f-------|--------
+                if ((piece.PieceIndex > file.PieceIndexBegin) && (pieceEnd == file.PieceIndexEnd))
+                {
+                    // our overlap function is incorrect
+                    return (file, 0L, 0, 0);
+                }
+
+                // ------|-----p-------|----
+                // --|-----f-------|--------
+                if ((piece.PieceIndex > file.PieceIndexBegin) && (pieceEnd > file.PieceIndexEnd))
+                {
+                    offset = piece.PieceIndex + file.PieceIndexBegin;
+                    begin = 0;
+                    length = (int)(piece.PieceIndex - file.PieceIndexEnd);
+
+                    return (file, offset, begin, length);
                 }
             }
 
-            return (0, 0);
+            offset = piece.PieceIndex + file.PieceIndexBegin;
+            begin = 0;
+            length = (int)(piece.MetaData.PieceLength - 1);
+
+            return (file, offset, begin, length);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

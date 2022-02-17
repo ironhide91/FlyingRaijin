@@ -29,9 +29,8 @@ namespace FlyingRaijin.Engine
             Receive<FileCreated>(message => OnFileCreated(message));
         }        
 
-        private const int MaxBytesToWrite = 512 * 10;
+        private const int MaxBytesToWrite = 512000;
         private readonly ChannelReader<CompletePiece> channelReaderPiece;
-        private readonly Dictionary<string, SafeFileHandle> openFileHandles;
         private readonly Timer timer;
 
         public ITimerScheduler Timers { get; set; }
@@ -51,59 +50,38 @@ namespace FlyingRaijin.Engine
 
         private void Timer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            long maxBytesWritten = MaxBytesToWrite;
+            //long maxBytesWritten = MaxBytesToWrite;
 
-            while (maxBytesWritten != 0 && channelReaderPiece.TryRead(out CompletePiece piece))
+            while (channelReaderPiece.TryRead(out CompletePiece piece))
             {
-                //var (overlaps, file) = PieceOverlaps(piece);
+                var (file, offset, index, length) = PieceFileHelper.DetermineSlice(piece);
 
-                //ReadOnlySpan<byte> bufferToWrite;
+                var exist = FileManager.TryGet(
+                    piece.MetaData.InfoHash,
+                    file.Path,
+                    out SafeFileHandle fileHandle);
 
-                //if (overlaps)
-                //{
-                //    if (file.PieceIndexBegin == piece.PieceIndex)
-                //    {
+                if (!exist)
+                {
+                    continue;
+                }
 
-                //    }
+                var bufferToWrite = piece.Block.Buffer.Span.Slice(index, length);
 
-                //    var length = file.PieceIndexBegin - piece.PieceIndex;
+                try
+                {
+                    RandomAccess.Write(fileHandle, bufferToWrite, offset);
+                }
+                catch (Exception ex)
+                {
 
-                //    bufferToWrite = piece.Block.Buffer.Span.Slice(file.PieceIndexBegin, length);
-                //}
-                //else
-                //{
-                //    bufferToWrite = piece.Block.Buffer.Span;
-                //}
-
-                //// can write whole piece as part of a single file
-
-                //var exist = FileManager.TryGet(
-                //    piece.MetaData.InfoHash,
-                //    file.Path,
-                //    out SafeFileHandle fileHandle);
-
-                //if (!exist)
-                //{
-                //    continue;
-                //}
-
-                //var offset = (piece.PieceIndex - file.PieceIndexBegin);
-
-                //try
-                //{
-                //    RandomAccess.Write(fileHandle, bufferToWrite, offset);
-                //}
-                //catch (Exception ex)
-                //{
-
-                //}
-                //finally
-                //{
-                //    piece.Block.ReleaseBuffer();
-                //}
+                }
+                finally
+                {
+                    piece.Block.ReleaseBuffer();
+                    //maxBytesWritten -= piece.MetaData.PieceLength;
+                }
             }
-        }
-
-        
+        }        
     }
 }
