@@ -7,7 +7,7 @@ using System.Runtime.CompilerServices;
 
 namespace FlyingRaijin.Engine.Torrent
 {
-    public static partial class MetaDataHelper
+    internal static partial class MetaDataHelper
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static T GetValue<T>(this BDictionary dictionary, string key) where T : IBObject
@@ -40,16 +40,17 @@ namespace FlyingRaijin.Engine.Torrent
             return false;
         }
 
-        public const string RootInfoKey = "info";
+
+        internal const string RootInfoKey = "info";
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static BDictionary ReadInfo(this BDictionary bDict)
+        internal static BDictionary ReadInfo(this BDictionary bDict)
         {
             return bDict.GetValue<BDictionary>(RootInfoKey);
         }
 
         private const string RootAnnounceUrlKey = "announce";
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string ReadAnnounceUrl(this BDictionary bDict)
+        internal static string ReadAnnounceUrl(this BDictionary bDict)
         {
             var result = bDict.GetValue<BString>(RootAnnounceUrlKey);
 
@@ -61,7 +62,7 @@ namespace FlyingRaijin.Engine.Torrent
 
         private const string RootAnnounceListKey = "announce-list";
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static AnnounceList ReadAnnounceList(this BDictionary bDict)
+        internal static AnnounceList ReadAnnounceList(this BDictionary bDict)
         {
             var bList = bDict.GetValue<BList>(RootAnnounceListKey);          
 
@@ -95,7 +96,7 @@ namespace FlyingRaijin.Engine.Torrent
 
         private const string RootCreationDateKey = "creation date";
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static long ReadCreationDate(this BDictionary bDict)
+        internal static long ReadCreationDate(this BDictionary bDict)
         {
             var result = bDict.GetValue<BInteger>(RootCreationDateKey);
 
@@ -107,7 +108,7 @@ namespace FlyingRaijin.Engine.Torrent
 
         private const string RootCommentKey = "comment";
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string ReadComment(this BDictionary bDict)
+        internal static string ReadComment(this BDictionary bDict)
         {
             var result = bDict.GetValue<BString>(RootCommentKey);
 
@@ -119,7 +120,7 @@ namespace FlyingRaijin.Engine.Torrent
 
         private const string RootCreatedByKey = "created by";
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string ReadCreatedBy(this BDictionary bDict)
+        internal static string ReadCreatedBy(this BDictionary bDict)
         {
             var result = bDict.GetValue<BString>(RootCreatedByKey);
 
@@ -131,7 +132,7 @@ namespace FlyingRaijin.Engine.Torrent
 
         private const string RootEncodingKey = "encoding";
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string ReadEncoding(this BDictionary bDict)
+        internal static string ReadEncoding(this BDictionary bDict)
         {
             var result = bDict.GetValue<BString>(RootEncodingKey);
 

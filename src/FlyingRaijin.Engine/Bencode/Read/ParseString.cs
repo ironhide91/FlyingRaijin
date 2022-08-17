@@ -8,7 +8,7 @@ using System.Text;
 
 namespace FlyingRaijin.Bencode.Read
 {
-    public static partial class BencodeParser
+    internal static partial class BencodeParser
     {
         private static readonly byte[] EmptyStringBytes = Enumerable.Empty<byte>().ToArray();
 

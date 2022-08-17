@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Buffers;
+using System.Collections.Generic;
 using System.IO.Pipelines;
 using System.Threading.Tasks;
 
@@ -19,44 +20,54 @@ namespace FlyingRaijin.Engine.Wire
             _ = await writer.FlushAsync();
         }
 
+        internal static void Push(PipeWriter writer, ref ReadOnlySequence<byte> sequence)
+        {
+            foreach (var segment in sequence)
+            {
+                writer.Write(segment.Span);
+                writer.Advance(segment.Span.Length);
+            }
+            
+            writer.FlushAsync();
+        }
+        
         internal static bool IsValidHandshakeResponse(
             ref SequenceReader<byte> hsReader,
             ref SequenceReader<byte> seqReader)
         {
             long consumed = 0;
 
-            // Protocol Length Prefix(1) + Protcol Length(19) = 20 bytes
-            var failed = !SequenceEquals(hsReader, ProtocolIdentifierBegin, ProtocolIdentifierEnd, seqReader);
+            var failed = !SequenceEquals(ref hsReader, ref seqReader, ProtocolIdentifierBegin, ProtocolIdentifierEnd);
             if (failed)
                 return false;
             consumed += 20;
 
             // Reserved
-            failed = !SequenceHasEnough(seqReader, 8);
+            failed = !SequenceHasEnough(ref seqReader, 8);
             if (failed)
                 return false;
             consumed += 8;
 
             // Info Hash
-            failed = !SequenceEquals(hsReader, InfoHashBegin, InfoHashEnd, seqReader);
+            failed = !SequenceEquals(ref hsReader, ref seqReader, InfoHashBegin, InfoHashEnd);
             if (failed)
                 return false;
             consumed += 20;
 
             // Peer Id
-            failed = !SequenceHasEnough(seqReader, 20);
+            failed = !SequenceHasEnough(ref seqReader, 20);
             if (failed)
                 return false;
-            consumed += 20;
-
-            seqReader.Advance(consumed);            
+                
+            consumed += 20;           
+            seqReader.Advance(consumed);
 
             return true;
         }
 
         internal static int TryReadMessageLength(ref SequenceReader<byte> seqReader)
         {
-            if (!SequenceHasEnough(seqReader, 4))
+            if (!SequenceHasEnough(ref seqReader, 4))
                 return int.MinValue;
 
             var pooledBytes = ArrayPool<byte>.Shared.Rent(4);
@@ -83,7 +94,7 @@ namespace FlyingRaijin.Engine.Wire
 
         internal static MessageType TryReadMessageType(ref SequenceReader<byte> seqReader)
         {
-            if (!SequenceHasEnough(seqReader, 1))
+            if (!SequenceHasEnough(ref seqReader, 1))
                 return byte.MinValue;            
 
             seqReader.TryPeek(0, out byte messageType);
@@ -96,7 +107,7 @@ namespace FlyingRaijin.Engine.Wire
             return (MessageType)messageType;
         }
 
-        public static void TryReadMessage(byte messageType, SequenceReader<byte> seqReader)
+        public static void TryReadMessage(byte messageType, ref SequenceReader<byte> seqReader)
         {
             switch (messageType)
             {
@@ -132,16 +143,16 @@ namespace FlyingRaijin.Engine.Wire
             }
         }
 
-        private static void TryReadBitFieldMessage(SequenceReader<byte> seqReader)
+        private static void TryReadBitFieldMessage(ref SequenceReader<byte> seqReader)
         {
 
         }
 
         private static bool SequenceEquals(
-            SequenceReader<byte> source,
-                             int sourceBegin,
-                             int sourceEnd,
-            SequenceReader<byte> destination)
+            ref SequenceReader<byte> source,
+            ref SequenceReader<byte> destination,
+            int sourceBegin,
+            int sourceEnd)
         {
             if (source.Length < sourceEnd)
                 return false;
@@ -160,15 +171,28 @@ namespace FlyingRaijin.Engine.Wire
 
                 if (!s.Equals(d))
                     return false;
-
             }
 
             return true;
         }
 
-        private static bool SequenceHasEnough(SequenceReader<byte> seqReader, int length)
+        private static bool SequenceHasEnough(ref SequenceReader<byte> seqReader, int length)
         {
             return (seqReader.UnreadSpan.Length >= length);
+        }
+
+        private static IEnumerable<ArraySegment<byte>> ToArraySegment(ReadOnlySequence<byte> ros)
+        {
+            List<ArraySegment<byte>> arraySegment = new List<ArraySegment<byte>>();
+
+            var temp = ros.GetEnumerator();
+
+            while (temp.MoveNext())
+            {
+                arraySegment.Add(temp.Current.Span.ToArray());
+            }
+
+            return arraySegment;
         }
     }
 }

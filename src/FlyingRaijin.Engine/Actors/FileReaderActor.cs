@@ -13,11 +13,15 @@ namespace FlyingRaijin.Engine.Actors
 
         private void OnReadFileCommand(FileReadCommand command)
         {
-            var data = File.ReadAllBytes(command.Path);
+            var handle = File.OpenHandle(command.Path);
+            var length = RandomAccess.GetLength(handle);
 
-            var fileRead = new FileRead(data);
+            var file = new FileRead();
+            file.InitializeBuffer((int)length);
+            RandomAccess.Read(handle, file.Buffer, 0);            
+            handle.Close();
 
-            Sender.Tell(fileRead);
+            Sender.Tell(file);
         }
     }
 }

@@ -6,7 +6,7 @@ using System.Text;
 
 namespace FlyingRaijin.Engine.Torrent
 {
-    public static partial class MetaDataHelper
+    internal static partial class MetaDataHelper
     {
         private static readonly ReadOnlyDictionary<string, BString> KnownKeys =
             new ReadOnlyDictionary<string, BString>(
@@ -29,7 +29,7 @@ namespace FlyingRaijin.Engine.Torrent
                     { InfoMultiFiles, new BString(null, InfoMultiFiles.ToBytes()) },                    
                 });
 
-        public static ReadOnlyMemory<byte> ToBytes(this string str)
+        internal static ReadOnlyMemory<byte> ToBytes(this string str)
         {
             return Encoding.UTF8.GetBytes(str);
         }

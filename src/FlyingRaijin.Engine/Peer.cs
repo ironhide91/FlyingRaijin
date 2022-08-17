@@ -1,6 +1,6 @@
 ﻿using System.Net;
 
-namespace FlyingRaijin.Engine.Tracker
+namespace FlyingRaijin.Engine
 {
     public class Peer
     {

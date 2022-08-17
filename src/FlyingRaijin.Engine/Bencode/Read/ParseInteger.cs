@@ -4,8 +4,8 @@ using System.Buffers;
 using System.Runtime.CompilerServices;
 
 namespace FlyingRaijin.Bencode.Read
-{    
-    public static partial class BencodeParser
+{
+    internal static partial class BencodeParser
     {
         private static readonly int Int64MinValueCharLength = long.MinValue.ToString().Length;
         private static readonly int Int64MaxValueCharLength = long.MaxValue.ToString().Length;

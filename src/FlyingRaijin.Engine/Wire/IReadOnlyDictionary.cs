@@ -1,0 +1,4 @@
+﻿namespace FlyingRaijin.Engine.Wire
+{
+
+}

@@ -3,11 +3,11 @@ using System.Runtime.CompilerServices;
 
 namespace FlyingRaijin.Engine.Torrent
 {
-    public static partial class MetaDataHelper
+    internal static partial class MetaDataHelper
     {
         private const string InfoSingleNameKey = "name";
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string ReadSingleName(this BDictionary bDict)
+        internal static string ReadSingleName(this BDictionary bDict)
         {
             var result = bDict.GetValue<BString>(InfoSingleNameKey);
 
@@ -19,7 +19,7 @@ namespace FlyingRaijin.Engine.Torrent
 
         private const string InfoSingleLengthKey = "length";
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static long ReadSingleLength(this BDictionary bDict)
+        internal static long ReadSingleLength(this BDictionary bDict)
         {
             var result = bDict.GetValue<BInteger>(InfoSingleLengthKey);
 
@@ -31,7 +31,7 @@ namespace FlyingRaijin.Engine.Torrent
 
         private const string InfoSingleMD5ChecksumKey = "md5sum";
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string ReadSingleMD5Checksum(this BDictionary bDict)
+        internal static string ReadSingleMD5Checksum(this BDictionary bDict)
         {
             var result = bDict.GetValue<BString>(InfoSingleMD5ChecksumKey);
 
@@ -41,12 +41,16 @@ namespace FlyingRaijin.Engine.Torrent
             return result.StringValue;
         }
 
-        public static FileUnit ReadSingleFile(this BDictionary infoDict)
+        internal static FileUnit ReadSingleFile(this BDictionary infoDict)
         {
+            var length = infoDict.ReadSingleLength();
+
             var file = new FileUnit(
-                     infoDict.ReadSingleLength(),
+                     infoDict.ReadSingleName(),
                      infoDict.ReadSingleMD5Checksum(),
-                     infoDict.ReadSingleName());
+                     length,
+                     0,
+                     length-1);
 
             return file;
         }

@@ -7,11 +7,11 @@ using System.Runtime.CompilerServices;
 
 namespace FlyingRaijin.Engine.Torrent
 {
-    public static partial class MetaDataHelper
+    internal static partial class MetaDataHelper
     {
         private const string InfoPieceLengthKey = "piece length";
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static long ReadPieceLength(this BDictionary bDict)
+        internal static long ReadPieceLength(this BDictionary bDict)
         {
             var infoDict = bDict.GetValue<BDictionary>(RootInfoKey);
 
@@ -25,7 +25,7 @@ namespace FlyingRaijin.Engine.Torrent
 
         private const string InfoPrivateKey = "private";
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool ReadIsPrivateFlag(this BDictionary bDict)
+        internal static bool ReadIsPrivateFlag(this BDictionary bDict)
         {
             var result = bDict.GetValue<BInteger>(InfoPrivateKey);
 
@@ -37,18 +37,18 @@ namespace FlyingRaijin.Engine.Torrent
 
         private const string InfoPiecesKey = "pieces";
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Pieces ReadPieces(this BDictionary bDict)
+        internal static PieceHash ReadPieceHash(this BDictionary bDict)
         {
             var info = bDict.GetValue<BDictionary>(RootInfoKey);
 
             if (info == null)
-                return Pieces.Empty;
+              return PieceHash.Empty;
 
             var result = info.GetValue<BString>(InfoPiecesKey);
 
             var isNotMultipleOf20 = (result.Value.Length % 20) != 0;
             if (isNotMultipleOf20)
-                return Pieces.Empty;
+                return PieceHash.Empty;
 
             int start = 0;
             int end   = (result.Value.Length - 20);
@@ -62,7 +62,40 @@ namespace FlyingRaijin.Engine.Torrent
                 start += 20;
             }
 
-            return new Pieces(ImmutableList.CreateRange(sha1Checksumns));
+            return new PieceHash(ImmutableList.CreateRange(sha1Checksumns));
+        }
+
+        private const string InfoMultiFileNameKey = "name";
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal static string ReadDirectoryName(this BDictionary dict)
+        {
+            var infoDict = dict.GetValue<BDictionary>(RootInfoKey);
+
+            if (infoDict.ContainsKey(InfoMultiFiles))
+            {
+                return infoDict.GetValue<BString>(InfoMultiFileNameKey).StringValue;
+            }
+
+            return string.Empty;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal static FileUnitCollection ReadFiles(this BDictionary dict)
+        {
+            var infoDict = dict.GetValue<BDictionary>(RootInfoKey);
+
+            if (infoDict.ContainsKey(InfoMultiFiles))
+            {
+                return infoDict.ReadMultiFiles();
+            }
+
+            var singleFile = infoDict.ReadSingleFile();
+
+            var files = new List<FileUnit>() { singleFile };
+
+            var collection = ImmutableList.CreateRange(files);
+
+            return new FileUnitCollection(collection);
         }
 
         private const string InfoMultiFileNameKey = "name";
