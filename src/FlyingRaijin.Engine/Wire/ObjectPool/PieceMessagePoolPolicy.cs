@@ -15,7 +15,7 @@ namespace FlyingRaijin.Engine.Wire
         {
             obj.Index = default;
             obj.Begin = default;
-            obj.ReleaseBuffer();
+            obj.Length = default;
 
             return true;
         }

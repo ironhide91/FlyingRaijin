@@ -35,7 +35,7 @@ namespace FFlyingRaijin.Engine.Actors
 
         internal void Stop()
         {
-            engineActorSystem.Dispose();
+            engineActorSystem.Terminate();
         }
     }
 }

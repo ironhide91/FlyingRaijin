@@ -2,31 +2,33 @@
 
 namespace FlyingRaijin.Engine.Wire
 {
-    internal class PieceDictionary
+    internal class PieceDictionary : IRequestPieceBlock
     {
-        public PieceDictionary(int pieceLength)
+        internal IEnumerable<KeyValuePair<int, PieceBlock>> Pieces { get { return pairs; } }
+
+        internal PieceDictionary(int pieceLength)
         {
             this.pieceLength = pieceLength;
             pairs = new Dictionary<int, PieceBlock>(100);
         }
 
-        private readonly Dictionary<int, PieceBlock> pairs;
-        private readonly int pieceLength;
-
-        internal IEnumerable<KeyValuePair<int, PieceBlock>> Pieces { get { return pairs; } }
-
-        internal void Add(PieceMessage message)
+        public void Request(int index, out PieceBlock block)
         {
-            if (pairs.ContainsKey(message.Index))
+            if (pairs.ContainsKey(index))
             {
-                pairs[message.Index].Add(message);
+                block = pairs[index];
                 return;
             }
 
-            var blocks = PieceBlockPool.Pool.Get();
-            blocks.SetPendingPieceLength(pieceLength);
+            block = PieceBlockPool.Pool.Get();
+            block.InitializeBuffer(pieceLength);
+            block.SetPendingPieceLength(pieceLength);
 
-            pairs.Add(message.Index, blocks);
+            pairs.Add(index, block);
+            block = pairs[index];
         }
+
+        private readonly Dictionary<int, PieceBlock> pairs;
+        private readonly int pieceLength;
     }
 }

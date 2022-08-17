@@ -1,18 +1,9 @@
 ﻿using Akka.Actor;
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading.Channels;
 
 namespace FlyingRaijin.Engine.Wire
 {
-    internal class MessageProcessorActorBuilder : ActorBuilderBase<ChannelReader<IMessage>, ChannelWriter<PieceMessage>>
-    {
-        internal override IActorRef Build(IUntypedActorContext context)
-        {
-            return context.ActorOf(Props.Create(() => new MessageProcessorActor(Value1, Value2)));
-        }
-    }
-
     internal class MessageProcessorActor : ReceiveActor
     {
         internal MessageProcessorActor(
@@ -23,10 +14,7 @@ namespace FlyingRaijin.Engine.Wire
             this.channelWriterPiece = channelWriterPiece;
 
             Receive<MonitorMessageQueue>(_ => OnMonitorChannelReaderMessage());            
-        }
-
-        private readonly ChannelReader<IMessage> channelReaderMessage;
-        private readonly ChannelWriter<PieceMessage> channelWriterPiece;
+        }        
 
         private void OnMonitorChannelReaderMessage()
         {
@@ -141,6 +129,19 @@ namespace FlyingRaijin.Engine.Wire
         private void ProcessUnknown()
         {
 
+        }
+
+        private readonly ChannelReader<IMessage> channelReaderMessage;
+        private readonly ChannelWriter<PieceMessage> channelWriterPiece;
+    }
+
+    internal class MessageProcessorActorBuilder : ActorBuilderBase<ChannelReader<IMessage>, ChannelWriter<PieceMessage>>
+    {
+        private readonly Props ctor;
+
+        internal MessageProcessorActorBuilder()
+        {
+            ctor = Props.Create(() => new MessageProcessorActor(Value1, Value2));
         }
     }
 }

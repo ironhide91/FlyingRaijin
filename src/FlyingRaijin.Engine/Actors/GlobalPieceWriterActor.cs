@@ -22,18 +22,16 @@ namespace FlyingRaijin.Engine
         {
             this.channelReaderPiece = channelReaderPiece;
 
-            timer = new Timer(30000);
+            timer = new Timer(40000);
             timer.Elapsed += Timer_Elapsed;
             
             Receive<StartPieceWriterThread>(_ => OnStartPieceWriterThread());
             Receive<FileCreated>(message => OnFileCreated(message));
         }        
 
-        private const int MaxBytesToWrite = 512000;
+        private const long MaxBytesToWrite = 512000L;
         private readonly ChannelReader<CompletePiece> channelReaderPiece;
         private readonly Timer timer;
-
-        public ITimerScheduler Timers { get; set; }
 
         private void OnStartPieceWriterThread()
         {
@@ -50,37 +48,37 @@ namespace FlyingRaijin.Engine
 
         private void Timer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            //long maxBytesWritten = MaxBytesToWrite;
+            long maxBytesWritten = 0;
 
-            while (channelReaderPiece.TryRead(out CompletePiece piece))
+            while ((maxBytesWritten <= MaxBytesToWrite) && channelReaderPiece.TryRead(out CompletePiece piece))
             {
-                var (file, offset, index, length) = PieceFileHelper.DetermineSlice(piece);
+                var writeInfos = PieceFileHelper.GetWriteInfo(piece);
 
-                var exist = FileManager.TryGet(
-                    piece.MetaData.InfoHash,
-                    file.Path,
-                    out SafeFileHandle fileHandle);
-
-                if (!exist)
+                foreach (var (file, sliceInfo) in writeInfos)
                 {
-                    continue;
-                }
+                    var exist = FileManager.TryGet(
+                        piece.MetaData.InfoHash,
+                        file.Path,
+                        out SafeFileHandle fileHandle);
 
-                var bufferToWrite = piece.Block.Buffer.Span.Slice(index, length);
+                    if (!exist)
+                    {
+                        continue;
+                    }
 
-                try
-                {
-                    RandomAccess.Write(fileHandle, bufferToWrite, offset);
-                }
-                catch (Exception ex)
-                {
+                    var bufferToWrite = piece.Block.Buffer.Span.Slice(sliceInfo.Start, sliceInfo.Length);
 
-                }
-                finally
-                {
-                    piece.Block.ReleaseBuffer();
-                    //maxBytesWritten -= piece.MetaData.PieceLength;
-                }
+                    try
+                    {
+                        RandomAccess.Write(fileHandle, bufferToWrite, sliceInfo.Offset);                        
+                        maxBytesWritten += piece.MetaData.PieceLength;
+                        piece.Block.ReleaseBuffer();
+                    }
+                    catch (Exception ex)
+                    {
+
+                    }
+                }                
             }
         }        
     }

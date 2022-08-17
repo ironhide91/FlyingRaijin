@@ -12,10 +12,27 @@ namespace FlyingRaijin.Engine.Wire
 {
     internal class PeerActorBuilder : ActorBuilderBase<MetaData, DnsEndPoint, ReadOnlyMemory<byte>, ChannelWriter<CompletePiece>>
     {
-        internal override IActorRef Build(IUntypedActorContext context)
+        private readonly Props ctor;
+
+        internal PeerActorBuilder()
         {
-            return context.ActorOf(Props.Create(() => new PeerActor(Value1, Value2, Value3, Value4)));
+            ctor = Props.Create(() => new PeerActor(Value1, Value2, Value3, Value4));
         }
+
+        //internal override Props Build()
+        //{
+        //    return ctor;
+        //}
+
+        //internal override IActorRef Build(IUntypedActorContext context)
+        //{
+        //    return context.ActorOf(Props.Create(() => new PeerActor(Value1, Value2, Value3, Value4)));
+        //}
+
+        //internal override IActorRef Build(ActorSystem system)
+        //{
+        //    return system.ActorOf(Props.Create(() => new PeerActor(Value1, Value2, Value3, Value4)));
+        //}
     }
 
     internal partial class PeerActor : ReceiveActor
@@ -97,20 +114,6 @@ namespace FlyingRaijin.Engine.Wire
 
             // notify handshake in progress
             wireProtocolActor.Tell(HandshakeInitiated.Instance);
-        }
-
-        private IEnumerable<ArraySegment<byte>> ToArraySegment(ReadOnlySequence<byte> ros)
-        {
-            List<ArraySegment<byte>> arraySegment = new List<ArraySegment<byte>>();
-
-            var temp = ros.GetEnumerator();
-
-            while (temp.MoveNext())
-            {
-                arraySegment.Add(temp.Current.Span.ToArray());
-            }
-
-            return arraySegment;
         }
     }
 }

@@ -1,9 +1,12 @@
-﻿using System;
-
-namespace FlyingRaijin.Engine.Wire
+﻿namespace FlyingRaijin.Engine.Wire
 {
-    internal sealed class PieceMessage : ByteBufferManager, IMessage
+    internal sealed class PieceMessage : IMessage
     {
+        public PieceMessage()
+        {
+
+        }
+
         public MessageId MessageId { get { return MessageId.Piece; } }
 
         /// <summary>
@@ -17,8 +20,8 @@ namespace FlyingRaijin.Engine.Wire
         public int Begin { get; set; }
 
         /// <summary>
-        /// block of data, which is a subset of the piece specified by index
+        /// length of the block
         /// </summary>
-        public ReadOnlyMemory<byte> Block { get { return Buffer; } }
+        public int Length { get; set; }
     }
 }

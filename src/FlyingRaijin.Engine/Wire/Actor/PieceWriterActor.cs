@@ -1,4 +1,5 @@
 ﻿using Akka.Actor;
+using FlyingRaijin.Engine.Bencode;
 using FlyingRaijin.Engine.Torrent;
 using System;
 using System.Text;
@@ -6,14 +7,6 @@ using System.Threading.Channels;
 
 namespace FlyingRaijin.Engine.Wire
 {
-    internal class PieceWriterActorBuilder : ActorBuilderBase<MetaData, ChannelReader<PieceMessage>, ChannelWriter<CompletePiece>>
-    {
-        internal override IActorRef Build(IUntypedActorContext context)
-        {
-            return context.ActorOf(Props.Create(() => new PieceWriterActor(Value1, Value2, Value3)));
-        }
-    }
-
     internal class PieceWriterActor : ReceiveActor, IWithTimers
     {
         internal PieceWriterActor(
@@ -28,12 +21,7 @@ namespace FlyingRaijin.Engine.Wire
             pieceDictionary = new PieceDictionary((int)torrent.PieceLength);
 
             Receive<MonitorPipeForData>(_ => OnMonitorChannelReaderForData());
-        }
-
-        private readonly MetaData torrent;
-        private readonly ChannelReader<PieceMessage> pieceMessageReader;
-        private readonly ChannelWriter<CompletePiece> globalPieceBlockWriter;
-        private PieceDictionary pieceDictionary;
+        }        
 
         public ITimerScheduler Timers { get; set; }
 
@@ -43,7 +31,7 @@ namespace FlyingRaijin.Engine.Wire
                 nameof(MonitorChannelReaderForData),
                 MonitorChannelReaderForData.Instance,
                 TimeSpan.FromSeconds(60),
-                TimeSpan.FromSeconds(20));
+                TimeSpan.FromSeconds(10));
         }
 
         private void OnMonitorChannelReaderForData()
@@ -52,40 +40,56 @@ namespace FlyingRaijin.Engine.Wire
 
             while (maxMessageToProcess != 0 && pieceMessageReader.TryRead(out PieceMessage message))
             {
-                pieceDictionary.Add(message);
+                IRequestPieceBlock pieceBlock = pieceDictionary;
 
-                foreach (var piece in pieceDictionary.Pieces)
+                pieceBlock.Request(message.Index, out PieceBlock requestedBlock);
+
+                if (requestedBlock.IsPending)
                 {
-                    if (piece.Value.PendingPieceLength > 0)
-                    {
-                        continue;
-                    }
-
-                    // we got all blocks in this piece
-                    // now compute hash
-                    var bytes = ByteArrayPool.Rent(20);
-                    Span<byte> hash = bytes;
-                    Bencode.BencodeEngine.GenerateHash(piece.Value.Buffer.Span, hash);
-
-                    // should match hash from torrent metadata
-                    if (torrent.PieceHash.Sha1Checksums[piece.Key].Span == hash)
-                    {
-                        var sb = new StringBuilder();
-
-                        for (int i = 0; i < hash.Length; i++)
-                        {
-                            sb.Append(hash[i].ToString("X2"));
-                        }
-
-                        // send to GlobalPieceWriter
-                        globalPieceBlockWriter.TryWrite(new CompletePiece(torrent, message.Index, piece.Value));
-                    }
-
-                    ByteArrayPool.Return(bytes);
+                    continue;
                 }
+
+                // we got all blocks in this piece
+                // now compute hash
+                var bytes = ByteArrayPool.Rent(20);
+                Span<byte> hash = bytes;
+                BencodeEngine.GenerateHash(requestedBlock.Buffer.Span, hash);
+
+                // should match hash from torrent metadata
+                if (torrent.PieceHash.Sha1Checksums[requestedBlock.Index].Span == hash)
+                {
+                    var sb = new StringBuilder();
+
+                    for (int i = 0; i < hash.Length; i++)
+                    {
+                        sb.Append(hash[i].ToString("X2"));
+                    }
+
+                    PieceMessagePoolPolicy.Instance.Return(message);
+
+                    // send to GlobalPieceWriter
+                    globalPieceBlockWriter.TryWrite(new CompletePiece(torrent, message.Index, requestedBlock));
+                }
+
+                ByteArrayPool.Return(bytes);
 
                 --maxMessageToProcess;
             }            
+        }
+
+        private readonly MetaData torrent;
+        private readonly ChannelReader<PieceMessage> pieceMessageReader;
+        private readonly ChannelWriter<CompletePiece> globalPieceBlockWriter;
+        private PieceDictionary pieceDictionary;
+    }
+
+    internal class PieceWriterActorBuilder : ActorBuilderBase<MetaData, ChannelReader<PieceMessage>, ChannelWriter<CompletePiece>>
+    {
+        private readonly Props ctor;
+
+        internal PieceWriterActorBuilder()
+        {
+            ctor = Props.Create(() => new PieceWriterActor(Value1, Value2, Value3));
         }
     }
 }

@@ -4,6 +4,7 @@ using FlyingRaijin.Engine.Torrent;
 using System;
 using System.Buffers;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -66,6 +67,7 @@ namespace FlyingRaijin.Engine.Bencode
             return null;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static void GenerateHash(ReadOnlySpan<byte> source, Span<byte> destination)
         {
             sha1Managed.TryComputeHash(source, destination, out _);

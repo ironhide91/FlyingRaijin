@@ -10,10 +10,25 @@ namespace FlyingRaijin.Engine.Wire
 {
     internal class TcpActorBuilder : ActorBuilderBase<DnsEndPoint, PipeWriter>
     {
-        internal override IActorRef Build(IUntypedActorContext context)
+        internal TcpActorBuilder() : base()
         {
-            return context.ActorOf(Props.Create(() => new TcpActor(Value1, Value2)));
+            Ctor = Props.Create(() => new TcpActor(Value1, Value2));
         }
+
+        //internal override Props Build()
+        //{
+        //    return ctor;
+        //}
+
+        //internal override IActorRef Build(IUntypedActorContext context)
+        //{
+        //    return context.ActorOf(ctor);
+        //}
+
+        //internal override IActorRef Build(ActorSystem system)
+        //{
+        //    return system.ActorOf(ctor);
+        //}
     }
 
     internal class TcpActor : ReceiveActor
@@ -23,35 +38,68 @@ namespace FlyingRaijin.Engine.Wire
             this.endPoint = endPoint;
             this.pipeWriter = pipeWriter;
 
-            Receive<PeerConnectMessage>(message => OnConnectCommand(message));
-            Receive<CommandFailed>(message => OnCommandFailed(message));
-            Receive<ConnectionClosed>(message => OnConnectionClosed(message));
-            Receive<Connected>(message => OnConnected(message));
-            Receive<Received>(message => OnReceived(message));
-            Receive<PeerWriteMessage>(message => OnWrite(message));
+            Become(InitialBehaviour);
         }
 
         private readonly DnsEndPoint endPoint;
         private readonly PipeWriter pipeWriter;
         private IActorRef remotePeer;
 
-        private void OnConnectCommand(PeerConnectMessage command)
+        #region Actor Behaviours
+        private void InitialBehaviour()
         {
+            Receive<PeerConnectMessage>(_ => OnConnectCommand());
+        }
+
+        private void ConnectingBehaviour()
+        {
+            Receive<CommandFailed>(message => OnCommandFailed(message));
+            Receive<Connected>(message => OnConnected(message));
+        }
+
+        private void ConnectedBehaviour()
+        {
+            Receive<Received>(message => OnReceived(message));
+            Receive<CommandFailed>(message => OnCommandFailed(message));
+            Receive<ConnectionClosed>(message => OnConnectionClosed(message));
+            Receive<PeerWriteMessage>(message => OnWrite(message));
+        }
+
+        private void ConnectionClosedBehaviour()
+        {
+            Self.Tell(PoisonPill.Instance);
+        }
+
+        private void ErrorBehaviour()
+        {
+            Self.Tell(PoisonPill.Instance);
+        }
+        #endregion
+
+        #region Message Handlers
+        private void OnConnectCommand()
+        {
+            Become(ConnectingBehaviour);            
             Context.System.Tcp().Tell(new Connect(endPoint));
+            Sender.Tell(PeerConnectingMessage.Instance);
         }
 
         private void OnCommandFailed(CommandFailed message)
         {
+            Become(ErrorBehaviour);
+
             System.Diagnostics.Debug.WriteLine($"command failed on {endPoint}");
         }
 
         private void OnConnectionClosed(ConnectionClosed message)
         {
+            Become(ConnectionClosedBehaviour);
             System.Diagnostics.Debug.WriteLine($"connection closed on {endPoint}");
         }
 
         private void OnConnected(Connected message)
         {
+            Become(ConnectedBehaviour);
             Sender.Tell(new Register(Self));
             remotePeer = Sender;
             Context.Parent.Tell(PeerConnectedMessage.Instance);
@@ -74,5 +122,6 @@ namespace FlyingRaijin.Engine.Wire
             remotePeer.Tell(Write.Create(ByteString.FromBytes(message.Data.Span.ToArray())));
             System.Diagnostics.Debug.WriteLine($"written to {endPoint}");
         }
+        #endregion
     }
 }

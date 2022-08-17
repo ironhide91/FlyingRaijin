@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Buffers;
+using System.Collections.Generic;
 using System.IO.Pipelines;
 using System.Runtime.CompilerServices;
 
@@ -266,7 +267,10 @@ namespace FlyingRaijin.Engine.Wire
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static ValueTuple<bool, PieceMessage> TryParsePieceMessage(this ref SequenceReader<byte> seqReader, long length)
+        internal static ValueTuple<bool, PieceMessage> TryParsePieceMessage(
+            this ref SequenceReader<byte> seqReader,
+            IRequestPieceBlock pieceBlock,
+            long length)
         {
             bool success = false;
             PieceMessage message = default;
@@ -279,16 +283,16 @@ namespace FlyingRaijin.Engine.Wire
                 span.Reverse();
 
                 var index = BitConverter.ToInt32(span.Slice(0, 4));
-                var begin = BitConverter.ToInt32(span.Slice(4, 4));                
+                var begin = BitConverter.ToInt32(span.Slice(4, 4));
+
+                ByteArrayPool.Return(pooledBytes);
 
                 message = PieceMessagePool.Pool.Get();
                 message.Index = index;
                 message.Begin = begin;
-                message.InitializeBuffer((int)length - 8);
-                message.CopyFrom(span.Slice(9));
 
-                ByteArrayPool.Return(pooledBytes);
-
+                pieceBlock.Request(index, out PieceBlock destination);
+                destination.Write(message, span.Slice(9));
                 seqReader.Advance(RequestMessage.MessageLength);
             }
             catch (Exception e)

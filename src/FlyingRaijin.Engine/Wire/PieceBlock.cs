@@ -1,4 +1,4 @@
-﻿using System.Buffers;
+﻿using System;
 
 namespace FlyingRaijin.Engine.Wire
 {
@@ -6,26 +6,48 @@ namespace FlyingRaijin.Engine.Wire
     {
         public PieceBlock()
         {
-
+            
         }
 
-        private IMemoryOwner<byte> buffer;
-
-        internal int PendingPieceLength { get; set; }
-
-        internal void SetPendingPieceLength(int pieceLength)
+        internal int Index
         {
-            PendingPieceLength = pieceLength;
+            get
+            {
+                return index.Value;
+            }
         }
-
-        internal void Add(PieceMessage message)
+        internal bool IsPending
         {
-            var block = buffer.Memory.Span.Slice(message.Begin, message.Block.Length);
-            message.Block.Span.CopyTo(block);
-
-            PendingPieceLength -= message.Block.Length;
-
-            PieceMessagePool.Pool.Return(message);
+            get
+            {
+                return pendingPieceLength.HasValue && pendingPieceLength.Value == 0;
+            }
         }
+        internal void SetPieceIndex(int index)
+        {
+            this.index = index;
+        }
+        internal void SetPendingPieceLength(int pendingBytes)
+        {
+            pendingPieceLength = pendingBytes;
+        }
+        internal void ResetIndex()
+        {
+            index = null;
+        }
+        internal void ResetPendingPieceLength()
+        {
+            pendingPieceLength = null;
+        }
+        internal void Write(PieceMessage message, ReadOnlySpan<byte> source)
+        {
+            var destination = buffer.Memory.Span.Slice(message.Begin, message.Length);
+            source.CopyTo(destination);
+
+            pendingPieceLength =- message.Length;
+        }
+
+        private int? index;
+        private int? pendingPieceLength;
     }
 }

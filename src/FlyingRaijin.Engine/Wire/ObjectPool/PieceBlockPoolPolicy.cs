@@ -13,7 +13,8 @@ namespace FlyingRaijin.Engine.Wire
 
         public bool Return(PieceBlock obj)
         {
-            obj.SetPendingPieceLength(int.MinValue);
+            obj.ResetIndex();
+            obj.ResetPendingPieceLength();
             obj.ReleaseBuffer();
 
             return true;
