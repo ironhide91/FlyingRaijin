@@ -26,7 +26,6 @@ namespace FFlyingRaijin.Engine.Actors
         internal void Start()
         {
             engineActorSystem = ActorSystem.Create("Engine");
-
             newTorrentActor = engineActorSystem.ActorOf<NewTorrentActor>(nameof(NewTorrentActor));
             httpClientActor = engineActorSystem.ActorOf<HttpClientActor>(nameof(HttpClientActor));
             httpClientActor = engineActorSystem.ActorOf<HttpClientActor>(nameof(HttpClientActor));

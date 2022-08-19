@@ -32,14 +32,14 @@ namespace FlyingRaijin.Engine.Actors
         public TorrentManagerActor(string path)
         {
             torrentPath = path;
-
+            
             channel = Channel.CreateUnbounded<ReadOnlyMemory<byte>>(
                 new UnboundedChannelOptions()
                 {
                     SingleReader = true,
                     SingleWriter = false
                 });
-
+                
                Receive<BeginCommand>(command => OnBeginCommand());
                    Receive<FileRead>(message => OnFileRead(message));
                    Receive<MetaData>(message => OnMetaData(message));

@@ -40,6 +40,7 @@ namespace FlyingRaijin.Engine.Torrent
             return false;
         }
 
+
         internal const string RootInfoKey = "info";
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static BDictionary ReadInfo(this BDictionary bDict)
