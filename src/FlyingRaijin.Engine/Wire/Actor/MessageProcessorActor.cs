@@ -137,8 +137,6 @@ namespace FlyingRaijin.Engine.Wire
 
     internal class MessageProcessorActorBuilder : ActorBuilderBase<ChannelReader<IMessage>, ChannelWriter<PieceMessage>>
     {
-        private readonly Props ctor;
-
         internal MessageProcessorActorBuilder()
         {
             ctor = Props.Create(() => new MessageProcessorActor(Value1, Value2));

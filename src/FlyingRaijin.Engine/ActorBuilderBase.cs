@@ -4,21 +4,21 @@ namespace FlyingRaijin.Engine
 {
     internal abstract class ActorBuilderBase
     {
-        protected Props Ctor;
+        protected Props ctor;
 
         internal Props Build()
         {
-            return Ctor;
+            return ctor;
         }
 
         internal IActorRef Build(ActorSystem system)
         {
-            return system.ActorOf(Ctor);
+            return system.ActorOf(ctor);
         }
 
         internal IActorRef Build(IUntypedActorContext context)
         {
-            return context.ActorOf(Ctor);
+            return context.ActorOf(ctor);
         }
     }
 

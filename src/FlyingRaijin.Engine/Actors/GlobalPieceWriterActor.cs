@@ -1,10 +1,8 @@
 ﻿using Akka.Actor;
 using FlyingRaijin.Engine.Messages;
-using FlyingRaijin.Engine.Torrent;
 using FlyingRaijin.Engine.Wire;
 using Microsoft.Win32.SafeHandles;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Threading.Channels;
 using System.Timers;
@@ -26,7 +24,6 @@ namespace FlyingRaijin.Engine
             timer.Elapsed += Timer_Elapsed;
             
             Receive<StartPieceWriterThread>(_ => OnStartPieceWriterThread());
-            Receive<FileCreated>(message => OnFileCreated(message));
         }        
 
         private const long MaxBytesToWrite = 512000L;
@@ -39,11 +36,6 @@ namespace FlyingRaijin.Engine
                 return;
 
             timer.Start();
-        }
-
-        private void OnFileCreated(FileCreated message)
-        {
-            FileManager.Add(message.InfoHash, message.File, message.FileHandle);
         }
 
         private void Timer_Elapsed(object sender, ElapsedEventArgs e)

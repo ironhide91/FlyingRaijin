@@ -12,7 +12,7 @@ namespace FlyingRaijin.Engine.Wire
     {
         internal TcpActorBuilder() : base()
         {
-            Ctor = Props.Create(() => new TcpActor(Value1, Value2));
+            ctor = Props.Create(() => new TcpActor(Value1, Value2));
         }
 
         //internal override Props Build()

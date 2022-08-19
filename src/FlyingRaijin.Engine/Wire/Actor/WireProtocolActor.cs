@@ -1,7 +1,6 @@
 ﻿using Akka.Actor;
 using System;
 using System.Buffers;
-using System.Collections.Generic;
 using System.IO.Pipelines;
 using System.Runtime.CompilerServices;
 using System.Threading.Channels;
@@ -222,14 +221,8 @@ namespace FlyingRaijin.Engine.Wire
     }
 
     internal class WireProtocolActorBuilder :
-        ActorBuilderBase<
-            ReadOnlyMemory<byte>,
-            PipeReader,
-            IReadOnlyDictionary<int, PieceBlock>,
-            ChannelWriter<IMessage>>
+        ActorBuilderBase<ReadOnlyMemory<byte>, PipeReader, IRequestPieceBlock, ChannelWriter<IMessage>>
     {
-        private readonly Props ctor;
-
         internal WireProtocolActorBuilder()
         {
             ctor = Props.Create(() => new WireProtocolActor(Value1, Value2, Value3, Value4));

@@ -85,8 +85,6 @@ namespace FlyingRaijin.Engine.Wire
 
     internal class PieceWriterActorBuilder : ActorBuilderBase<MetaData, ChannelReader<PieceMessage>, ChannelWriter<CompletePiece>>
     {
-        private readonly Props ctor;
-
         internal PieceWriterActorBuilder()
         {
             ctor = Props.Create(() => new PieceWriterActor(Value1, Value2, Value3));

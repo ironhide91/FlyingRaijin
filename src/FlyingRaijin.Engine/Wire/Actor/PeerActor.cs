@@ -12,27 +12,10 @@ namespace FlyingRaijin.Engine.Wire
 {
     internal class PeerActorBuilder : ActorBuilderBase<MetaData, DnsEndPoint, ReadOnlyMemory<byte>, ChannelWriter<CompletePiece>>
     {
-        private readonly Props ctor;
-
         internal PeerActorBuilder()
         {
             ctor = Props.Create(() => new PeerActor(Value1, Value2, Value3, Value4));
         }
-
-        //internal override Props Build()
-        //{
-        //    return ctor;
-        //}
-
-        //internal override IActorRef Build(IUntypedActorContext context)
-        //{
-        //    return context.ActorOf(Props.Create(() => new PeerActor(Value1, Value2, Value3, Value4)));
-        //}
-
-        //internal override IActorRef Build(ActorSystem system)
-        //{
-        //    return system.ActorOf(Props.Create(() => new PeerActor(Value1, Value2, Value3, Value4)));
-        //}
     }
 
     internal partial class PeerActor : ReceiveActor

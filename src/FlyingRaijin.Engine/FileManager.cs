@@ -7,7 +7,6 @@ namespace FlyingRaijin.Engine
 {
     internal static class FileManager
     {
-
         internal static bool TryAdd(InfoHash infoHash, string file, SafeFileHandle fileHandle)
         {
             if (dict.ContainsKey(infoHash))
