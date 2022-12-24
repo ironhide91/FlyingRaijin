@@ -24,11 +24,7 @@ namespace FlyingRaijin.Engine
             timer.Elapsed += Timer_Elapsed;
             
             Receive<StartPieceWriterThread>(_ => OnStartPieceWriterThread());
-        }        
-
-        private const long MaxBytesToWrite = 512000L;
-        private readonly ChannelReader<CompletePiece> channelReaderPiece;
-        private readonly Timer timer;
+        }
 
         private void OnStartPieceWriterThread()
         {
@@ -42,7 +38,7 @@ namespace FlyingRaijin.Engine
         {
             long maxBytesWritten = 0;
 
-            while ((maxBytesWritten <= MaxBytesToWrite) && channelReaderPiece.TryRead(out CompletePiece piece))
+            while ((maxBytesWritten <= MaxBytesPerWrite) && channelReaderPiece.TryRead(out CompletePiece piece))
             {
                 var writeInfos = PieceFileHelper.GetWriteInfo(piece);
 
@@ -72,6 +68,10 @@ namespace FlyingRaijin.Engine
                     }
                 }                
             }
-        }        
+        }
+
+        private const long MaxBytesPerWrite = 512000L;
+        private readonly ChannelReader<CompletePiece> channelReaderPiece;
+        private readonly Timer timer;
     }
 }

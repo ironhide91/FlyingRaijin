@@ -2,21 +2,12 @@
 using FlyingRaijin.Engine.Messages.Peer;
 using FlyingRaijin.Engine.Torrent;
 using System;
-using System.Buffers;
-using System.Collections.Generic;
 using System.IO.Pipelines;
 using System.Net;
 using System.Threading.Channels;
 
 namespace FlyingRaijin.Engine.Wire
 {
-    internal class PeerActorBuilder : ActorBuilderBase<MetaData, DnsEndPoint, ReadOnlyMemory<byte>, ChannelWriter<CompletePiece>>
-    {
-        internal PeerActorBuilder()
-        {
-            ctor = Props.Create(() => new PeerActor(Value1, Value2, Value3, Value4));
-        }
-    }
 
     internal partial class PeerActor : ReceiveActor
     {
@@ -51,19 +42,6 @@ namespace FlyingRaijin.Engine.Wire
             Receive<PeerConnectedMessage>(_ => OnConnected());
         }
 
-        private ReadOnlyMemory<byte> handshake;
-        private readonly MetaData torrent;
-        private readonly DnsEndPoint endPoint;
-        private readonly Pipe pipe;
-        private readonly Channel<IMessage> channelMessage;
-        private readonly Channel<PieceMessage> channelPieceMessage;
-        private readonly ChannelWriter<CompletePiece> channelWriterCompletePiece;
-
-        private IActorRef tcpActor;
-        private IActorRef wireProtocolActor;
-        private IActorRef messageProcessorActor;
-        private IActorRef pieceWriterActor;
-
         private void OnConnectCommand()
         {
             var tcpActorBuilder = new TcpActorBuilder();
@@ -97,6 +75,27 @@ namespace FlyingRaijin.Engine.Wire
 
             // notify handshake in progress
             wireProtocolActor.Tell(HandshakeInitiated.Instance);
+        }
+
+        private ReadOnlyMemory<byte> handshake;
+        private readonly MetaData torrent;
+        private readonly DnsEndPoint endPoint;
+        private readonly Pipe pipe;
+        private readonly Channel<IMessage> channelMessage;
+        private readonly Channel<PieceMessage> channelPieceMessage;
+        private readonly ChannelWriter<CompletePiece> channelWriterCompletePiece;
+
+        private IActorRef tcpActor;
+        private IActorRef wireProtocolActor;
+        private IActorRef messageProcessorActor;
+        private IActorRef pieceWriterActor;
+    }
+
+    internal class PeerActorBuilder : ActorBuilderBase<MetaData, DnsEndPoint, ReadOnlyMemory<byte>, ChannelWriter<CompletePiece>>
+    {
+        internal PeerActorBuilder()
+        {
+            ctor = Props.Create(() => new PeerActor(Value1, Value2, Value3, Value4));
         }
     }
 }

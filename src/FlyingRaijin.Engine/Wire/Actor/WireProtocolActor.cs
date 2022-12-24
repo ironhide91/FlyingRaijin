@@ -25,15 +25,6 @@ namespace FlyingRaijin.Engine.Wire
             Receive<MonitorPipeForData>(_ => OnMonitorPipeForData());
         }
 
-        private readonly ReadOnlyMemory<byte> handshake;
-        private readonly PipeReader pipeReader;
-        IRequestPieceBlock pieceBlock;
-        private readonly ChannelWriter<IMessage> channelWriterMessage;
-
-        private HandshakeStatus handshakeStatus;
-        private MessageId currentMessageId;
-        private int pendingMessageLength;
-
         public ITimerScheduler Timers { get; set; }
 
         protected override void PreStart()
@@ -78,6 +69,7 @@ namespace FlyingRaijin.Engine.Wire
             ReadPipe();
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void ReadPipe()
         {
             if (!pipeReader.TryRead(out ReadResult result))
@@ -217,7 +209,16 @@ namespace FlyingRaijin.Engine.Wire
             }
 
             pipeReader.AdvanceTo(seqReader.Position);
-        }       
+        }
+
+        private readonly ReadOnlyMemory<byte> handshake;
+        private readonly PipeReader pipeReader;
+        IRequestPieceBlock pieceBlock;
+        private readonly ChannelWriter<IMessage> channelWriterMessage;
+
+        private HandshakeStatus handshakeStatus;
+        private MessageId currentMessageId;
+        private int pendingMessageLength;
     }
 
     internal class WireProtocolActorBuilder :

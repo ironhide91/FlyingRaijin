@@ -16,6 +16,7 @@ namespace FlyingRaijin.Engine.Wire
                 return index.Value;
             }
         }
+
         internal bool IsPending
         {
             get
@@ -23,22 +24,27 @@ namespace FlyingRaijin.Engine.Wire
                 return pendingPieceLength.HasValue && pendingPieceLength.Value == 0;
             }
         }
+
         internal void SetPieceIndex(int index)
         {
             this.index = index;
         }
+
         internal void SetPendingPieceLength(int pendingBytes)
         {
             pendingPieceLength = pendingBytes;
         }
+
         internal void ResetIndex()
         {
             index = null;
         }
+
         internal void ResetPendingPieceLength()
         {
             pendingPieceLength = null;
         }
+
         internal void Write(PieceMessage message, ReadOnlySpan<byte> source)
         {
             var destination = buffer.Memory.Span.Slice(message.Begin, message.Length);
