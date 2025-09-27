@@ -30,14 +30,13 @@ namespace FlyingRaijin.Engine.Wire
             
             writer.FlushAsync();
         }
-
+        
         internal static bool IsValidHandshakeResponse(
             ref SequenceReader<byte> hsReader,
             ref SequenceReader<byte> seqReader)
         {
             long consumed = 0;
 
-            // Protocol Length Prefix(1) + Protcol Length(19) = 20 bytes
             var failed = !SequenceEquals(ref hsReader, ref seqReader, ProtocolIdentifierBegin, ProtocolIdentifierEnd);
             if (failed)
                 return false;
@@ -59,8 +58,8 @@ namespace FlyingRaijin.Engine.Wire
             failed = !SequenceHasEnough(ref seqReader, 20);
             if (failed)
                 return false;
-            consumed += 20;
-
+                
+            consumed += 20;           
             seqReader.Advance(consumed);
 
             return true;
@@ -172,7 +171,6 @@ namespace FlyingRaijin.Engine.Wire
 
                 if (!s.Equals(d))
                     return false;
-
             }
 
             return true;

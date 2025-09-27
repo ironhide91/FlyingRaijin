@@ -12,7 +12,7 @@ namespace FlyingRaijin.Engine.Actors
         }
 
         private void OnReadFileCommand(FileReadCommand command)
-        {            
+        {
             var handle = File.OpenHandle(command.Path);
             var length = RandomAccess.GetLength(handle);
 

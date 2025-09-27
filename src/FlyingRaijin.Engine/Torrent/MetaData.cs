@@ -29,7 +29,6 @@ namespace FlyingRaijin.Engine.Torrent
                  Comment = dictionary.ReadComment();
                CreatedBy = dictionary.ReadCreatedBy();
                 Encoding = dictionary.ReadEncoding();
-
                PieceHash = dictionary.ReadPieceHash();
                IsPrivate = dictionary.ReadIsPrivateFlag();
              PieceLength = dictionary.ReadPieceLength();

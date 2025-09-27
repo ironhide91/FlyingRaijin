@@ -1,4 +1,3 @@
-﻿using Akka.Actor;
 using FlyingRaijin.Engine.Messages;
 using FlyingRaijin.Engine.Messages.Peer;
 using FlyingRaijin.Engine.Torrent;
@@ -62,7 +61,7 @@ namespace FlyingRaijin.Engine.Actors
                 if (!peers.Contains(peer))
                 {
                     peers.Add(peer);
-
+                    
                     var peerActorBuilder = new PeerActorBuilder();
                     peerActorBuilder.With(torrent);
                     peerActorBuilder.With(peer);
@@ -70,6 +69,7 @@ namespace FlyingRaijin.Engine.Actors
 
                     var peerActor = peerActorBuilder.Build(Context);
                     peerActor.Tell(PeerConnectMessage.Instance);
+                    
                     break;
                 }
             }

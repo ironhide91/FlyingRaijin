@@ -42,7 +42,7 @@ namespace FlyingRaijin.Engine.Torrent
             var info = bDict.GetValue<BDictionary>(RootInfoKey);
 
             if (info == null)
-                return PieceHash.Empty;
+              return PieceHash.Empty;
 
             var result = info.GetValue<BString>(InfoPiecesKey);
 
@@ -81,6 +81,39 @@ namespace FlyingRaijin.Engine.Torrent
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static FileUnitCollection ReadFiles(this BDictionary dict)
+        {
+            var infoDict = dict.GetValue<BDictionary>(RootInfoKey);
+
+            if (infoDict.ContainsKey(InfoMultiFiles))
+            {
+                return infoDict.ReadMultiFiles();
+            }
+
+            var singleFile = infoDict.ReadSingleFile();
+
+            var files = new List<FileUnit>() { singleFile };
+
+            var collection = ImmutableList.CreateRange(files);
+
+            return new FileUnitCollection(collection);
+        }
+
+        private const string InfoMultiFileNameKey = "name";
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static string ReadDirectoryName(this BDictionary dict)
+        {
+            var infoDict = dict.GetValue<BDictionary>(RootInfoKey);
+
+            if (infoDict.ContainsKey(InfoMultiFiles))
+            {
+                return infoDict.GetValue<BString>(InfoMultiFileNameKey).StringValue;
+            }
+
+            return string.Empty;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static FileUnitCollection ReadFiles(this BDictionary dict)
         {
             var infoDict = dict.GetValue<BDictionary>(RootInfoKey);
 
