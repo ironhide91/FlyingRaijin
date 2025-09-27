@@ -98,9 +98,9 @@ namespace FlyingRaijin.Engine.Torrent
             return new FileUnitCollection(collection);
         }
 
-        private const string InfoMultiFileNameKey = "name";
+        private const string InfoMultiFileNameKey1 = "name";
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string ReadDirectoryName(this BDictionary dict)
+        public static string ReadDirectoryName1(this BDictionary dict)
         {
             var infoDict = dict.GetValue<BDictionary>(RootInfoKey);
 
@@ -113,7 +113,7 @@ namespace FlyingRaijin.Engine.Torrent
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static FileUnitCollection ReadFiles(this BDictionary dict)
+        public static FileUnitCollection ReadFiles1(this BDictionary dict)
         {
             var infoDict = dict.GetValue<BDictionary>(RootInfoKey);
 

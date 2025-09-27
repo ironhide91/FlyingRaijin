@@ -26,14 +26,14 @@ namespace FlyingRaijin.Controller
 
             clientActorSystem = ActorSystem.Create("Client", config);
 
-            newTorrentClientActorRef = clientActorSystem.ActorOf<NewTorrentClientActor>();
+            //newTorrentClientActorRef = clientActorSystem.ActorOf<NewTorrentClientActor>();
         }
 
         public static TheController Instance { get { return lazy.Value; } }
 
         private static Lazy<TheController> lazy = new Lazy<TheController>(() => new TheController());
         private readonly ActorSystem clientActorSystem;
-        private readonly IActorRef newTorrentClientActorRef;
+        //private readonly IActorRef newTorrentClientActorRef;
 
         public void Add(string filePath)
         {
@@ -44,7 +44,7 @@ namespace FlyingRaijin.Controller
             }
             System.Diagnostics.Debug.WriteLine("");
 
-            newTorrentClientActorRef.Tell(new NewTorrentCommand(filePath));
+            //newTorrentClientActorRef.Tell(new NewTorrentCommand(filePath));
         }
 
         public void Dispose()

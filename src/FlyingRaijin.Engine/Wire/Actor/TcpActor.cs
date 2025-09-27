@@ -12,7 +12,7 @@ namespace FlyingRaijin.Engine.Wire
     {
         internal TcpActorBuilder() : base()
         {
-            Ctor = Props.Create(() => new TcpActor(Value1, Value2));
+            //Ctor = Props.Create(() => new TcpActor(Value1, Value2));
         }
 
         //internal override Props Build()
@@ -31,9 +31,9 @@ namespace FlyingRaijin.Engine.Wire
         //}
     }
 
-    internal class TcpActor : ReceiveActor
+    internal class TcpActor1 : ReceiveActor
     {
-        public TcpActor(DnsEndPoint endPoint, PipeWriter pipeWriter)
+        public TcpActor1(DnsEndPoint endPoint, PipeWriter pipeWriter)
         {
             this.endPoint = endPoint;
             this.pipeWriter = pipeWriter;

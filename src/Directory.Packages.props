@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <ItemGroup>
+    <PackageVersion Include="Akka" Version="1.5.50" />
+    <PackageVersion Include="Akka.Remote" Version="1.5.50" />
+	<PackageVersion Include="Akka.Streams" Version="1.5.50" />
+	<PackageVersion Include="Akka.TestKit.Xunit2" Version="1.5.50" />
+    <PackageVersion Include="Topshelf" Version="4.3.0" />
+	<PackageVersion Include="FluentAssertions" Version="8.7.0" />
+	<PackageVersion Include="xunit" Version="2.9.3" />
+	<PackageVersion Include="xunit.extensibility.core" Version="2.9.3" />
+	<PackageVersion Include="IdGen" Version="2.0.0" />
+	<PackageVersion Include="Microsoft.Extensions.ObjectPool" Version="8.0.0" />
+	<PackageVersion Include="Microsoft.IO.RecyclableMemoryStream" Version="3.0.0" />
+	<PackageVersion Include="Serilog" Version="3.1.0" />
+	<PackageVersion Include="Serilog.Sinks.File" Version="5.0.0" />
+	<PackageVersion Include="System.IO.Pipelines" Version="7.0.0" />
+	<PackageVersion Include="System.Threading.Channels" Version="9.0.9" />
+  </ItemGroup>
+</Project>

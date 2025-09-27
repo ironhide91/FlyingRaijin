@@ -232,7 +232,7 @@ namespace FlyingRaijin.Engine.Wire
 
         internal WireProtocolActorBuilder()
         {
-            ctor = Props.Create(() => new WireProtocolActor(Value1, Value2, Value3, Value4));
+            //ctor = Props.Create(() => new WireProtocolActor(Value1, Value2, Value3, Value4));
         }
     }
 }

@@ -43,7 +43,7 @@ namespace FlyingRaijin.Engine
 
         private void OnFileCreated(FileCreated message)
         {
-            FileManager.Add(message.InfoHash, message.File, message.FileHandle);
+            //FileManager.Add(message.InfoHash, message.File, message.FileHandle);
         }
 
         private void Timer_Elapsed(object sender, ElapsedEventArgs e)
